@@ -1,0 +1,19 @@
+
+Create a character sheet server, with AI voice integration, and a web interface for managing characters.
+
+Use the following technologies:
+- Python
+- FastAPI
+- hypercorn for the server, with the uv loop
+- PostgreSQL to persist character data
+- HTML
+- JavaScript
+- WebRTC
+
+
+The server should have the following features:
+- Create, read, update, and delete character sheets
+- AI voice integration for setting values on the character sheet
+- Web interface for viewing and editing character sheets
+
+The rules system is detailed in the file rules.md.

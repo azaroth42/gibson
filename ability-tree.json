@@ -1,0 +1,831 @@
+{
+    "playbooks": {
+        "driver": {
+            "cost": 0,
+            "children": [
+                {
+                    "sweet-ride": {
+                        "cost": 2,
+                        "description": "Sweet Ride: When you Hit the Streets in your vehicle, take +1.",
+                        "children": []
+                    }
+                }
+            ]
+        },
+        "face": {
+            "cost": 0,
+            "children": [
+                {
+                    "mask": {
+                        "cost": 3,
+                        "description": "If you are in a Mask, and roll 12+ on Fast Talk, you can increase or decrease a relevant countdown clock. The GM will tell you which clock, you decide to move it up or down.",
+                        "children": []
+                    }
+                }
+            ]
+        },
+        "netrunner": {
+            "cost": 0,
+            "children": [
+                {
+                    "quick-hack": {
+                        "cost": 3,
+                        "description": "Quick Hack",
+                        "children": []
+                    }
+                }
+            ]
+        },
+        "investigator": {
+            "cost": 0,
+            "children": [
+                {
+                    "something": {
+                        "cost": 3,
+                        "description": "something",
+                        "children": []
+                    }
+                }
+            ]
+        },
+        "killer": {
+            "cost": 0,
+            "children": []
+        },
+        "tech": {
+            "cost": 0,
+            "children": []
+        },
+        "infiltrator": {
+            "cost": 0,
+            "children": []
+        },
+        "razor": {
+            "cost": 0,
+            "children": []
+        },
+        "streamer": {
+            "cost": 0,
+            "children": [
+                {
+                    "Dedicated Followers": {
+                        "cost": 3,
+                        "description": "You are known for a particular sort of stream. When you buy this move pick one of the following to gain temporary Influence when Live and on the Air in certain circumstances. \u2022\tCombat Vlogger: In a firefight, temporarily gain 3 Influence \u2022\tHigh Speed: In a vehicle, temporarily gain 3 Influence \u2022\tPenetration: In a high security area, temporarily gain 3 Influence \u2022\tBlackhat: Whenever a friendly Netrunner does something obvious to help the group, temporarily gain 1 Influence \u2022\tMaven: In a social situation, temporarily gain 3 Influence \u2022\tRocker: If you are actively being entertaining by Performing your Art, temporarily gain 5 Influence and an extra hold for Perform",
+                        "children": []
+                    }
+                }
+            ]
+        },
+        "juicer": {
+            "cost": 0,
+            "children": []
+        },
+        "courier": {
+            "cost": 0,
+            "children": [
+                {
+                    "something": {
+                        "cost": 3,
+                        "description": "something",
+                        "children": []
+                    }
+                }
+            ]
+        },
+        "cyberware": {
+            "cost": 0,
+            "children": []
+        },
+        "gear": {
+            "cost": 0,
+            "children": []
+        },
+        "combat": {
+            "cost": 0,
+            "children": []
+        }
+    },
+    "mix-it-up": {
+        "cost": 0,
+        "children": [
+            {
+                "damage1": {
+                    "cost": 1,
+                    "description": "Base damage is d6+1",
+                    "children": [
+                        {
+                            "option1": {
+                                "cost": 1,
+                                "description": "Add option: Target drops an item they\u2019re holding",
+                                "children": []
+                            }
+                        },
+                        {
+                            "stat-damage": {
+                                "cost": 2,
+                                "description": "Add +Tough damage",
+                                "children": [
+                                    {
+                                        "stat-damage-swap": {
+                                            "cost": 2,
+                                            "description": "Swap above stat to any other for damage",
+                                            "children": [
+                                                {
+                                                    "stat-move-swap": {
+                                                        "cost": 3,
+                                                        "description": "Swap also for the move (explain!)",
+                                                        "children": []
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "option2": {
+                                            "cost": 2,
+                                            "description": "Add option: Target is stunned momentarily",
+                                            "children": [
+                                                {
+                                                    "option3": {
+                                                        "cost": 2,
+                                                        "description": "Add option: Target\u2019s speed is reduced to zero",
+                                                        "children": []
+                                                    }
+                                                },
+                                                {
+                                                    "free-option": {
+                                                        "cost": 3,
+                                                        "description": "Add an option on 10+ for free",
+                                                        "children": []
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "damage2": {
+                                "cost": 2,
+                                "description": "d6+2 damage",
+                                "children": [
+                                    {
+                                        "damage3": {
+                                            "cost": 3,
+                                            "description": "2d6 damage",
+                                            "children": [
+                                                {
+                                                    "damage4": {
+                                                        "cost": 3,
+                                                        "description": "2d6+2 damage",
+                                                        "children": []
+                                                    }
+                                                },
+                                                {
+                                                    "damage-die": {
+                                                        "cost": 3,
+                                                        "description": "First d6 is a d8",
+                                                        "children": []
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "target-reload": {
+                    "cost": 3,
+                    "description": "+1 target, or -reload",
+                    "children": []
+                }
+            },
+            {
+                "piercing1": {
+                    "cost": 2,
+                    "description": "1 piercing",
+                    "children": [
+                        {
+                            "piercing2": {
+                                "cost": 2,
+                                "description": "2 piercing",
+                                "children": [
+                                    {
+                                        "piercing3": {
+                                            "cost": 3,
+                                            "description": "3 piercing",
+                                            "children": []
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "reroll": {
+                                "cost": 3,
+                                "description": "+Reroll",
+                                "children": []
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "armor1": {
+                    "cost": 1,
+                    "description": "+2 Armor",
+                    "children": [
+                        {
+                            "armor2": {
+                                "cost": 2,
+                                "description": "+4 Armor (total)",
+                                "children": []
+                            }
+                        },
+                        {
+                            "armor-complication": {
+                                "cost": 2,
+                                "description": "Gain the move Out of the Frying Pan",
+                                "children": []
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "reckless": {
+                    "cost": 2,
+                    "description": "Gain the move Reckless.",
+                    "children": []
+                }
+            },
+            {
+                "criticals": {
+                    "cost": 1,
+                    "description": "Gain the move Criticals.",
+                    "children": []
+                }
+            }
+        ]
+    },
+    "fight-another-day": {
+        "cost": 0,
+        "children": []
+    },
+    "act-under-pressure": {
+        "cost": 0,
+        "children": [
+            {
+                "sneaky": {
+                    "cost": 1,
+                    "description": "Sneaky: Take +1 when using AUP for stealth",
+                    "children": [
+                        {
+                            "surveillance": {
+                                "cost": 2,
+                                "description": "Gain the move: Surveillance",
+                                "children": []
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "backstab": {
+                    "cost": 2,
+                    "description": "Gain the move: Backstab",
+                    "children": [
+                        {
+                            "backstab-option1": {
+                                "cost": 2,
+                                "description": "+1 ongoing vs target",
+                                "children": []
+                            }
+                        },
+                        {
+                            "backstab-option2": {
+                                "cost": 3,
+                                "description": "You remain hidden (explain how)",
+                                "children": [
+                                    {
+                                        "backstab-option3": {
+                                            "cost": 2,
+                                            "description": "Ask an Assess question after the attack",
+                                            "children": []
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "sniper": {
+                                "cost": 3,
+                                "description": "If you are alone and set up a hide in advance, you pick an additional option for Backstab",
+                                "children": []
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "trapsmith": {
+                    "cost": 1,
+                    "description": "Trapsmith: Take +1 when using AUP to disable traps or dangerous devices",
+                    "children": [
+                        {
+                            "trapsmith-option1": {
+                                "cost": 2,
+                                "description": "You are not affected by failing to disable a trap or device",
+                                "children": []
+                            }
+                        },
+                        {
+                            "trapsmith-option2": {
+                                "cost": 2,
+                                "description": "When you bypass or disable a trap or device, gain [intel]",
+                                "children": []
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "ninja": {
+                    "cost": 1,
+                    "description": "Ninja: Take +1 when using AUP for acrobatic or athletic stunts",
+                    "children": [
+                        {
+                            "outta-here": {
+                                "cost": 2,
+                                "description": "Gain the move: Outta Here",
+                                "children": []
+                            }
+                        },
+                        {
+                            "fast": {
+                                "cost": 2,
+                                "description": "Fast: You act first in combat, as if you had Synth Nerves",
+                                "children": []
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "thief": {
+                    "cost": 1,
+                    "description": "Thief: Take +1 when using AUP to steal something",
+                    "children": [
+                        {
+                            "thief-bonus": {
+                                "cost": 2,
+                                "description": "Gain +1 [gear] or credits when you successfully steal something",
+                                "children": []
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "first-aid": {
+        "cost": 0,
+        "children": [
+            {
+                "heal1": {
+                    "cost": 1,
+                    "description": "Heal d6+Cool+2 hp",
+                    "children": [
+                        {
+                            "heal2": {
+                                "cost": 2,
+                                "description": "Heal 2d6+Cool+2 hp",
+                                "children": [
+                                    {
+                                        "heal3": {
+                                            "cost": 2,
+                                            "description": "Heal 2d6+Cool+4 hp",
+                                            "children": [
+                                                {
+                                                    "heal4": {
+                                                        "cost": 3,
+                                                        "description": "Heal 3d6+Cool+2 hp",
+                                                        "children": []
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "heal5": {
+                                            "cost": 2,
+                                            "description": "(Juicer only) Heal traumatic injuries (with medical gear)",
+                                            "children": [
+                                                {
+                                                    "heal6": {
+                                                        "cost": 3,
+                                                        "description": "(Juicer only) Install cyberware (with right facilities)",
+                                                        "children": []
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "research": {
+        "cost": 0,
+        "children": [
+            {
+                "research1": {
+                    "cost": 1,
+                    "description": "On a 10+, hold 1. Spend it to +1 forward when you act on the info",
+                    "children": []
+                }
+            },
+            {
+                "specialized": {
+                    "cost": 1,
+                    "description": "Specialized: You have a specialization from the list below. If you are researching a topic you have a specialization for, before you roll, choose to either take +1 on the roll, or if successful gain an additional [intel]. \u2022\tWeapons and Armor \u2022\tCybernetics \u2022\tThe Matrix, Software and Decks \u2022\tVehicles, Drones and Geography \u2022\tTechnology (other than above) \u2022\tStreet Politics, People and Places \u2022\tCorporate Politics, People and Places",
+                    "children": [
+                        {
+                            "specialized2": {
+                                "cost": 2,
+                                "description": "Gain another specialization (repeatable)",
+                                "children": []
+                            }
+                        },
+                        {
+                            "specialized3": {
+                                "cost": 2,
+                                "description": "On a 10+, hold 2 for your specialization.",
+                                "children": []
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "rq1": {
+                    "cost": 1,
+                    "description": "Add: Who or what is ___ most valuable to?",
+                    "children": []
+                }
+            },
+            {
+                "rq2": {
+                    "cost": 1,
+                    "description": "Add: What is the relationship between ___ and ___?",
+                    "children": []
+                }
+            },
+            {
+                "rq3": {
+                    "cost": 1,
+                    "description": "Add: What should I be careful about with ___?",
+                    "children": []
+                }
+            },
+            {
+                "rq4": {
+                    "cost": 1,
+                    "description": "Add: How would I fix, improve or help ___?",
+                    "children": []
+                }
+            },
+            {
+                "rq5": {
+                    "cost": 1,
+                    "description": "Add: What is the historical significance of ___ ?",
+                    "children": []
+                }
+            }
+        ]
+    },
+    "assess": {
+        "cost": 0,
+        "children": [
+            {
+                "aq": {
+                    "cost": 2,
+                    "description": "Ask an additional Question on a hit",
+                    "children": []
+                }
+            },
+            {
+                "aq1": {
+                    "cost": 1,
+                    "description": "Add: Who\u2019s really in control here?",
+                    "children": []
+                }
+            },
+            {
+                "aq2": {
+                    "cost": 1,
+                    "description": "Add: What is my enemy\u2019s true position?",
+                    "children": []
+                }
+            },
+            {
+                "aq3": {
+                    "cost": 1,
+                    "description": "Add: Where did they go?",
+                    "children": []
+                }
+            },
+            {
+                "aq4": {
+                    "cost": 1,
+                    "description": "Add: How can it be disabled?",
+                    "children": []
+                }
+            },
+            {
+                "aq5": {
+                    "cost": 1,
+                    "description": "Add: Who/What were they and how long ago was it?",
+                    "children": []
+                }
+            },
+            {
+                "aq6": {
+                    "cost": 1,
+                    "description": "Add: Who might be behind these events?",
+                    "children": []
+                }
+            },
+            {
+                "aq7": {
+                    "cost": 1,
+                    "description": "Add: When and where will the next related event occur?",
+                    "children": []
+                }
+            }
+        ]
+    },
+    "fast-talk": {
+        "cost": 0,
+        "children": [
+            {
+                "ftq": {
+                    "cost": 1,
+                    "description": "Ask a Question when using Fast Talk and gain 2 questions from list",
+                    "children": [
+                        {
+                            "ftq1": {
+                                "cost": 1,
+                                "description": "Add another Question from the list (repeatable)",
+                                "children": []
+                            }
+                        },
+                        {
+                            "ftq2": {
+                                "cost": 2,
+                                "description": ":Ask two Questions on a hit",
+                                "children": []
+                            }
+                        },
+                        {
+                            "ft-intel": {
+                                "cost": 2,
+                                "description": "On a hit, gain [intel]",
+                                "children": []
+                            }
+                        },
+                        {
+                            "heres-the-plan": {
+                                "cost": 2,
+                                "description": "Gain the move: Here\u2019s the Plan",
+                                "children": []
+                            }
+                        },
+                        {
+                            "perform": {
+                                "cost": 2,
+                                "description": "Gain the move: Perform",
+                                "children": [
+                                    {
+                                        "memorable": {
+                                            "cost": 1,
+                                            "description": "Gain the move: Memorable",
+                                            "children": [
+                                                {
+                                                    "rockstar": {
+                                                        "cost": 2,
+                                                        "description": "Gain the move: Rockstar",
+                                                        "children": []
+                                                    }
+                                                },
+                                                {
+                                                    "endorsed": {
+                                                        "cost": 2,
+                                                        "description": "Gain the move: Endorsed",
+                                                        "children": []
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "ta-dah": {
+                                            "cost": 2,
+                                            "description": "Gain the move: Ta-Dah!",
+                                            "children": [
+                                                {
+                                                    "witty-repartee": {
+                                                        "cost": 2,
+                                                        "description": "Gain the move: Witty Repartee",
+                                                        "children": []
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "heard-of-me": {
+                                            "cost": 2,
+                                            "description": "Gain the move: But You HAVE Heard of Me",
+                                            "children": []
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "negotiator": {
+                                "cost": 2,
+                                "description": "Gain the move: Negotiator",
+                                "children": [
+                                    {
+                                        "neg-option1": {
+                                            "cost": 1,
+                                            "description": "Add option: The employer is identifiable",
+                                            "children": []
+                                        }
+                                    },
+                                    {
+                                        "neg-option2": {
+                                            "cost": 2,
+                                            "description": "On a hit, pick one more option",
+                                            "children": []
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "hit-the-streets": {
+        "cost": 0,
+        "children": [
+            {
+                "contacts": {
+                    "cost": 1,
+                    "description": "Declare another contact. This can be done at any time without a roll, just pay the XP cost. You can get help from them as if you had rolled a 10+",
+                    "children": []
+                }
+            },
+            {
+                "followers": {
+                    "cost": 1,
+                    "description": "Gain 1 group of Followers (repeatable)",
+                    "children": [
+                        {
+                            "hustler": {
+                                "cost": 2,
+                                "description": "Gain the move: Hustler",
+                                "children": [
+                                    {
+                                        "hustle-option1": {
+                                            "cost": 2,
+                                            "description": "You can exchange a Credit gained for [gear] or [intel]",
+                                            "children": []
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "good-for-it": {
+                    "cost": 1,
+                    "description": "Good for it: You can pay the extra cost later instead",
+                    "children": [
+                        {
+                            "hit-forward": {
+                                "cost": 1,
+                                "description": "On a 10+, take +1 forward for the next time you Hit the Streets.",
+                                "children": []
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "read-the-terrain": {
+                    "cost": 2,
+                    "description": "Gain the move: Read the Terrain",
+                    "children": []
+                }
+            }
+        ]
+    },
+    "assist": {
+        "cost": 0,
+        "children": []
+    },
+    "do-science": {
+        "cost": 0,
+        "children": []
+    },
+    "life": {
+        "cost": 0,
+        "children": [
+            {
+                "hp1": {
+                    "cost": 1,
+                    "description": "27+Tough HP",
+                    "children": [
+                        {
+                            "hp2": {
+                                "cost": 2,
+                                "description": "29+Tough HP",
+                                "children": [
+                                    {
+                                        "hp3": {
+                                            "cost": 2,
+                                            "description": "32+Tough HP",
+                                            "children": [
+                                                {
+                                                    "hp4": {
+                                                        "cost": 3,
+                                                        "description": "35+Tough HP",
+                                                        "children": [
+                                                            {
+                                                                "hp5": {
+                                                                    "cost": 3,
+                                                                    "description": "40+Tough HP",
+                                                                    "children": []
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "stat1": {
+                                            "cost": 2,
+                                            "description": "Add +1 to a stat at -1,0",
+                                            "children": [
+                                                {
+                                                    "stat2": {
+                                                        "cost": 3,
+                                                        "description": "Add +1 to stat at -1,0,1",
+                                                        "children": [
+                                                            {
+                                                                "stat3": {
+                                                                    "cost": 4,
+                                                                    "description": "Add +1 to any stat",
+                                                                    "children": []
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "stat4": {
+                                "cost": 3,
+                                "description": "Add +1 to stat at -1,0,1",
+                                "children": []
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
