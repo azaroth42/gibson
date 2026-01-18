@@ -1,14 +1,16 @@
 
 # Basic Moves
-•	Mix It Up:  Deal damage to an enemy (Tough)
-•	Fight Another Day:  Survive when on 0 hp (Tough)
-•	Act Under Pressure: Resolve a dangerous situation (Cool)
-•	First Aid: Heal yourself or another character (Cool)
-•	Research: Provide information about something (Sharp)
-•	Assess: Perceive what is around you (Sharp)
-•	Fast Talk: Convince someone to do something (Style)
-•	Hit the Streets: Get something from someone you know (Style)
-•	Assist: Help another character (Special)
+There are 9 basic moves which everyone has access to:
+
+    • Mix It Up:  Deal damage to an enemy (Tough)
+    • Fight Another Day:  Survive when on 0 hp (Tough)
+    • Act Under Pressure: Resolve a dangerous situation (Cool)
+    • First Aid: Heal yourself or another character (Cool)
+    • Research: Provide information about something (Sharp)
+    • Assess: Perceive what is around you (Sharp)
+    • Fast Talk: Convince someone to do something (Style)
+    • Hit the Streets: Get something from someone you know (Style)
+    • Assist: Help another character (Links)
 
 ## Move: Mix It Up
 
@@ -17,49 +19,55 @@
 When you attack an enemy, describe what you’re doing and roll +Tough. On a 10+ you deal your damage to the enemy and avoid any retaliation. On a 7–9, you deal your damage to the enemy and either the enemy makes an attack against you or you experience some other complication.
   
 On a 10+ you may choose to either deal no damage or take an attack against you, or both on a 7-9, to add one of the following effects:
-•	Target is pushed backwards
-•	Target is knocked off their feet
+
+    • Target is pushed backwards
+    • Target is knocked off their feet
 
 Potential Complications (beyond a counterattack):
-•	You lose your footing
-•	You lose your grip on whatever you’re holding
-•	You lose track of someone/something important
-•	You are surprised by someone or something
+
+    • You lose your footing
+    • You lose your grip on whatever you’re holding
+    • You lose track of someone/something important
+    • You are surprised by someone or something
 
 The base damage is d6. The target takes the damage from the weapon used, minus their armor value. The target’s armor value is reduced by the amount of piercing that an attack has for this calculation. This move will be further modified by any weapon used to make the attack.
 
 ### Advances:
-[1] damage1: Base damage is d6+1
-	[1] option1: Add option: Target drops an item they’re holding
-	[2] stat-damage: Add +Tough damage
-		[2] stat-damage-swap: Swap above stat to any other for damage
-			[3] stat-move-swap: Swap also for the move (explain!)
-		[2] option2: Add option: Target is stunned momentarily
-			[2] option3: Add option: Target’s speed is reduced to zero
-			[3] free-option:Add an option on 10+ for free
-	[2] damage2: d6+2 damage 
-		[3] damage3: 2d6 damage
-			[3] damage4: 2d6+2 damage
-			[3] damage-die: First d6 is a d8
-[3] target-reload: +1 target, or -reload
-[2] piercing1: 1 piercing
-		[2] piercing2: 2 piercing
-			[3] piercing3: 3 piercing
-		[3] reroll: +Reroll
-[1] armor1: +2 Armor
-	[2] armor2: +4 Armor (total)
-	[2] armor-complication: Gain the move Out of the Frying Pan 
-[2] reckless: Gain the move Reckless.
-[1] criticals: Gain the move Criticals.
+
+* [1] damage1: Base damage is d6+1
+	* [1] option1: Add option: Target drops an item they’re holding
+	* [2] stat-damage: Add +Tough damage
+		* [2] stat-damage-swap: Swap above stat to any other for damage
+			* [3] stat-move-swap: Swap also for the move (explain!)
+		* [2] option2: Add option: Target is stunned momentarily
+			* [2] option3: Add option: Target’s speed is reduced to zero
+			* [3] free-option:Add an option on 10+ for free
+	* [2] damage2: d6+2 damage 
+		* [3] damage3: 2d6 damage
+			* [3] damage4: 2d6+2 damage
+			* [3] damage-die: First d6 is a d8
+	* [3] target-reload: +1 target, or -reload
+	* [2] piercing1: 1 piercing
+		* [2] piercing2: 2 piercing
+			* [3] piercing3: 3 piercing
+		* [3] reroll: +Reroll
+* [1] armor1: +2 Armor
+	* [2] armor2: +4 Armor (total)
+	* [2] armor-complication: Gain the move Out of the Frying Pan 
+* [2] reckless: Gain the move Reckless.
+* [1] criticals: Gain the move Criticals.
 
 
 ### Move Details:
 
-Out of the Frying Pan: When you take damage, you can reduce the damage by 5 by voluntarily taking a complication of the GM’s choice.
+**Out of the Frying Pan:**
+When you take damage, you can reduce the damage by 5 by voluntarily taking a complication of the GM’s choice.
 
-Reckless:  Take +1 forward, +1 to damage if you rush in heedless of any danger
+**Reckless:**
+Take +1 forward, +1 to damage if you rush in heedless of any danger
 
-Criticals: Whenever you roll Attack, on a natural 12 you do maximum normal damage. However on a natural 2, the GM gets to make two moves against you.
+**Criticals:**
+Whenever you roll Attack, on a natural 12 you do maximum normal damage. However on a natural 2, the GM gets to make two moves against you.
 
 
 ## Move: Fight Another Day
@@ -67,11 +75,12 @@ Criticals: Whenever you roll Attack, on a natural 12 you do maximum normal damag
 ### Description:
 
 When you're dying, roll +Tough. On a 10+ you're stable … at least until someone arrives. On a 7–9, you survive at a cost. Pick one:
-•	Dirty needles: -1 to a stat
-•	Owned: You’re owned by a Corp
-•	Damaged: Cross off a piece of cyberware which was destroyed
-On a miss, you are dead. You can carry over any unspent XP to your next character.
 
+    • Dirty needles: -1 to a stat
+    • Owned: You’re owned by a Corp
+    • Damaged: Cross off a piece of cyberware which was destroyed
+
+On a miss, you are dead. You can carry over any unspent XP to your next character.
 
 ## Move: Act Under Pressure
 
@@ -80,35 +89,37 @@ On a miss, you are dead. You can carry over any unspent XP to your next characte
 When you act despite an imminent threat, say how you deal with it and roll +Cool. On a 10+, you do what you set out to do and the threat doesn't come to pass. On a 7–9, you stumble, hesitate, or flinch: the GM will offer you a worse outcome, hard bargain, or ugly choice.
 
 ### Advances:
-[1] sneaky: Sneaky: Take +1 when using AUP for stealth
-	[2] surveillance:Gain the move: Surveillance
-[2] backstab: Gain the move: Backstab
-	[2] backstab-option1: +1 ongoing vs target
-	[3] backstab-option2: You remain hidden (explain how)
-    [2] backstab-option3: Ask an Assess question after the attack
-	[3] sniper: If you are alone and set up a hide in advance, you pick an additional option for Backstab
-[1] trapsmith: Trapsmith: Take +1 when using AUP to disable traps or dangerous devices
-    [2] trapsmith-option1: You are not affected by failing to disable a trap or device
-    [2] trapsmith-option2: When you bypass or disable a trap or device, gain [intel]
-[1] ninja: Ninja: Take +1 when using AUP for acrobatic or athletic stunts
-	[2] outta-here: Gain the move: Outta Here
-	[2] fast: Fast: You act first in combat, as if you had Synth Nerves
-[1] thief: Thief: Take +1 when using AUP to steal something
-	[2] thief-bonus: Gain +1 [gear] or credits when you successfully steal something
+
+* [1] sneaky: Sneaky: Take +1 when using AUP for stealth
+	* [2] surveillance:Gain the move: Surveillance
+* [2] backstab: Gain the move: Backstab
+	* [2] backstab-option1: +1 ongoing vs target
+	* [3] backstab-option2: You remain hidden (explain how)
+    * [2] backstab-option3: Ask an Assess question after the attack
+	* [3] sniper: If you are alone and set up a hide in advance, you pick an additional option for Backstab
+* [1] trapsmith: Trapsmith: Take +1 when using AUP to disable traps or dangerous devices
+    * [2] trapsmith-option1: You are not affected by failing to disable a trap or device
+    * [2] trapsmith-option2: When you bypass or disable a trap or device, gain [intel]
+* [1] ninja: Ninja: Take +1 when using AUP for acrobatic or athletic stunts
+	* [2] outta-here: Gain the move: Outta Here
+	* [2] fast: Fast: You act first in combat, as if you had Synth Nerves
+* [1] thief: Thief: Take +1 when using AUP to steal something
+	* [2] thief-bonus: Gain +1 [gear] or credits when you successfully steal something
 
 ### Move Details:
 
-Backstab/Sniper:
+**Backstab/Sniper:**
 If your target is unaware of your attack, and you wish to deal a crippling blow, roll +Cool instead of +Tough for Mix It Up. In addition to the regular effects, on a 10+ pick two, or on a 7-9 pick one:
-•	You deal +d6 damage
-•	You gain +2 piercing
-•	You take +1 forward against the target
-•	The target cannot make a return attack (on 7-9)
 
-Outta Here:
+    * You deal +d6 damage
+    * You gain +2 piercing
+    * You take +1 forward against the target
+    * The target cannot make a return attack (on 7-9)
+
+**Outta Here:**
 Name your escape route and roll+Cool. On a 10+, you’re gone. On a 7–9, you can go or stay, but if you go it costs you: leave something behind, or take something with you, the GM will tell you what. On a miss, you’re caught vulnerable, half in and half out.
 
-Surveillance:
+**Surveillance:**
 When you tail someone or stake out a location, you may roll +Cool instead of +Sharp for Assess and gain [intel] on a hit.
 
 ## Move: First Aid
@@ -117,67 +128,80 @@ When you tail someone or stake out a location, you may roll +Cool instead of +Sh
 When you heal someone of damage, roll +Cool.  On a 10+, the target, who must be at close range, regains d6+Cool points of damage.  On a 7-9, it either it costs a Gear, a Credit, or there are unexpected complications (your choice).
 
 ### Advances:
-[1] heal1: Heal d6+Cool+2 hp
-	[2] heal2: Heal 2d6+Cool+2 hp
-	    [2] heal3: Heal 2d6+Cool+4 hp
-	        [3] heal4: Heal 3d6+Cool+2 hp
-	    [2] heal5: (Juicer only) Heal traumatic injuries (with medical gear) 
-	        [3] heal6: (Juicer only) Install cyberware (with right facilities)
+
+* [1] heal1: Heal d6+Cool+2 hp
+	* [2] heal2: Heal 2d6+Cool+2 hp
+	    * [2] heal3: Heal 2d6+Cool+4 hp
+	        * [3] heal4: Heal 3d6+Cool+2 hp
+	    * [2] heal5: (Juicer only) Heal traumatic injuries (with medical gear) 
+	        * [3] heal6: (Juicer only) Install cyberware (with right facilities)
 
 ## Move: Research
 
 ### Description:
 
-When you consult appropriate accumulated knowledge (a dossier, a library, a database, an AI, a knowledgeable contact etc.) about something, ask a question from the list below and roll+Sharp. 
-•	Where would I find ___?
-•	How secure or reliable is ___?
-•	Who or what is related to ___?
-•	Who owned, employed or used ___?
-•	How important or valuable is ___?
+When you consult appropriate accumulated knowledge (a dossier, a library, a database, an AI, a knowledgeable contact etc.) about something, ask a question from the list below and roll+Sharp.
+ 
+    * Where would I find ___?
+    * How secure or reliable is ___?
+    * Who or what is related to ___?
+    * Who owned, employed or used ___?
+    * How important or valuable is ___?
 
 On a 10+, take [intel] and the GM will answer your question and a follow-up question from the list about the same subject.
 On a 7–9, take [intel] and the GM will answer your question, but it might not be as helpful or positive as you might like. 
 On a miss, the GM will (cough) answer your question …
  
 ### Advances:
-[1] research1: On a 10+, hold 1. Spend it to +1 forward when you act on the info
-[1] specialized: Specialized: You have a specialization from the list below. If you are researching a topic you have a specialization for, before you roll, choose to either take +1 on the roll, or if successful gain an additional [intel].
-•	Weapons and Armor
-•	Cybernetics
-•	The Matrix, Software and Decks
-•	Vehicles, Drones and Geography
-•	Technology (other than above)
-•	Street Politics, People and Places
-•	Corporate Politics, People and Places
-    [2] specialized2: Gain another specialization (repeatable)
-    [2] specialized3: On a 10+, hold 2 for your specialization.
-[1]	rq1: Add: Who or what is ___ most valuable to?
-[1]	rq2: Add: What is the relationship between ___ and ___?
-[1]	rq3: Add: What should I be careful about with ___?
-[1]	rq4: Add: How would I fix, improve or help ___?
-[1]	rq5: Add: What is the historical significance of ___ ?
+
+    * [1] research1: On a 10+, hold 1. Spend it to +1 forward when you act on the info
+    * [2] specialized: Gain a specialization. 
+        * [2] specialized2: Gain another specialization
+        * [2] specialized3: On a 10+, hold 2 for your specialization.
+    * [1] rq1: Add: Who or what is ___ most valuable to?
+    * [1] rq2: Add: What is the relationship between ___ and ___?
+    * [1] rq3: Add: What should I be careful about with ___?
+    * [1] rq4: Add: How would I fix, improve or help ___?
+    * [1] rq5: Add: What is the historical significance of ___ ?
+
+### Move Details:
+
+**Specialized:**
+
+You have a specialization from the list below. If you are researching a topic you have a specialization for, before you roll, choose to either take +1 on the roll, or if successful gain an additional [intel].
+
+Specializations: 
+
+    * Weapons and Armor
+    * Cybernetics
+    * The Matrix, Software and Decks
+    * Vehicles, Drones and Geography
+    * Technology (other than above)
+    * Street Politics, People and Places
+    * Corporate Politics, People and Places
 
 ## Move: Assess
 
 ### Description:
 
 When you closely study a situation, location or person, roll+Sharp. On a 10+ ask the GM 2 questions from the list below. On a 7–9 ask 1. Take +1 forward if you immediately and directly act upon the answers.
-	What happened here recently?
-	What is about to happen?
-	What should I be on the lookout for?
-	What here is useful or valuable to me?
-	What here is not what it appears to be?
-	What or who here is the biggest threat to me?
+
+    * What happened here recently?
+    * What is about to happen?
+    * What should I be on the lookout for?
+    * What here is useful or valuable to me?
+    * What here is not what it appears to be?
+    * What or who here is the biggest threat to me?
 
 ### Advances:
-[2] aq: Ask an additional Question on a hit
-[1] aq1: Add: Who’s really in control here?
-[1] aq2: Add: What is my enemy’s true position?
-[1] aq3: Add: Where did they go?
-[1] aq4: Add: How can it be disabled?
-[1] aq5: Add: Who/What were they and how long ago was it?
-[1] aq6: Add: Who might be behind these events?
-[1] aq7: Add: When and where will the next related event occur?
+* [2] aq: Ask an additional Question on a hit
+* [1] aq1: Add: Who’s really in control here?
+* [1] aq2: Add: What is my enemy’s true position?
+* [1] aq3: Add: Where did they go?
+* [1] aq4: Add: How can it be disabled?
+* [1] aq5: Add: Who/What were they and how long ago was it?
+* [1] aq6: Add: Who might be behind these events?
+* [1] aq7: Add: When and where will the next related event occur?
 
 ## Move: Fast Talk
 
@@ -186,78 +210,91 @@ When you closely study a situation, location or person, roll+Sharp. On a 10+ ask
 When you manipulate an NPC into doing something for you, telling you something, or similar, roll +Style. If you are threatening violence, and intend to carry through, you can roll +Tough instead. On a hit they ask you for something and do it if you make them a promise first. On a 7–9, they need some concrete assurance of your promise, right now.  
 
 ### Advances:
-[1] ftq: Ask a Question when using Fast Talk and gain 2 questions from list
-    [1] ftq1: Add another Question from the list (repeatable)
-    [2] ftq2: :Ask two Questions on a hit
-    [2] ft-intel: On a hit, gain [intel]
-    [2] heres-the-plan: Gain the move: Here’s the Plan
-    [2] perform: Gain the move: Perform
-	    [1] memorable: Gain the move: Memorable
-	        [2] rockstar: Gain the move: Rockstar 
-	        [2] endorsed: Gain the move: Endorsed
-	    [2] ta-dah: Gain the move: Ta-Dah!
-	    	[2] witty-repartee:Gain the move: Witty Repartee
-	    [2] heard-of-me: Gain the move: But You HAVE Heard of Me
-    [2] negotiator: Gain the move: Negotiator
-	    [1] neg-option1: Add option: The employer is identifiable
-	    [2] neg-option2: On a hit, pick one more option
+* [1] ftq: Ask a Question when using Fast Talk and gain 2 questions from list
+    * [1] ftq1: Add another Question from the list (repeatable)
+    * [2] ftq2: :Ask two Questions on a hit
+    * [2] ft-intel: On a hit, gain [intel]
+    * [2] heres-the-plan: Gain the move: Here’s the Plan
+    * [2] perform: Gain the move: Perform
+	    * [1] memorable: Gain the move: Memorable
+	        * [2] rockstar: Gain the move: Rockstar 
+	        * [2] endorsed: Gain the move: Endorsed
+	    * [2] ta-dah: Gain the move: Ta-Dah!
+	    	* [2] witty-repartee:Gain the move: Witty Repartee
+	    * [2] heard-of-me: Gain the move: But You HAVE Heard of Me
+    * [2] negotiator: Gain the move: Negotiator
+	    * [1] neg-option1: Add option: The employer is identifiable
+	    * [2] neg-option2: On a hit, pick one more option
 
 ### Move Details:
 
-Bonus Questions:
-•	Whom do you serve?
-•	What do you wish I would do?
-•	How can I get you to ______?
-•	Are you connected to the current events?
-•	What are you really feeling right now?
-•	Are you telling the truth?
-•	What are you really intending to do?
-•	What do you most desire?
-•	What was your lowest moment?
-•	What do you crave forgiveness for, and of whom?
-•	What are your secret pains?
-•	How are you vulnerable to me?
+**Bonus Questions:**
 
-Here’s the Plan: 
+    * Whom do you serve?
+    * What do you wish I would do?
+    * How can I get you to ______?
+    * Are you connected to the current events?
+    * What are you really feeling right now?
+    * Are you telling the truth?
+    * What are you really intending to do?
+    * What do you most desire?
+    * What was your lowest moment?
+    * What do you crave forgiveness for, and of whom?
+    * What are your secret pains?
+    * How are you vulnerable to me?
+
+**Here’s the Plan:** 
+
 When you make a plan for a dangerous situation, assign people tasks and roll +Style. On a 10+, everyone holds three to spend for +1 forward while acting on their task.  On a 7-9, +1 forward. If the plan succeeds, and everyone follows their tasks, everyone involved gains 1 CP. There can only be one plan at once!  On a miss, your plan goes awry catastrophically.
 
-Perform:
-When you perform your chosen art — any act of expression or culture — or when you put its product before an audience, roll+Style. On a 10+, gain 3 hold. On a 7–9, gain 1 hold. Spend 1 hold to choose one of the following:
-•	Named member of the audience person must meet me
-•	It brings in finances (+1 Credit)
-•	Named member of the audience gives a gift (+[gear])
-•	Gain lackeys (+1 follower temporarily)
-•	Gain fame (+1 Influence temporarily)
+**Perform:**
 
-Memorable:
+When you perform your chosen art — any act of expression or culture — or when you put its product before an audience, roll+Style. On a 10+, gain 3 hold. On a 7–9, gain 1 hold. Spend 1 hold to choose one of the following:
+
+    * Named member of the audience person must meet me
+    * It brings in finances (+1 Credit)
+    * Named member of the audience gives a gift (+[gear])
+    * Gain lackeys (+1 follower temporarily)
+    * Gain fame (+1 Influence temporarily)
+
+**Memorable:**
+
 When you Fast Talk someone who has heard you successfully Perform, you can ask another question.
 
-Rockstar:
+**Rockstar:**
+
 When you Fast Talk someone who has heard you successfully Perform, you roll with Advantage.
 
-Endorsed:
+**Endorsed:**
+
 Add the Perform option: Determine the audience’s reaction to a topic or event of your choice.
 
-Witty Repartee:
-When you subtly mock someone, roll +Style. On a 7-9 pick one, on a 10+ pick 2:
-•	Your allies take +1 forward against them
-•	They make a blunder or mistake
-•	You impress others who witness it
-•	They don’t notice you doing it
+**Witty Repartee:**
 
-Ta-Dah!: 
+When you subtly mock someone, roll +Style. On a 7-9 pick one, on a 10+ pick 2:
+
+    * Your allies take +1 forward against them
+    * They make a blunder or mistake
+    * You impress others who witness it
+    * They don’t notice you doing it
+
+**Ta-Dah!:** 
+
 When you make a showy entrance into a dangerous or important situation, roll +Style. On 10+ everyone stops to watch and listen to whatever you have to say or do. On a 7-9, you pick one target to stop, watch and listen. On a miss, either your entrance falls completely flat and you take -1 ongoing to all social interactions, or you are marked as the most biggest threat to be eliminated first.
 
-But You HAVE Heard of Me:
+**But You HAVE Heard of Me:**
+
 When you meet someone important (your call), roll +Style. On a hit, they’ve heard of you, and you say what they’ve heard; the GM will have them respond accordingly. On a 10+, you take +1 forward for dealing with them. On a miss, they’ve heard of you, but the GM will decide what it is that they’ve heard. This can trigger Bonds.
 
-Negotiator:
+**Negotiator:**
+
 When you negotiate the terms of a contract or mission, roll +Style. 
 On a 10+ pick two, on a 7-9 pick one:
-•	It pays better than expected
-•	You’ll learn something (Everyone marks XP if completed)
-•	It doesn’t attract unwanted attention or isn’t a set-up
-•	The employer provides [gear] or [intel] up front
+
+    * It pays better than expected
+    * You’ll learn something (Everyone marks XP if completed)
+    * It doesn’t attract unwanted attention or isn’t a set-up
+    * The employer provides [gear] or [intel] up front
 
 ## Move: Hit the Streets
 
@@ -266,31 +303,36 @@ On a 10+ pick two, on a 7-9 pick one:
 If you have not declared a Contact this session, you may declare a new Contact. Name and describe them, including which of you owes the other a favor. The GM may ask additional questions about the contact. Write the contact down on your sheet. This can trigger Bonds.
 
 When you go to a Contact for help, state which one and roll +Style. On a 10+, they have what you need and a little extra. Gain +[intel] or +[gear]. On a 7-9, they have what you need, but choose two from the following list:
-•	It’s going to cost you extra, right now
-•	It’s going to take some time
-•	It’s going to attract unwanted attention or consequences
-•	Your contact needs your help with something. You can’t ask this contact again until you’ve helped them out.
+
+    * It’s going to cost you extra, right now
+    * It’s going to take some time
+    * It’s going to attract unwanted attention or consequences
+    * Your contact needs your help with something. You can’t ask this contact again until you’ve helped them out.
 
 ### Advances:
-[1] contacts: Declare another contact. This can be done at any time without a roll, just pay the XP cost. You can get help from them as if you had rolled a 10+
-[1] followers: Gain 1 group of Followers (repeatable)
-    [2] hustler: Gain the move: Hustler
-	    [2] hustle-option1: You can exchange a Credit gained for [gear] or [intel]
-[1] good-for-it: Good for it: You can pay the extra cost later instead
-    [1] hit-forward: On a 10+, take +1 forward for the next time you Hit the Streets.
-[2] read-the-terrain: Gain the move: Read the Terrain
+
+    * [1] contacts: Declare another contact. This can be done at any time without a roll, just pay the XP cost. You can get help from them as if you had rolled a 10+
+    * [1] followers: Gain 1 group of Followers (repeatable)
+        * [2] hustler: Gain the move: Hustler
+            * [2] hustle-option1: You can exchange a Credit gained for [gear] or [intel]
+    * [1] good-for-it: Good for it: You can pay the extra cost later instead
+    * [1] hit-forward: On a 10+, take +1 forward for the next time you Hit the Streets.
+    * [2] read-the-terrain: Gain the move: Read the Terrain
 
 ### Move Details:
 
-Hustler: 
+**Hustler:** 
+
 Between sessions, describe a number of jobs equal to or less than your number of followers, and roll +Style. On a 10+, you gain 1 Credit per job. On a 7-9, you gain 1 Credit per job, but one of the jobs goes wrong somehow. On a miss, everything is a disaster.
 
-Read the Terrain:
+**Read the Terrain:**
+
 When you first go to a new part of the city, you can ask the GM two of the following questions:
-•	Who is in control in this part of town?
-•	Where is there a safe house here?
-•	What is not what it appears to be here?
-•	What or who is the most dangerous here?
+
+    * Who is in control in this part of town?
+    * Where is there a safe house here?
+    * What is not what it appears to be here?
+    * What or who is the most dangerous here?
 
 ## Move: Assist
 
@@ -306,20 +348,23 @@ When you try to help someone, roll +Bonds with that character (max +3). On a hit
 ### Description:
 
 This move is available to several Playbooks:
-•	Driver: vehicles
-•	Face: nanopolymer face masks
-•	Netrunner: software 
-•	Tech: technology in a specialization
-•	Juicer: drugs or other biotech
+
+    * Driver: vehicles
+    * Face: nanopolymer face masks
+    * Netrunner: software 
+    * Tech: technology in a specialization
+    * Juicer: drugs or other biotech
 
 When you spend at least half a day to work with technology in order to fix or improve it, create something new, or learn about how it works or where it came from, tell the GM what you're trying to achieve and roll +Sharp. The GM will tell you "Yes, you can do that, but..." and then 1 to 2 on a 10+, or 2-4 on a 7-9, of the following statements:
-•	It's going to take days/weeks/months
-•	First you must ____
-•	You'll need help from ____
-•	It will require  ___ Credits
-•	The best you can do is a lesser version, unreliable and limited
-•	You and your allies will risk danger from ____
-•	You'll have to use up ____ to do it
+
+    * It's going to take days/weeks/months
+    * First you must ____
+    * You'll need help from ____
+    * It will require  ___ Credits
+    * The best you can do is a lesser version, unreliable and limited
+    * You and your allies will risk danger from ____
+    * You'll have to use up ____ to do it
+
 On a miss, you cannot perform the Science! as described. There may also be unexpected consequences for failing.
 
 
@@ -342,15 +387,15 @@ At 17 hp: damage cyberware
 
 ### Advances:
 
-[1] hp1: 27+Tough HP
-    [2] hp2: 29+Tough HP
-        [2] hp3: 32+Tough HP
-            [3] hp4: 35+Tough HP
-                [3] hp5: 40+Tough HP
-	    [2] stat1: Add +1 to a stat at -1,0
-	        [3] stat2: Add +1 to stat at -1,0,1
-	            [4] stat3: Add +1 to any stat
-			[3] stat4: Add +1 to stat at -1,0,1
+    * [1] hp1: 27+Tough HP
+        * [2] hp2: 29+Tough HP
+            * [2] hp3: 32+Tough HP
+                * [3] hp4: 35+Tough HP
+                    * [3] hp5: 40+Tough HP
+        * [2] stat1: Add +1 to a stat at -1,0
+            * [3] stat2: Add +1 to stat at -1,0,1
+                * [4] stat3: Add +1 to any stat
+            * [3] stat4: Add +1 to stat at -1,0,1
 
 # Playbooks
 
