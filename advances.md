@@ -2,8 +2,8 @@
 # Basic Moves
 There are 9 basic moves which everyone has access to:
 
-    • Mix It Up:  Deal damage to an enemy (Tough)
-    • Fight Another Day:  Survive when on 0 hp (Tough)
+* Mix It Up:  Deal damage to an enemy (Tough)
+* Fight Another Day:  Survive when on 0 hp (Tough)
     • Act Under Pressure: Resolve a dangerous situation (Cool)
     • First Aid: Heal yourself or another character (Cool)
     • Research: Provide information about something (Sharp)
@@ -415,28 +415,35 @@ When you Act Under Pressure while in control of a vehicle, you may roll +Chrome 
 
 You can Do Science! for vehicles.
 
-### Move: Expert Wheelman
+### Move: Wheelman
 
 At the start of the session, roll +Cool. On a 10+, hold 3+Cool. On a 7-9, hold 1+Cool. On a miss, hold 1 anyway, but during the session you lose focus or your connection to your vehicle at a critical moment. The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
-•	Gain +[gear] (from the back seat/trunk/panniers)
-•	Avoid a danger or maintain control of the vehicle
-•	Escape a pursuing vehicle
-•	Impress, dismay or frighten someone watching
+* Gain +[gear] (from the back seat/trunk/panniers)
+* Avoid a danger or maintain control of the vehicle
+* Escape a regular, pursuing vehicle
+* Impress, dismay or frighten someone watching
 
 ### Advances:
-[2] sweet-ride: Sweet Ride: When you Hit the Streets in your vehicle, take +1.
+
+* [2] sweet-ride: Sweet Ride: If your vehicle has the +looks tag, when you Hit the Streets in your vehicle, take +1.
+* [2] doc-wagon: Doc Wagon: If your vehicle has the +ambulance tag, when you do First Aid, take +1. A Juicer can use your vehicle for surgery (but not to install cyberware).
+* [2] muscle-car: Muscle Car: If your vehicle has the +intimidating tag, when you Fast Talk from your vehicle in an intimidating way, take +1
+* [2] weapons: Military: If your vehicle has the +military tag, deal and additional +d6 damage when you Mix It Up. You can spend a hold to kill an unnamed NPC.
+* [1] ai-pilot: If your vehicle has the +ai tag, then you spend a hold to have the vehicle appear exactly when and where it's needed (without a neural interface).
+* [1] fast: If your vehicle has the +fast or +agile tag, then you can spend a hold to escape any pursuing vehicle, or catch a vehicle you are in pursuit of
+
 
 ## Face
 
 ### Description:
 
-Start with 2 additional contacts.
+Start with 2 additional Contacts.
 
 When you Act Under Pressure and you resolve the danger by talking your way out of it, you may roll +Style instead of +Cool.
 
 You can Do Science! to create a polymer face mask to disguise yourself as a particular person [Mission Impossible style]. You do not start with any face masks.
 
-### Move: Expert Con Artist
+### Move: Con Artist
 
 At the start of the session, roll +Style. On a 10+, hold 3+Style. On a 7-9, hold 1+Style. On a miss, hold 1 anyway, but during the session you will commit a serious faux-pas or breach of etiquette. The GM will tell you when and what happens. You may spend hold during the session one of one for any of these situations:
 •	Convince someone of something
@@ -445,7 +452,8 @@ At the start of the session, roll +Style. On a 10+, hold 3+Style. On a 7-9, hold
 •	Gain +1 Credits when getting paid for a job
 
 ### Advances:
-[3] mask: If you are in a Mask, and roll 12+ on Fast Talk, you can increase or decrease a relevant countdown clock. The GM will tell you which clock, you decide to move it up or down.
+
+* [3] mask: If you are in a Mask, and roll 12+ on Fast Talk, you can increase or decrease a relevant countdown clock. The GM will tell you which clock, you decide to move it up or down.
 
 ## Netrunner
 
@@ -454,7 +462,7 @@ At the start of the session, roll +Style. On a 10+, hold 3+Style. On a 7-9, hold
 You can Do Science! for programs and cyberdecks.
 
 ### Move: Console Cowboy
-At the start of a session, when you're tooling up to cut some ICE, roll +Mind. On a 10+ hold 3+Synth for hacking. On a 7-9 hold 1+Synth. On a miss, hold 1 anyway … you'll need it. On a miss, the GM will have your connection interrupted, your deck go on the fritz, or you'll be unable to jack out … at just the wrong time.
+At the start of a session, when you're tooling up to cut some ICE, roll +Sharp. On a 10+ hold 3+Chrome for hacking. On a 7-9 hold 1+Synth. On a miss, hold 1 anyway … you'll need it. On a miss, the GM will have your connection interrupted, your deck go on the fritz, or you'll be unable to jack out … at just the wrong time.
 
 ### Move: Sleaze
 
@@ -474,7 +482,26 @@ When you want to crash your way into a system and seize control of it, roll +Syn
 On a miss, the ICE blocks you: you pick one and the MC picks one.
 
 ### Advances:
-[3] quick-hack: Quick Hack
+
+* [3] quick-hack: Gain the move Quick Hack.
+    * [2] Select another option for Quick Hack.
+	* [3] Add an option: You can take momentary control of a component or system
+* [3] false-flag: Gain the move False Flag Operation.
+
+### Move Details
+
+**Quick Hack:**
+
+When you use your Neural Interface and Comms to quickly hack a networked system or cybernetic device, roll +Cool. On a 10+, pick two. On a 7-9, pick one:
+
+* You can hack cyberware (if it's networked)
+* You can disable a component or system
+* It can't be traced to you in the future
+* It doesn't attract unwanted attention in the moment
+
+**False Flag Operation:**
+
+When you are in control of a system, you may spend a hold to create misinformation and modify a countdown clock. The GM will tell you which one, and you decide whether to modify it up or down.
 
 
 ## Investigator
@@ -492,7 +519,7 @@ At the start of the session, roll +Sharp. On a 10+, hold 3+Sharp. On a 7-9, hold
 •	Consult the rolodex: Declare a contact
 
 ### Advances:
-[3] something: something
+[3] Prepared: At the start of the session, take +[intel] and +[gear]
 
 ## Killer
 
@@ -783,6 +810,27 @@ Armored Jacket/Trenchcoat: 2
 Body Armor: 4
 Tactical Gear: 6  ()
 Military Hardsuit: 10  (Halo / MaxTac style)
+
+
+
+Vehicles:
+
+* Powered Rollerblades (1 person) 
+* Sports Bike (1 person)
+* Chopper (1 person) 
+* Car (2-4 people) 
+* Sports Car: (2 people) 
+* Van (4-6 people)
+* Ambulance (4-6 people)
+* Armored Personnel Carrier (6-10 people)
+* Tank (2-4 people)
+* Attack Helicopter (4-6 people)
+* VTOL Fighter (1-2 people)
+* Jetboat (2-4 people)
+
+Vehicle tags: +looks, +intimidating, +fast, +agile, +ambulance, +military, +ai, +armored
+Negative vehicle tags: +damaged, +unreliable, +fragile, +tracked, +expensive, +exposed, +slow
+
 
 ## Combat
 
