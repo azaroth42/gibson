@@ -19,10 +19,10 @@ There are 9 basic moves which everyone has access to:
 
 * Mix It Up:  Deal damage to an enemy (Tough)
 * Fight Another Day:  Survive when on 0 hp (Tough)
+* Act Under Pressure: Resolve a dangerous situation (Cool)
 * First Aid: Heal yourself or another character (Cool)
 * Research: Provide information about something (Sharp)
 * Assess: Perceive what is around you (Sharp)
-* Act Under Pressure: Resolve a dangerous situation (Cool)
 * Fast Talk: Convince someone to do something (Style)
 * Hit the Streets: Get something from someone you know (Style)
 * Assist: Help another character (Links)
@@ -270,11 +270,11 @@ When you make a plan for a dangerous situation, assign people tasks and roll +St
 
 When you perform your chosen art — any act of expression or culture — or when you put its product before an audience, roll+Style. On a 10+, gain 3 hold. On a 7–9, gain 1 hold. Spend 1 hold to choose one of the following:
 
-    * Named member of the audience person must meet me
-    * It brings in finances (+1 Credit)
-    * Named member of the audience gives a gift (+[gear])
-    * Gain lackeys (+1 follower temporarily)
-    * Gain fame (+1 Influence temporarily)
+* Named member of the audience person must meet me
+* It brings in finances (+1 Credit)
+* Named member of the audience gives a gift (+[gear])
+* Gain lackeys (+1 follower temporarily)
+* Gain fame (+1 Influence temporarily)
 
 **Memorable:**
 
@@ -517,7 +517,7 @@ When you use your Neural Interface and Comms to quickly hack a networked system 
 * It can't be traced to you in the future
 * It doesn't attract unwanted attention in the moment
 
-**False Flag Operation:**
+**False Flag Op:**
 
 When you are in control of a system, you may spend a hold to create misinformation and modify a countdown clock. The GM will tell you which one, and you decide whether to modify it up or down.
 
@@ -590,7 +590,7 @@ You have Do Science! for each of your specializations.
 
 ### Move: Total Geek
 
-At the start of the session, roll +Mind. On a 10+, hold 3+Mind. On a 7-9, hold 1+Mind. On a miss, hold 1 anyway, but during the session you will miss a crucial clue or opportunity. The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
+At the start of the session, roll +Sharp. On a 10+, hold 3+Sharp. On a 7-9, hold 1+Sharp. On a miss, hold 1 anyway, but during the session you will miss a crucial clue or opportunity. The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
 * +[gear]
 * Blow something up
 * Quickly setup or configure something for which you have a specialization
@@ -602,23 +602,23 @@ At the start of the session, roll +Mind. On a 10+, hold 3+Mind. On a 7-9, hold 1
     * [2] Gain the move: Void the Warranty
 * [2] Gain the move: Technobabble
 * [2] Gain another specialization (repeatable)
-* [3] Gain the move: Pay Attention, 007
-    * [2] Gain the move: Do Try To Return It Intact
+* [3] Gain the move: Now Pay Attention
+    * [3] Gain the move: Try To Return It Intact
     * [2] Gain the move: Hacked Firmware
 
 ### Move Details
 
-**Pay Attention, 007**
+**Now Pay Attention**
 
 When you have time, at your HQ or in a facility, to outfit *another* character, roll +Links with that character. On a 10+, they take +[gear] and +1 forward. On a 7-9, they take +[gear] or +1 forward. On a miss, when they try to use [gear] this session, there will be a critical malfunction, either because you messed something up, or they didn't pay attention to how to use it.
+
+**Try To Return It Intact**
+
+If the [gear] from Pay Attention is used to generate something that should be valuable and should not be destroyed, but the player narrates how it *is* destroyed as part of using it, then both you and the other character gain 1 CP at the end of the session. You can gain a maximum of 1 CP per session in this way.
 
 **Technobabble**
 
 When you baffle, confuse or just stall an NPC by spouting technical jargon at them, roll +Sharp. On a 10+, they are baffled or impressed and give you what you want. On a 7-9, they are confused but suspicious. 
-
-**Do Try To Return It Intact**
-
-If the [gear] from Pay Attention is used to generate something that should be valuable and should not be destroyed, but the player narrates how it *is* destroyed as part of using it, then __________
 
 **Hacked Firmware**
 
@@ -636,12 +636,14 @@ When you try to overclock any sort of technology and push it past its normal lim
 
 ### Description:
 
+```This is boring ... need a more interesting base move```
+
 Active Camoflage: When you are by yourself, you take +1 to Act Under Pressure for stealth.
 
 
 ### Move: Black Operative
 
-At the start of the session, roll +Sharp. On a 10+, hold 3+Sharp. On a 7-9, hold 1+Sharp. On a miss, hold 1 anyway, but during the session you will ... The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
+At the start of the session, roll +Cool. On a 10+, hold 3+Cool. On a 7-9, hold 1+Cool. On a miss, hold 1 anyway, but during the session you will ... The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
 * Bypass a security system or guard
 * Disable a bypassed system or guard
 * Escape notice
@@ -697,15 +699,16 @@ At the start of the session, roll +Tough. On a 10+, hold 3+Tough. On a 7-9, hold
 ### Advances:
 
 * [2] +1 hold for Street Samurai
+* [2] Active Defence gives you +2 armor
 * [2] Gain a second custom weapon
 * [2] Add another feature to one of your weapons (repeatable)
 * [2] Add a piece of cyberware, explain how you got it.
-* [2] Gain the move: Ginsu Knife
+* [2] Gain the move: Ginsu Sword
     * [2] Gain the move: But Wait, There's More
 
 ### Move Details
 
-**Ginsu Knife**
+**Ginsu Sword**
 
 When you use your weapon to cut through or destroy an obstacle, roll +Tough. On a 10+ pick 3, on a 7-9 pick 2:
 
@@ -819,20 +822,24 @@ At the start of the session, roll +Sharp. On a 10+, hold 3+Sharp. On a 7-9, hold
 ### Description:
 
 You must start with at least 0 Chrome and Overclocked Reflexes.
+
 While in constant motion, you have +1 armor. 
+
 Take +1 when you Act Under Pressure using motion or momentum to resolve the danger.
+
+When attacking while in motion, you can roll +Cool.
 
 ### Move: Expert 'blader
 
 At the start of the session, roll +Cool. On a 10+, hold 3+Cool. On a 7-9, hold 1+Cool. On a miss, hold 1 anyway, but during the session you will ... The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
 * 	Grab an object as you pass by
 * 	Move along vertical surfaces such as walls, or grind along thin objects like power lines or zip lines
-* 	Roll +Cool for Mix It Up, if your movement is key
 * 	Parkour your way out of a sticky situation
 
 ### Advances:
 
 * [2] +1 hold for Expert 'blader
+* [2] +2 armor for Constant Motion
 * [3] something: something
 
 
@@ -840,7 +847,7 @@ At the start of the session, roll +Cool. On a 10+, hold 3+Cool. On a 7-9, hold 1
 
 ## Cyberware
 
-Player chooses which cyberware goes in which slots. Cyberware in 12 and 17 can be “healed” by a tech on the fly, 2 and 7 need resources and a surgery.
+Player chooses which cyberware goes in which health slots. Cyberware in 12 and 17 can be “healed” by a tech on the fly, 2 and 7 need resources and a surgery.
 
 Assumption is that cyberware is realistic looking by default, though often with some “tell” or giveaway. Players can choose to style it in other ways when the cyberware is installed. Characters start with up to Chrome pieces of cyberware from the list below. You can have at most Chrome plus 1 pieces of stress-causing cyberware before suffering from Neural/Cybernetic System Overload Syndrome (NC-SOS).
 
@@ -851,9 +858,12 @@ Cool: You’re losing your edge, trying to keep the mind, metal and meat all wor
 Sharp: What were you saying? Who are you again? You have a tendency to zone out, miss the obvious, and just forget things you’ve always known as the stress of neural control of implanted hardware eats away at your mind. 
 Style: No one trusts anyone, but they trust a stressed-out cyborg packing a bunch of implants a whole lot less than your regular ‘punk or corporate. It’s hard to be manipulative and charming when you’re clearly fighting for control of your body and humanity. 
 
-Stress-Causing Cyberware:
+### Stress-Causing Cyberware:
 
-SynthSenses: Cybernetic eyes and/or ears. When your enhanced senses would help you, you can roll +Chrome for Assess.
+#### SynthSenses
+
+Cybernetic eyes and/or ears. When your enhanced senses would help you, you can roll +Chrome for Assess.
+
 Start with 2 Tags.
 
 Available Tags: +thermographic, +amplification, +magnification, +telescopic, +microscopic, +dampening, +recording, +encrypted, +HUD, +lights, +sensorium 
@@ -862,7 +872,9 @@ Sensorium allows you to also capture other senses and sensations, such as smell,
 
 With Tactical AI, allows independent targeting of multiple hand-held weapons.
 
-Comms: When you have comms installed, you can communicate electronically without moving or making an audible sound.
+#### Comms
+
+When you have comms installed, you can communicate electronically without moving or making an audible sound.
 
 Start with one tag.
 Available Tags: +encrypted, +jamming, +recording, +broadcast, +inaccessible partition, +iced
@@ -872,13 +884,17 @@ Comms without +encrypted can be intercepted. Any comms makes you susceptible to 
 With SynthSenses, you can project communications into your field of view. 
 
 
-Implanted Weaponry:  retractable claws, blade, pistol, monofilament whip or other small weapon. You cannot be disarmed. It is automatically +linked. 
+#### Implanted Weaponry
 
-Overclocked Reflexes: You react much faster than others. Roll with Advantage on any Act Under Pressure roll where reaction speed is critical. You automatically go first in combat. If none of your enemies have overclocked nerves, then you also roll with Advantage for Mix It Up.
+retractable claws, blade, pistol, monofilament whip or other small weapon. You cannot be disarmed. It is automatically +linked. 
 
-Neural Interface: Allows direct neural control of an appropriately
-configured external device such as a vehicle, weapon, recording
-device, or hacked electronic system.
+#### Overclocked Reflexes
+
+You react much faster than others. Roll with Advantage on any Act Under Pressure roll where reaction speed is critical. You automatically go first in combat. If none of your enemies have overclocked nerves, then you also roll with Advantage for Mix It Up.
+
+#### Neural Interface
+
+Allows direct neural control of an appropriately configured external device such as a vehicle, weapon, recording device, or hacked electronic system.
 
 With Comms, allows the Driver to remotely pilot vehicles and drones, and the Netrunner to do wireless hacking / quick hack.
 
@@ -886,48 +902,65 @@ With either Tactical AI or +HUD on SynthSenses, allows you to roll with Advantag
 
 With Overclocked Reflexes you can also precisely define who gets hit with automatic weapons. 
 
-Skill Shards:  You may slot chips to grant certain skills.
+#### Skill Shards
+
+You may slot chips to grant certain skills.
 When your slotted shard is appropriate to a move you are
 making, take +1 ongoing if your relevant stat is +1 or less. If it is +2 or higher, you roll with Advantage.
 You can slot two shards at once. When you acquire the cyberware, it comes with one shard.
 
 If you also have Tactical AI, you can slot a third shard.
 
-Tactical AI:  An expert system enhances the user’s
-understanding of and operation within a tactical environment.
+#### Tactical AI
+
+An expert system enhances the user’s understanding of and operation within a tactical environment.
 When you assess in a tactical situation, hold +1, even on a miss.
 When Acting Under Pressure in a tactical situation, you can roll +Chrome instead of +Cool. The GM will take into account on a miss or 7-9 that you were giving up control to an onboard AI.
 
-Stress-Free Cyberware:
+### Stress-Free Cyberware:
 
 The following cyberware does not cause stress:
 
-Dermal Plating: +2 armor, stacking with other armor.
+#### Dermal Plating
 
-Bone Hardening: +5 HP
++2 armor, stacking with other armor.
 
-Muscle Grafts: When fighting unarmed or with a melee weapon, you can roll +Chrome instead of +Tough for Mix It Up, and add +d6 damage
+#### Bone Hardening
 
-ChemSkin: A subdermal layer that changes the color of your skin. You can program it in advance with complex patterns, or instantly shift to simple tones. With Tactical AI, (and translucent or scanty clothing), you roll with Advantage for Act Under Pressure for stealth as the AI blends you in with the background. With Synthsenses you can also change how your eyes look at will. 
++5 HP
 
-Compartment: A compartment built into a real or cybernetic part of your body which can contain a small item. It is well hidden but not interactive in any way. Describe where it is and how you get to it.
+#### Muscle Grafts
 
-Health Monitor: Built in monitor for your physical condition. Optionally includes a dedicated tracer and alert warning to a virtual destination of your choice (typically to summon a Trauma Team to patch you up). With Comms you can send the details to anyone in real time.
+When fighting unarmed or with a melee weapon, you can roll +Chrome instead of +Tough for Mix It Up, and add +d6 damage
+
+#### ChemSkin
+
+A subdermal layer that changes the color of your skin. You can program it in advance with complex patterns, or instantly shift to simple tones. With Tactical AI, (and translucent or scanty clothing), you roll with Advantage for Act Under Pressure for stealth as the AI blends you in with the background. With Synthsenses you can also change how your eyes look at will. 
+
+#### Compartment
+
+A compartment built into a real or cybernetic part of your body which can contain a small item. It is well hidden but not interactive in any way. Describe where it is and how you get to it.
+
+#### Health Monitor
+
+Built in monitor for your physical condition. Optionally includes a dedicated tracer and alert warning to a virtual destination of your choice (typically to summon a Trauma Team to patch you up). With Comms you can send the details to anyone in real time.
  
-Autoinjecter: Inject a dose of a drug if your Health Monitor detects a pre-determined trigger condition. You can manually cause the inject to trigger – describe how it is triggered. With a neural interface, you can trigger it by thought.
+#### Autoinjecter
+
+Inject a dose of a drug if your Health Monitor detects a pre-determined trigger condition. You can manually cause the inject to trigger – describe how it is triggered. With a neural interface, you can trigger it by thought.
 
 
 ## Gear
 All adventurers have everything you need in a normal situation for free, such as rope, spikes, backpack, bags, chalk, lanterns, ammunition, food, etc etc etc. They also have up to two weapons and one armor.
 
-Melee Weapons:
+### Melee Weapons
 
 Fists: +0
 Knife, Dagger, Claws, Club: +2
 Katana, Longsword: +d6
 Claymore / Battleaxe: +d6+2
 
-Firearms:
+### Firearms
 
 Pistol: +d6
 Heavy Pistol: +d6+2
@@ -938,7 +971,7 @@ Sniper Rifle: +3d6, +reroll, +slow
 Assault Cannon: +4d6, +reroll, +target, +clumsy
 Flechette X: +reroll, +quiet, but armor is doubled
 
-Armor:
+### Armor
 
 Clothing: 0
 Heavy Clothing: 1
@@ -948,8 +981,7 @@ Tactical Gear: 6  ()
 Military Hardsuit: 10  (Halo / MaxTac style)
 
 
-
-Vehicles:
+### Vehicles
 
 * Powered Rollerblades (1 person) 
 * Sports Bike (1 person)
@@ -968,6 +1000,9 @@ Vehicle tags: +looks, +intimidating, +fast, +agile, +ambulance, +military, +ai, 
 Negative vehicle tags: +damaged, +unreliable, +fragile, +tracked, +expensive, +exposed, +slow
 
 
+
+# Systems
+
 ## Combat
 
 ### Ranges
@@ -980,7 +1015,7 @@ The range levels for combat are as follows:
 
 
 
-# The Matrix
+## The Matrix
 
 Jack In: This isn't an actual move, just fictional positioning.
 Recon: This is just Research on the system
@@ -1033,78 +1068,87 @@ Deck:
 
 
 
-
-
-
-
 # Downtime Moves
 
 These moves are used between missions, or when a particular situation allows for them.  They use Credit to power the rolls and at most 3 Credit can be spent on any one roll.
 
-Hit the Clubs:
+### Move: Hit the Clubs
+
 When you hit the town and spend Cred to make a good impression, roll +Cred spent, on a 10+ choose 3, on a 7-9 choose 1:
-* 	You befriend an important NPC; add them as a Contact if you wish
-* 	You hear rumors of an opportunity, describe it.
-* 	You learn some useful information, or find a cool gadget (+intel or +gear, your choice)
-* 	You are not tricked, trapped, or cause trouble in the process
+
+* You befriend an important NPC; add them as a Contact if you wish
+* You hear rumors of an opportunity, describe it.
+* You learn some useful information, or find a cool gadget (+intel or +gear, your choice)
+* You are not tricked, trapped, or cause trouble in the process
  
-Personal Business:
+### Move: Personal Business
+
 When you spend time and Cred in pursuit of your own desires, such as tying up a loose end or revenge on an enemy, describe the situation and how you intend to resolve it, then roll +Cred spent.  On a hit, the MC will tell you how this factors into the next mission and will ensure that it is both relevant and important. On a 10+ you may take +1 forward when acting on this information.  
  
-Deal with the Corps:
+### Move: Deal with the Corps
+
 When you spend Cred in a deal with a Corporation, roll +Cred spent and name the Corp that you want to work with. Take +1 on the roll if you are +owned by the Corporation. On a miss, increase the countdown clock of the Corporation by 1. On a 10+ choose 3, on a 7-9 choose 1:
-* 	You increase your status within the Corp, keep track of this per named Corporation.
-* 	You can avail yourself of Corporate assets
-* 	You can ask the MC a question that the Corp would be able to answer
-* 	You gain an audience with Corporate executives and may ask a favor of them
-* 	A rival, corporate or otherwise, does not hear about your dealings
+* You increase your status within the Corp, keep track of this per named Corporation.
+* You can avail yourself of Corporate assets
+* You can ask the MC a question that the Corp would be able to answer
+* You gain an audience with Corporate executives and may ask a favor of them
+* A rival, corporate or otherwise, does not hear about your dealings
 
 Corporations with a particular focus have further options on a 10+ for those with at least one point of status:
-* 	Intelligence: Acquire sole control of some piece knowledge
-* 	Commercial: Acquire a rare item not otherwise available
-* 	Black Ops: Kill an NPC
-* 	Matrix: Gain a program or a slot for your deck
-* 	Military: Your primary weapon permanently deals +1 harm
-* 	Justice: Absolve yourself of a crime, or persecute someone
+
+* Intelligence: Acquire sole control of some piece knowledge
+* Commercial: Acquire a rare item not otherwise available
+* Black Ops: Kill an NPC
+* Matrix: Gain a program or a slot for your deck
+* Military: Your primary weapon permanently deals +1 harm
+* Justice: Absolve yourself of a crime, or persecute someone
  
-Seek a Handler:
+### Move: Seek a Handler
+
 When you flash around some Cred to seek a sponsor, roll +Cred spent. On a hit you attract the notice of one of the following, your choice:
-* 	An elite hacker, seeks: information and bleeding edge technology
-* 	A corporate executive with powerful ambitions, seeks: power
-* 	An anonymous benefactor with a hidden agenda, seeks: furthering their goals without being revealed
-* 	A zealot in service of her ideals, seeks: devotion and furthering a public agenda
-* 	A cyber-preppie, idle and decadent, seeks: excitement
-* 	A military officer, seeks: warfare and conflict
-* 	A gang leader, seeks: chaos and destruction
-* 	A local community leader, seeks: order and justice
+
+* An elite hacker, seeks: information and bleeding edge technology
+* A corporate executive with powerful ambitions, seeks: power
+* An anonymous benefactor with a hidden agenda, seeks: furthering their goals without being revealed
+* A zealot in service of her ideals, seeks: devotion and furthering a public agenda
+* A cyber-preppie, idle and decadent, seeks: excitement
+* A military officer, seeks: warfare and conflict
+* A gang leader, seeks: chaos and destruction
+* A local community leader, seeks: order and justice
+
 When you bring your sponsor something that they seek, they will reward you appropriately.
  
-Put Down Roots
+### Move: Put Down Roots
+
 When you invest your Cred and status to take control of a somewhere to be your HQ, choose one of the below or tell the MC about a suitable location from an earlier mission:
-* 	An abandoned warehouse
-* 	A top floor apartment … in a bad part of town
-* 	A shipping container, cramped but mobile 
-* 	The back room behind a bar
-* 	A bedsit above a shop
-* 	A boring 3 bed, 2 bath in suburbia, far away from the action
+
+* An abandoned warehouse
+* A top floor apartment … in a bad part of town
+* A shipping container, cramped but mobile 
+* The back room behind a bar
+* A bedsit above a shop
+* A boring 3 bed, 2 bath in suburbia, far away from the action
  
 Once a location has been selected, roll +Cred spent. On a 10+ choose 3, on a 7-9 choose 1:
-* 	It has some security
-* 	It is relatively anonymous
-* 	The neighbors aren't suspicious. Yet. 
-* 	It has someone who looks after it when you're not there
-* 	You are the rightful owner and your presence is uncontested
-* 	You discover something valuable hidden in a wall safe
-* 	Your location, or the entrance to it, is hard to find
-* 	You share in the profits, and the danger [Shop or Bar only]
- 
-Home Improvement:
-When you spend Cred to improve your HQ, tell the MC what you want to add (from the list above or something else) and roll +Cred spent. On a 10+ you add, on a 7-9 the GM will tell you the consequences or cost to add this.
-On a 10+, you may also select:
-* 	+Dossiers: You have +1 ongoing to Research when performed within your HQ
-* 	+Medical: You can perform Go Under the Knife within your HQ and heal between missions
-* 	+Weaponized: You have +1 ongoing to Play Hardball and Mix It Up within your HQ
-* 	+Encrypted: Your gateway to the Matrix is secure
-* 	+Satellite: You have control of a spy satellite from (only) within your HQ 
 
+* It has some security
+* It is relatively anonymous
+* The neighbors aren't suspicious. Yet. 
+* It has someone who looks after it when you're not there
+* You are the rightful owner and your presence is uncontested
+* You discover something valuable hidden in a wall safe
+* Your location, or the entrance to it, is hard to find
+* You share in the profits, and the danger [Shop or Bar only]
+ 
+### Move: Home Improvement
+
+When you spend Cred to improve your HQ, tell the MC what you want to add (from the list above or something else) and roll +Cred spent. On a 10+ you add, on a 7-9 the GM will tell you the consequences or cost to add this.
+
+On a 10+, you may also select:
+
+* +Dossiers: You have +1 ongoing to Research when performed within your HQ
+* +Medical: You can perform Go Under the Knife within your HQ and heal between missions
+* +Weaponized: You have +1 ongoing to Play Hardball and Mix It Up within your HQ
+* +Encrypted: Your gateway to the Matrix is secure
+* +Satellite: You have control of a spy satellite from (only) within your HQ 
 
