@@ -696,6 +696,7 @@ At the start of the session, roll +Tough. On a 10+, hold 3+Tough. On a 7-9, hold
 
 ### Advances:
 
+* [2] +1 hold for Street Samurai
 * [2] Gain a second custom weapon
 * [2] Add another feature to one of your weapons (repeatable)
 * [2] Add a piece of cyberware, explain how you got it.
@@ -708,88 +709,116 @@ At the start of the session, roll +Tough. On a 10+, hold 3+Tough. On a 7-9, hold
 
 When you use your weapon to cut through or destroy an obstacle, roll +Tough. On a 10+ pick 3, on a 7-9 pick 2:
 
+* It cuts through more than tin cans and tomatoes
 * It doesn't take long
 * Nothing else is damaged
 * It doesn't make much noise
-* It can be fixed
+* It can be fixed or the damage hidden
 
 **But Wait, There's More**
 
-
-
+Add the option, "You also get a free +1 forward", and select an additional option.
 
 
 ## Streamer
 
 ### Description:
 
-You start with: 2 Followers, Sensorium Broadcast rig. 
-You have an Influence score which starts at 2. Every time you gain a new follower, it is increased by 1. You can increase it in other ways as well.
+You must have 0 or more Chrome and take the Synthsenses and Comms cyberware.
 
-Declare how you get any feedback from L&otA. 
+You start with: 2 Followers and free tags: +sensorium (for Synthsenses) and +broadcast, +iced (for comms)
+You can still choose one more tag for each.
 
-Move: Live and on the Air
-When you live stream your current situation, declare who can access the stream: only your followers and/or contacts, or that it’s public and anyone can see it, and roll +Style. On a 10+ hold 3. On a 7-9 hold 1. 
-While you’re streaming, you can spend hold to:
-* 	Phone a Friend: Ask a question you have access to from Assess, Research or Fast Talk, but you have to ask it out loud for your audience to hear. 
-* 	PR Disaster: If it is obvious that you’re streaming, then +1 on AUP or Fast Talk to avoid combat or to have an attack targeting you instead target someone else.
-* 	Crowdsourcing: Take +1 forward, or give someone else +1 forward, by taking advice from the crowd.
-* 	Flashfunding: Get past a corruptible human danger or barrier by bribing them with money from the crowd. 
-* 	Slashdotted: If global and your influence is 6 or more, DDOS a site. Give the Netrunner 2 hold. (Once per stream)
-* 	Flashmob: If global and your Influence is 6 or more, cause a scene in the vicinity. (Once per stream)
-* 	Gone Viral: If global and your influence is 10 or more, increase or decrease a corporate clock. The GM will do the opposite to another clock. (Once per stream)
-On a miss, if you’re streaming globally, the GM will also advance a countdown clock. 
+You have an Influence score which starts at 2. Every time you gain a new Follower, it is increased by 1. You can increase it in other ways as well.
 
-### Move: Expert Influencer
+Declare how you get any feedback from Live and on the Air, and how you can interact with it. Examples include:
 
-At the start of the session, roll +Style. On a 10+, hold 3+Style. On a 7-9, hold 1+Style. On a miss, hold 1 anyway, but during the session you will ... The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
-* 	Millions of Micro Payments: Gain 1 Cred when live and on the air (once per stream)
-* 	Permanently gain 1 Influence when live and on the air (once per stream)
-* 	Take 10 on Fast Talk when your fame is relevant, but the GM advances a Clock
-* 	Get your followers to do something off camera
+* It seems like thoughts rather than projected as augmented reality
+* It appears as text in a chatbox in your vision
+* You can hear it, but must look at a screen somewhere to see anything
+* It goes somewhere else on the Matrix, and you have to access that site to interact
+
+
+### Move: Live and on the Air
+
+When you live stream your current, interesting situation, declare who can access the stream: only your followers and/or contacts, or that it’s global and anyone can see it, and roll +Style. On a 10+ hold 3. On a 7-9 hold 1. On a miss, if you’re streaming globally, the GM will also advance a countdown clock. While you’re streaming, you can spend hold to:
+
+* Phone a Friend: Ask a question you have access to from Assess, Research or Fast Talk, but you have to ask it out loud for your audience to hear. 
+* PR Disaster: If it is obvious that you’re streaming, then +1 on Act Under Pressure or Fast Talk to avoid combat or to have an attack targeting you instead target someone else.
+* Crowdsourcing: Take +1 forward, or give someone else +1 forward, by taking advice from the crowd.
+* Flashfunding: If you're streaming globally, get past a corruptible human danger or barrier by bribing them with money from the crowd. 
+* Slashdotted: If you're streaming globally and your influence is 6 or more, DDOS a site. Give the Netrunner 2 hold. (Once per stream)
+* Flashmob: If you're streaming globally and your Influence is 6 or more, cause a scene in the vicinity. (Once per stream)
+* Gone Viral: If you're streaming globally and your influence is 10 or more, increase or decrease a corporate clock. The GM will do the opposite to another clock. (Once per stream)
+
+
+### Move: Mega-Influencer
+
+At the start of the session, roll +Style. On a 10+, hold 3+Style. On a 7-9, hold 1+Style. On a miss, hold 1 anyway, but during the session you will screw up on air with terrible consequences. The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
+* Millions of Micro Payments: Gain 1 Cred when live and on the air (once per stream)
+* Permanently gain 1 Influence when live and on the air (once per stream)
+* Take 10 on Fast Talk when your fame is relevant, but the GM advances a Clock
+* Get your followers to do something off camera
 
 ### Advances:
-[3] Dedicated Followers: You are known for a particular sort of stream. When you buy this move pick one of the following to gain temporary Influence when Live and on the Air in certain circumstances.
-* 	Combat Vlogger: In a firefight, temporarily gain 3 Influence
-* 	High Speed: In a vehicle, temporarily gain 3 Influence
-* 	Penetration: In a high security area, temporarily gain 3 Influence
-* 	Blackhat: Whenever a friendly Netrunner does something obvious to help the group, temporarily gain 1 Influence 
-* 	Maven: In a social situation, temporarily gain 3 Influence
-* 	Rocker: If you are actively being entertaining by Performing your Art, temporarily gain 5 Influence and an extra hold for Perform
+* [2] +1 hold for Mega-Influencer
+* [3] You gain the move: Dedicated Followers
+    * [2] Diverse Followers: Pick a second following
+
+### Move Details
+
+**Dedicated Followers**
+
+You are known for a particular sort of stream. When you buy this move pick one of the following to gain temporary Influence when Live and on the Air in certain circumstances.
+* Combat Vlogger: In a firefight, temporarily gain 3 Influence
+* High Speed: In a vehicle, temporarily gain 3 Influence
+* Penetration: In a high security area, temporarily gain 3 Influence
+* Blackhat: Whenever a friendly Netrunner does something obvious to help the group, temporarily gain 1 Influence 
+* Maven: In a social situation, temporarily gain 3 Influence
+* Rocker: If you are actively being entertaining by Performing your Art, temporarily gain 5 Influence and an extra hold for Perform
 
  
 ## Juicer
 
 ### Description:
 
-You can Do Science! to research drugs and medicines.
+You have access to a medical and pharmacology facilities, either one location or separate, where you can perform surgery and make drugs. If have an HQ, then it can be there. Explain your choices to the GM.
+
+You can Do Science! to research drugs (including medicines) at an appropriate facility.
+
+You can Act Under Pressure (instead of Do Science!) with the right facilities to make d6 doses of any drug that you know.
+
 You can buy the Juicer only upgrades to First Aid.
 
 You start with knowledge of three of the following drugs:
-* 	‘face:  +1 Chrome for 10 minutes, then -1 Tough for 12 hours
-* 	Speed: React as if you had synthetic nerves for 1 scene
-* 	Flesh Knitter: +2d6 healing with First Aid
-* 	Blue Starfire: +1 Style, -1 Cool, -1 Sharp for 1 hour. Party drug ;)
-* 	Glass: +1 Sharp, take d6 extra damage if hurt
-* 	Sandman: Knockout drug (inhaled or ingested)
+* ‘face:  +1 Chrome for 10 minutes, then -1 Tough for 12 hours
+* Speed: React as if you had synthetic nerves for 1 scene
+* Flesh Knitter: +2d6 healing with First Aid
+* Blue Starfire: +1 Style, -1 Cool, -1 Sharp for 1 hour.
+* Glass: +1 Sharp, take d6 extra damage if hurt
+* Sandman: Knockout drug (inhaled or ingested)
+* Immunoblockers: Reduce Stress by 1 for the game session. + Something Bad. 
 
-You can Act Under Pressure with the right facilities to make d6 doses of any drug that you know.
 
 ### Move: Expert Biohacker
 
-At the start of the session, roll +Sharp. On a 10+, hold 3+Sharp. On a 7-9, hold 1+Sharp. On a miss, hold 1 anyway, but during the session you will ... The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
-* 	Have a stash of the right drug when you need it. (Spend hold as [gear] for a drug you know about)
-* 	Surgical Strike: When you hit with Mix It Up, select one of the bonus options you have access to.
-* 	Ignore the stat modifiers from damage for a roll, or resist a toxin
-* 	Autopsy: Ask a question (like Assess) about a dead body
-* 	Organ Legger: Harvest organs or cyberware from bodies
+At the start of the session, roll +Sharp. On a 10+, hold 3+Sharp. On a 7-9, hold 1+Sharp. On a miss, hold 1 anyway, but during the session your attention will lapse at a critical moment, causing greivous harm. The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
+* Have a stash of the right drug when you need it: You can spend hold as [gear] for a drug you know about
+* Surgical Strike: When you hit with Mix It Up, select one of the bonus options you have access to.
+* Autopsy: Ask a question (like Assess) about a dead body
+* Organ Legger: Harvest organs or cyberware from bodies
+
+### Advances:
+
+* [2] +1 hold for Expert Biohacker
+* [1] Know another drug without researching it with Science (repeatable)
 
 
 ## Courier
 
 ### Description:
 
-You must start with Overclocked Reflexes.
+You must start with at least 0 Chrome and Overclocked Reflexes.
 While in constant motion, you have +1 armor. 
 Take +1 when you Act Under Pressure using motion or momentum to resolve the danger.
 
@@ -803,7 +832,8 @@ At the start of the session, roll +Cool. On a 10+, hold 3+Cool. On a 7-9, hold 1
 
 ### Advances:
 
-[3] something: something
+* [2] +1 hold for Expert 'blader
+* [3] something: something
 
 
 # Equipment
@@ -826,17 +856,21 @@ Stress-Causing Cyberware:
 SynthSenses: Cybernetic eyes and/or ears. When your enhanced senses would help you, you can roll +Chrome for Assess.
 Start with 2 Tags.
 
-Available Tags: +thermographic, +amplification, +magnification, +telescopic, +microscopic, +dampening, +recording, +encrypted, +HUD, +lights
+Available Tags: +thermographic, +amplification, +magnification, +telescopic, +microscopic, +dampening, +recording, +encrypted, +HUD, +lights, +sensorium 
+
+Sensorium allows you to also capture other senses and sensations, such as smell, touch (including pain), and taste.
 
 With Tactical AI, allows independent targeting of multiple hand-held weapons.
 
 Comms: When you have comms installed, you can communicate electronically without moving or making an audible sound.
 
 Start with one tag.
-Available Tags: +encrypted, +jamming, +recording, +broadcast, 
-+inaccessible partition, +iced
+Available Tags: +encrypted, +jamming, +recording, +broadcast, +inaccessible partition, +iced
 
 Comms without +encrypted can be intercepted. Any comms makes you susceptible to being quickhacked, +iced increases the time needed for a netrunner to break through. +recording lets you record communications to internal storage, while +broadcast lets you broadcast what you’re seeing.
+
+With SynthSenses, you can project communications into your field of view. 
+
 
 Implanted Weaponry:  retractable claws, blade, pistol, monofilament whip or other small weapon. You cannot be disarmed. It is automatically +linked. 
 
