@@ -1,16 +1,31 @@
 
+# Basic Statistics
+
+There are 5 basic statistics which every one has:
+
+* Tough
+* Cool
+* Sharp
+* Style
+* Chrome
+
+There are two additional statistics:
+
+* Links: between the character and another PC/NPC, with individual values for each
+* Stress: the number of stress-causing cybernetics installed
+
 # Basic Moves
 There are 9 basic moves which everyone has access to:
 
 * Mix It Up:  Deal damage to an enemy (Tough)
 * Fight Another Day:  Survive when on 0 hp (Tough)
-    • Act Under Pressure: Resolve a dangerous situation (Cool)
-    • First Aid: Heal yourself or another character (Cool)
-    • Research: Provide information about something (Sharp)
-    • Assess: Perceive what is around you (Sharp)
-    • Fast Talk: Convince someone to do something (Style)
-    • Hit the Streets: Get something from someone you know (Style)
-    • Assist: Help another character (Links)
+* First Aid: Heal yourself or another character (Cool)
+* Research: Provide information about something (Sharp)
+* Assess: Perceive what is around you (Sharp)
+* Act Under Pressure: Resolve a dangerous situation (Cool)
+* Fast Talk: Convince someone to do something (Style)
+* Hit the Streets: Get something from someone you know (Style)
+* Assist: Help another character (Links)
 
 ## Move: Mix It Up
 
@@ -288,7 +303,7 @@ When you make a showy entrance into a dangerous or important situation, roll +St
 
 **But You HAVE Heard of Me:**
 
-When you meet someone important (your call), roll +Style. On a hit, they’ve heard of you, and you say what they’ve heard; the GM will have them respond accordingly. On a 10+, you take +1 forward for dealing with them. On a miss, they’ve heard of you, but the GM will decide what it is that they’ve heard. This can trigger Bonds.
+When you meet someone important (your call), roll +Style. On a hit, they’ve heard of you, and you say what they’ve heard; the GM will have them respond accordingly. On a 10+, you take +1 forward for dealing with them. On a miss, they’ve heard of you, but the GM will decide what it is that they’ve heard. This can trigger Links.
 
 **Negotiator:**
 
@@ -304,7 +319,7 @@ On a 10+ pick two, on a 7-9 pick one:
 
 ### Description:
 
-If you have not declared a Contact this session, you may declare a new Contact. Name and describe them, including which of you owes the other a favor. The GM may ask additional questions about the contact. Write the contact down on your sheet. This can trigger Bonds.
+If you have not declared a Contact this session, you may declare a new Contact. Name and describe them, including which of you owes the other a favor. The GM may ask additional questions about the contact. Write the contact down on your sheet. This can trigger Links.
 
 When you go to a Contact for help, state which one and roll +Style. On a 10+, they have what you need and a little extra. Gain +[intel] or +[gear]. On a 7-9, they have what you need, but choose two from the following list:
 
@@ -342,9 +357,9 @@ When you first go to a new part of the city, you can ask the GM two of the follo
 
 ### Description:
 
-When a player describes something about their character’s past, such as a Contact they know, how they got a piece of equipment, or how they know something, another player, in order of fewest to most bonds, may opt to describe how their character was also part of that story. A player who does so gains +1 bond with the acting character. Only one bond may be generated per story, and joining the story does not trigger new Bonds.
+When a player describes something about their character’s past, such as a Contact they know, how they got a piece of equipment, or how they know something, another player, in order of fewest to most Links, may opt to describe how their character was also part of that story. A player who does so gains +1 Link with the acting character. Only one link may be generated per story, and joining the story does not trigger new Links.
 
-When you try to help someone, roll +Bonds with that character (max +3). On a hit, they take +1 forward, +2 armor or +d6 damage as appropriate for what you’re trying to help with.  
+When you try to help someone, roll +Links with that character (max +3). On a hit, they take +1 forward, +2 armor or +d6 damage as appropriate for what you’re trying to help with.  
 
 
 ## Move: Do Science!
@@ -425,6 +440,7 @@ At the start of the session, roll +Cool. On a 10+, hold 3+Cool. On a 7-9, hold 1
 
 ### Advances:
 
+* [2] Hold +1 for Wheelman
 * [2] sweet-ride: Sweet Ride: If your vehicle has the +looks tag, when you Hit the Streets in your vehicle, take +1.
 * [2] doc-wagon: Doc Wagon: If your vehicle has the +ambulance tag, when you do First Aid, take +1. A Juicer can use your vehicle for surgery (but not to install cyberware).
 * [2] muscle-car: Muscle Car: If your vehicle has the +intimidating tag, when you Fast Talk from your vehicle in an intimidating way, take +1
@@ -446,13 +462,15 @@ You can Do Science! to create a polymer face mask to disguise yourself as a part
 ### Move: Con Artist
 
 At the start of the session, roll +Style. On a 10+, hold 3+Style. On a 7-9, hold 1+Style. On a miss, hold 1 anyway, but during the session you will commit a serious faux-pas or breach of etiquette. The GM will tell you when and what happens. You may spend hold during the session one of one for any of these situations:
-•	Convince someone of something
-•	Bluff to avoid a threat
-•	Impersonate someone successfully
-•	Gain +1 Credits when getting paid for a job
+
+* Convince someone of something
+* Bluff to avoid a threat
+* Impersonate someone successfully
+* Gain +1 Credits when getting paid for a job
 
 ### Advances:
 
+* [2] Hold +1 for Con Artist
 * [3] mask: If you are in a Mask, and roll 12+ on Fast Talk, you can increase or decrease a relevant countdown clock. The GM will tell you which clock, you decide to move it up or down.
 
 ## Netrunner
@@ -467,22 +485,22 @@ At the start of a session, when you're tooling up to cut some ICE, roll +Sharp. 
 ### Move: Sleaze
 
 When you want to appear to a system as legitimate sysop and it should follow the commands you give it, roll +Synth. On a 10+ you're root with full administrator privileges (for now), increase your hacking hold by 2. On a 7-9, you're an admin, increase your hold by 1. The system will execute the commands but your reduced privileges make it harder, pick one:
-•	The commands are logged and someone will find out in due course. The MC will increase an appropriate countdown clock by 1.
-•	The system launches a routine traceroute. Increase your trace countdown clock by 1.
-•	You need to constantly pay attention to fighting the system. You have -1 ongoing until you jack out.
+* The commands are logged and someone will find out in due course. The MC will increase an appropriate countdown clock by 1.
+* The system launches a routine traceroute. Increase your trace countdown clock by 1.
+* You need to constantly pay attention to fighting the system. You have -1 ongoing until you jack out.
 On a miss, your connection is blocked and ICE is triggered against you: the MC will tell you what happens.
 
 ### Move: Crash
 
 When you want to crash your way into a system and seize control of it, roll +Synth. On a 10+ you cut through the ICE and take forceful control of the system, for now. Increase your hacking hold by 2. On a 7-9, you're through, increase your hold by 1 and pick one:
-•	Your deck is damaged until repaired: -1 to a stat or remove a positive tag
-•	Your neural interface is damaged until repaired: give it +unreliable, +damaging, +decay, or +substandard or remove a positive tag
-•	One of your programs is deleted or otherwise irrecoverably corrupted, the MC picks which one.
-•	Visible/Audible Alarms go off on site. Advance the Mission clock by 1.
+* Your deck is damaged until repaired: -1 to a stat or remove a positive tag
+* Your neural interface is damaged until repaired: give it +unreliable, +damaging, +decay, or +substandard or remove a positive tag
+* One of your programs is deleted or otherwise irrecoverably corrupted, the MC picks which one.
+* Visible/Audible Alarms go off on site. Advance the Mission clock by 1.
 On a miss, the ICE blocks you: you pick one and the MC picks one.
 
 ### Advances:
-
+* [2] Hold +1 for Console Cowboy
 * [3] quick-hack: Gain the move Quick Hack.
     * [2] Select another option for Quick Hack.
 	* [3] Add an option: You can take momentary control of a component or system
@@ -508,114 +526,198 @@ When you are in control of a system, you may spend a hold to create misinformati
 
 ### Description:
 
-Get a bonus research question and a bonus assess question for free.
+Get a new research question and a new assess question for free.
 
 ### Move: Expert Hunter
 
 At the start of the session, roll +Sharp. On a 10+, hold 3+Sharp. On a 7-9, hold 1+Sharp. On a miss, hold 1 anyway, but during the session you will miss a crucial clue or opportunity. The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
-•	Take [intel]
-•	Ask a question from the Research list
-•	Ask a question from the Assess list
-•	Consult the rolodex: Declare a contact
+* Take [intel]
+* Ask a question from the Research list
+* Ask a question from the Assess list
+* Consult the rolodex: Declare a contact
 
 ### Advances:
-[3] Prepared: At the start of the session, take +[intel] and +[gear]
+* [2] Hold +1 for Expert Hunter
+* [3] Prepared: At the start of the session, take +[intel] and +[gear]
+* [3] On the Trail: When you want to find someone or something, name your target. When you gain [intel] you can say whether it is about your target or not. Spend three such [intel] and the GM will tell you where the target is, you tell the GM how the clues led to that knowledge.
 
 ## Killer
 
 ### Description:
 
 You start with a custom firearm. Pick a base type. It can be +linked for free. Pick two:
-•	Hi-powered: +2 damage
-•	Super-hi-powered: +d6 damage (requires hi-powered)
-•	Big and Dangerous: +reroll, +loud
-•	Silenced: -loud
-•	Shaped: +2 Piercing
-•	Recognizable: +1 to Fast Talk if brandished
-•	Discreet: Can be hidden on your person
-•	DNA-keyed: Only you can use it without consequences
 
-### Move: Expert Badass
+* Hi-powered: +2 damage
+* Super-hi-powered: +d6 damage (requires hi-powered)
+* Big and Dangerous: +reroll, +loud
+* Silenced: -loud
+* Shaped: +2 Piercing
+* Recognizable: +1 to Fast Talk if brandished
+* Discreet: Can be hidden on your person
+* DNA-keyed: Only you can use it without consequences
+
+### Move: Total Badass
 
 At the start of the session, roll +Tough. On a 10+, hold 3+Tough. On a 7-9, hold 1+Tough. On a miss, hold 1 anyway, but during the session you will be outmatched or outgunned. The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
-•	Disable or kill an unnamed NPC in combat
-•	Deal +d6 damage on a hit for Mix It Up
-•	Choose one less option for Hit the Streets when you go in search of weapons, explosives or other military gear
+
+* Disable or kill an unnamed NPC in combat
+* Deal +d6 damage on a hit for Mix It Up
+* Choose one less option for Hit the Streets when you go in search of weapons, explosives or other military gear
 
 ### Advances:
 
-[2] Gain a second custom weapon
-[2] Add another feature to one of your weapons (repeatable)
+* [2] Hold +1 for Total Badass
+* [2] Gain a second custom weapon
+* [2] Add another feature to one of your weapons (repeatable)
+* [2] Add a piece of cyberware, explain how you got it.
 
 ## Tech
 
 ### Description:
 
 Pick one specialization:
-•	Weapons
-•	Cyberware
-•	Decks and Computers
-•	Vehicles and Drones
-•	Security Equipment
-•	Scientific (including Medical) Equipment
 
-Have access to a facility for each of your specializations, as if had it at HQ per downtime moves. If have an HQ, then it can be there, your choice. 
+* Weapons
+* Cyberware
+* Decks and Computers
+* Vehicles and Drones
+* Security Equipment
+* Scientific (including Medical) Equipment
+
+You have access to a facility for each of your specializations, as if you had it at HQ per downtime moves. If have an HQ, then it can be there, your choice. 
 
 You have Do Science! for each of your specializations.
 
-### Move: Expert Something
+### Move: Total Geek
 
 At the start of the session, roll +Mind. On a 10+, hold 3+Mind. On a 7-9, hold 1+Mind. On a miss, hold 1 anyway, but during the session you will miss a crucial clue or opportunity. The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
-•	+[gear]
-•	Blow something up
-•	Quickly setup or configure something for which you have a specialization
-•	Fix an item for which you have a specialization
+* +[gear]
+* Blow something up
+* Quickly setup or configure something for which you have a specialization
+* Fix an item for which you have a specialization
 
 ### Advances:
-[2] Gain another specialization (repeatable)
+
+* [2] Hold +1 for Total Geek
+    * [2] Gain the move: Void the Warranty
+* [2] Gain the move: Technobabble
+* [2] Gain another specialization (repeatable)
+* [3] Gain the move: Pay Attention, 007
+    * [2] Gain the move: Do Try To Return It Intact
+    * [2] Gain the move: Hacked Firmware
+
+### Move Details
+
+**Pay Attention, 007**
+
+When you have time, at your HQ or in a facility, to outfit *another* character, roll +Links with that character. On a 10+, they take +[gear] and +1 forward. On a 7-9, they take +[gear] or +1 forward. On a miss, when they try to use [gear] this session, there will be a critical malfunction, either because you messed something up, or they didn't pay attention to how to use it.
+
+**Technobabble**
+
+When you baffle, confuse or just stall an NPC by spouting technical jargon at them, roll +Sharp. On a 10+, they are baffled or impressed and give you what you want. On a 7-9, they are confused but suspicious. 
+
+**Do Try To Return It Intact**
+
+If the [gear] from Pay Attention is used to generate something that should be valuable and should not be destroyed, but the player narrates how it *is* destroyed as part of using it, then __________
+
+**Hacked Firmware**
+
+When another character uses [gear] and misses a roll related to that [gear], spend a hold to declare that you had hacked the firmware, allowing the miss to be rerolled. If the new roll is also a miss, then you will share in the complications generated.
+
+**Void the Warranty**
+
+When you try to overclock any sort of technology and push it past its normal limits, spend a [gear] and roll +Sharp. If you have Comms and a Neural Interface, you can do this remotely on cybernetics. On a hit, the technology can go beyond normal limits. On a 7-9, also pick one:
+* It burns out and is useless until you can fix it ... hopefully
+* It damages the user, and malfunctions until the end of the scene
+* The GM will advance a relevant countdown clock
+
 
 ## Infiltrator
 
 ### Description:
 
-### Move: Expert Operative
+Active Camoflage: When you are by yourself, you take +1 to Act Under Pressure for stealth.
+
+
+### Move: Black Operative
 
 At the start of the session, roll +Sharp. On a 10+, hold 3+Sharp. On a 7-9, hold 1+Sharp. On a miss, hold 1 anyway, but during the session you will ... The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
-•	Bypass a security system or guard
-•	Disable a bypassed system or guard
-•	Escape notice
-•	Bring someone with you
+* Bypass a security system or guard
+* Disable a bypassed system or guard
+* Escape notice
+* Bring someone with you
 
 ### Advances:
+* [2] +1 hold for Black Operative
+* [2] When you spend hold to bring someone, you can bring a second person as well
+* [1] Add option for Black Operative: There's always an air duct: get from one part of a building to another quickly and quietly.
+* [2] Gain the move: Sensor Ghost
+* [2] Gain the move: Spiderclimb
+
+### Move Details
+
+**Sensor Ghost**
+
+If you have a Neural Interface and Comms, when you hack to edit yourself out of live recording devices, roll +Chrome. On a 10+, you're invisible to electronic sensors for the scene. On a 7-9, there's a glitch, pick one: 
+
+* Security eventually traces it back to you; the GM will increase a countdown clock.
+* Security comes to investigate, time to move!
+* It takes a lot of effort to confuse the sensors, take -1 ongoing.
+
+**Spiderclimb**
+
+When you use technology or cybernetics to quickly scale vertical surfaces, ceilings or otherwise traverse an "impossible" space, roll +Cool.  On a 10+, you make it safely and ____. On a 7-9, you drop something, leave an identifying trace, or attract unwanted attention.
+
 
 ## Razor
 
 ### Description:
 
-You have +1 armor while you’re conscious.
-You start with a custom melee weapon. Pick a base type. 
-Pick two:
-•	Nanoedge: +d6 damange
-•	Balanced: Roll +Sharp instead of +Tough
-•	Vibroblade: +2 piercing
-•	Chainsword: +messy, +reroll
-•	Poisoned: Mix it Up option: Deliver a dose of a drug
-•	Retractable: It is physically embedded in a limb
-•	Parry: Act Under Pressure to prevent all damage from a melee attack (requires Balanced)
+Active Defence: You have +1 armor while you’re conscious.
 
+You start with a custom melee weapon. Pick a base type.  Pick two:
 
-### Move: Expert Something
+* Nanoedge: +d6 damange
+* Balanced: Roll +Sharp instead of +Tough
+* Vibroblade: +2 piercing
+* Chainsword: +messy, +reroll
+* Poisoned: Mix it Up option: Deliver a dose of a drug
+* Retractable: It is physically embedded in a limb
+* Parry: Act Under Pressure to prevent all damage from a melee attack (requires Balanced)
+
+### Move: Street Samurai
 
 At the start of the session, roll +Tough. On a 10+, hold 3+Tough. On a 7-9, hold 1+Tough. On a miss, hold 1 anyway, but during the session you will ... The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
-•	Take +2 armor for a combat
-•	Before damage is announced against another character (PC or NPC), take the damage instead of the target
-•	Disable or kill an unnamed NPC in combat with your blades
-•	Shake it off: Heal d6+2 damage
+
+* Take +2 armor for a combat
+* Before damage is announced against another character (PC or NPC), take the damage instead of the target
+* Disable or kill an unnamed NPC in combat with your blades
+* Shake it off: Heal d6+2 damage
 
 ### Advances:
 
-[2] Gain a second custom weapon
-[2] Add another feature to one of your weapons (repeatable)
+* [2] Gain a second custom weapon
+* [2] Add another feature to one of your weapons (repeatable)
+* [2] Add a piece of cyberware, explain how you got it.
+* [2] Gain the move: Ginsu Knife
+    * [2] Gain the move: But Wait, There's More
+
+### Move Details
+
+**Ginsu Knife**
+
+When you use your weapon to cut through or destroy an obstacle, roll +Tough. On a 10+ pick 3, on a 7-9 pick 2:
+
+* It doesn't take long
+* Nothing else is damaged
+* It doesn't make much noise
+* It can be fixed
+
+**But Wait, There's More**
+
+
+
+
 
 ## Streamer
 
@@ -629,31 +731,31 @@ Declare how you get any feedback from L&otA.
 Move: Live and on the Air
 When you live stream your current situation, declare who can access the stream: only your followers and/or contacts, or that it’s public and anyone can see it, and roll +Style. On a 10+ hold 3. On a 7-9 hold 1. 
 While you’re streaming, you can spend hold to:
-•	Phone a Friend: Ask a question you have access to from Assess, Research or Fast Talk, but you have to ask it out loud for your audience to hear. 
-•	PR Disaster: If it is obvious that you’re streaming, then +1 on AUP or Fast Talk to avoid combat or to have an attack targeting you instead target someone else.
-•	Crowdsourcing: Take +1 forward, or give someone else +1 forward, by taking advice from the crowd.
-•	Flashfunding: Get past a corruptible human danger or barrier by bribing them with money from the crowd. 
-•	Slashdotted: If global and your influence is 6 or more, DDOS a site. Give the Netrunner 2 hold. (Once per stream)
-•	Flashmob: If global and your Influence is 6 or more, cause a scene in the vicinity. (Once per stream)
-•	Gone Viral: If global and your influence is 10 or more, increase or decrease a corporate clock. The GM will do the opposite to another clock. (Once per stream)
+* 	Phone a Friend: Ask a question you have access to from Assess, Research or Fast Talk, but you have to ask it out loud for your audience to hear. 
+* 	PR Disaster: If it is obvious that you’re streaming, then +1 on AUP or Fast Talk to avoid combat or to have an attack targeting you instead target someone else.
+* 	Crowdsourcing: Take +1 forward, or give someone else +1 forward, by taking advice from the crowd.
+* 	Flashfunding: Get past a corruptible human danger or barrier by bribing them with money from the crowd. 
+* 	Slashdotted: If global and your influence is 6 or more, DDOS a site. Give the Netrunner 2 hold. (Once per stream)
+* 	Flashmob: If global and your Influence is 6 or more, cause a scene in the vicinity. (Once per stream)
+* 	Gone Viral: If global and your influence is 10 or more, increase or decrease a corporate clock. The GM will do the opposite to another clock. (Once per stream)
 On a miss, if you’re streaming globally, the GM will also advance a countdown clock. 
 
 ### Move: Expert Influencer
 
 At the start of the session, roll +Style. On a 10+, hold 3+Style. On a 7-9, hold 1+Style. On a miss, hold 1 anyway, but during the session you will ... The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
-•	Millions of Micro Payments: Gain 1 Cred when live and on the air (once per stream)
-•	Permanently gain 1 Influence when live and on the air (once per stream)
-•	Take 10 on Fast Talk when your fame is relevant, but the GM advances a Clock
-•	Get your followers to do something off camera
+* 	Millions of Micro Payments: Gain 1 Cred when live and on the air (once per stream)
+* 	Permanently gain 1 Influence when live and on the air (once per stream)
+* 	Take 10 on Fast Talk when your fame is relevant, but the GM advances a Clock
+* 	Get your followers to do something off camera
 
 ### Advances:
 [3] Dedicated Followers: You are known for a particular sort of stream. When you buy this move pick one of the following to gain temporary Influence when Live and on the Air in certain circumstances.
-•	Combat Vlogger: In a firefight, temporarily gain 3 Influence
-•	High Speed: In a vehicle, temporarily gain 3 Influence
-•	Penetration: In a high security area, temporarily gain 3 Influence
-•	Blackhat: Whenever a friendly Netrunner does something obvious to help the group, temporarily gain 1 Influence 
-•	Maven: In a social situation, temporarily gain 3 Influence
-•	Rocker: If you are actively being entertaining by Performing your Art, temporarily gain 5 Influence and an extra hold for Perform
+* 	Combat Vlogger: In a firefight, temporarily gain 3 Influence
+* 	High Speed: In a vehicle, temporarily gain 3 Influence
+* 	Penetration: In a high security area, temporarily gain 3 Influence
+* 	Blackhat: Whenever a friendly Netrunner does something obvious to help the group, temporarily gain 1 Influence 
+* 	Maven: In a social situation, temporarily gain 3 Influence
+* 	Rocker: If you are actively being entertaining by Performing your Art, temporarily gain 5 Influence and an extra hold for Perform
 
  
 ## Juicer
@@ -664,23 +766,23 @@ You can Do Science! to research drugs and medicines.
 You can buy the Juicer only upgrades to First Aid.
 
 You start with knowledge of three of the following drugs:
-•	‘face:  +1 Chrome for 10 minutes, then -1 Tough for 12 hours
-•	Speed: React as if you had synthetic nerves for 1 scene
-•	Flesh Knitter: +2d6 healing with First Aid
-•	Blue Starfire: +1 Style, -1 Cool, -1 Sharp for 1 hour. Party drug ;)
-•	Glass: +1 Sharp, take d6 extra damage if hurt
-•	Sandman: Knockout drug (inhaled or ingested)
+* 	‘face:  +1 Chrome for 10 minutes, then -1 Tough for 12 hours
+* 	Speed: React as if you had synthetic nerves for 1 scene
+* 	Flesh Knitter: +2d6 healing with First Aid
+* 	Blue Starfire: +1 Style, -1 Cool, -1 Sharp for 1 hour. Party drug ;)
+* 	Glass: +1 Sharp, take d6 extra damage if hurt
+* 	Sandman: Knockout drug (inhaled or ingested)
 
 You can Act Under Pressure with the right facilities to make d6 doses of any drug that you know.
 
 ### Move: Expert Biohacker
 
 At the start of the session, roll +Sharp. On a 10+, hold 3+Sharp. On a 7-9, hold 1+Sharp. On a miss, hold 1 anyway, but during the session you will ... The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
-•	Have a stash of the right drug when you need it. (Spend hold as [gear] for a drug you know about)
-•	Surgical Strike: When you hit with Mix It Up, select one of the bonus options you have access to.
-•	Ignore the stat modifiers from damage for a roll, or resist a toxin
-•	Autopsy: Ask a question (like Assess) about a dead body
-•	Organ Legger: Harvest organs or cyberware from bodies
+* 	Have a stash of the right drug when you need it. (Spend hold as [gear] for a drug you know about)
+* 	Surgical Strike: When you hit with Mix It Up, select one of the bonus options you have access to.
+* 	Ignore the stat modifiers from damage for a roll, or resist a toxin
+* 	Autopsy: Ask a question (like Assess) about a dead body
+* 	Organ Legger: Harvest organs or cyberware from bodies
 
 
 ## Courier
@@ -694,10 +796,10 @@ Take +1 when you Act Under Pressure using motion or momentum to resolve the dang
 ### Move: Expert 'blader
 
 At the start of the session, roll +Cool. On a 10+, hold 3+Cool. On a 7-9, hold 1+Cool. On a miss, hold 1 anyway, but during the session you will ... The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
-•	Grab an object as you pass by
-•	Move along vertical surfaces such as walls, or grind along thin objects like power lines or zip lines
-•	Roll +Cool for Mix It Up, if your movement is key
-•	Parkour your way out of a sticky situation
+* 	Grab an object as you pass by
+* 	Move along vertical surfaces such as walls, or grind along thin objects like power lines or zip lines
+* 	Roll +Cool for Mix It Up, if your movement is key
+* 	Parkour your way out of a sticky situation
 
 ### Advances:
 
@@ -836,11 +938,11 @@ Negative vehicle tags: +damaged, +unreliable, +fragile, +tracked, +expensive, +e
 
 ### Ranges
 The range levels for combat are as follows:
-•	Close:     Touchable, certainly hittable with a stick
-•	Near:       Not touchable, but easy move-and-hit distance
-•	Medium:  One ‘action’ of moving is required to get to near
-•	Far:         Two or more actions required to get to near
-•	Visible:    Far away, but at least visible
+* 	Close:     Touchable, certainly hittable with a stick
+* 	Near:       Not touchable, but easy move-and-hit distance
+* 	Medium:  One ‘action’ of moving is required to get to near
+* 	Far:         Two or more actions required to get to near
+* 	Visible:    Far away, but at least visible
 
 
 
@@ -853,12 +955,12 @@ Find the File: This is just Assess
 
 Hacking:
 When you are jacked into the matrix and have some control of a computer system via Sleaze or Crash, you can spend a hold to:
-•	Get past a piece of inactive ICE or other subsystem without triggering it
-•	Prevent an alarm from triggering
-•	Control a connected piece of hardware for a limited time
-•	Decrease your Trace clock by 1 (once)
-•	[Any of the other routines in the Matrix rules]
-•	Take +1 forward for a roll against the system or in the system (once per roll)
+* 	Get past a piece of inactive ICE or other subsystem without triggering it
+* 	Prevent an alarm from triggering
+* 	Control a connected piece of hardware for a limited time
+* 	Decrease your Trace clock by 1 (once)
+* 	[Any of the other routines in the Matrix rules]
+* 	Take +1 forward for a roll against the system or in the system (once per roll)
 
 You may spend [intel] to increase your hold by 2. 
 
@@ -907,68 +1009,68 @@ These moves are used between missions, or when a particular situation allows for
 
 Hit the Clubs:
 When you hit the town and spend Cred to make a good impression, roll +Cred spent, on a 10+ choose 3, on a 7-9 choose 1:
-•	You befriend an important NPC; add them as a Contact if you wish
-•	You hear rumors of an opportunity, describe it.
-•	You learn some useful information, or find a cool gadget (+intel or +gear, your choice)
-•	You are not tricked, trapped, or cause trouble in the process
+* 	You befriend an important NPC; add them as a Contact if you wish
+* 	You hear rumors of an opportunity, describe it.
+* 	You learn some useful information, or find a cool gadget (+intel or +gear, your choice)
+* 	You are not tricked, trapped, or cause trouble in the process
  
 Personal Business:
 When you spend time and Cred in pursuit of your own desires, such as tying up a loose end or revenge on an enemy, describe the situation and how you intend to resolve it, then roll +Cred spent.  On a hit, the MC will tell you how this factors into the next mission and will ensure that it is both relevant and important. On a 10+ you may take +1 forward when acting on this information.  
  
 Deal with the Corps:
 When you spend Cred in a deal with a Corporation, roll +Cred spent and name the Corp that you want to work with. Take +1 on the roll if you are +owned by the Corporation. On a miss, increase the countdown clock of the Corporation by 1. On a 10+ choose 3, on a 7-9 choose 1:
-•	You increase your status within the Corp, keep track of this per named Corporation.
-•	You can avail yourself of Corporate assets
-•	You can ask the MC a question that the Corp would be able to answer
-•	You gain an audience with Corporate executives and may ask a favor of them
-•	A rival, corporate or otherwise, does not hear about your dealings
+* 	You increase your status within the Corp, keep track of this per named Corporation.
+* 	You can avail yourself of Corporate assets
+* 	You can ask the MC a question that the Corp would be able to answer
+* 	You gain an audience with Corporate executives and may ask a favor of them
+* 	A rival, corporate or otherwise, does not hear about your dealings
 
 Corporations with a particular focus have further options on a 10+ for those with at least one point of status:
-•	Intelligence: Acquire sole control of some piece knowledge
-•	Commercial: Acquire a rare item not otherwise available
-•	Black Ops: Kill an NPC
-•	Matrix: Gain a program or a slot for your deck
-•	Military: Your primary weapon permanently deals +1 harm
-•	Justice: Absolve yourself of a crime, or persecute someone
+* 	Intelligence: Acquire sole control of some piece knowledge
+* 	Commercial: Acquire a rare item not otherwise available
+* 	Black Ops: Kill an NPC
+* 	Matrix: Gain a program or a slot for your deck
+* 	Military: Your primary weapon permanently deals +1 harm
+* 	Justice: Absolve yourself of a crime, or persecute someone
  
 Seek a Handler:
 When you flash around some Cred to seek a sponsor, roll +Cred spent. On a hit you attract the notice of one of the following, your choice:
-•	An elite hacker, seeks: information and bleeding edge technology
-•	A corporate executive with powerful ambitions, seeks: power
-•	An anonymous benefactor with a hidden agenda, seeks: furthering their goals without being revealed
-•	A zealot in service of her ideals, seeks: devotion and furthering a public agenda
-•	A cyber-preppie, idle and decadent, seeks: excitement
-•	A military officer, seeks: warfare and conflict
-•	A gang leader, seeks: chaos and destruction
-•	A local community leader, seeks: order and justice
+* 	An elite hacker, seeks: information and bleeding edge technology
+* 	A corporate executive with powerful ambitions, seeks: power
+* 	An anonymous benefactor with a hidden agenda, seeks: furthering their goals without being revealed
+* 	A zealot in service of her ideals, seeks: devotion and furthering a public agenda
+* 	A cyber-preppie, idle and decadent, seeks: excitement
+* 	A military officer, seeks: warfare and conflict
+* 	A gang leader, seeks: chaos and destruction
+* 	A local community leader, seeks: order and justice
 When you bring your sponsor something that they seek, they will reward you appropriately.
  
 Put Down Roots
 When you invest your Cred and status to take control of a somewhere to be your HQ, choose one of the below or tell the MC about a suitable location from an earlier mission:
-•	An abandoned warehouse
-•	A top floor apartment … in a bad part of town
-•	A shipping container, cramped but mobile 
-•	The back room behind a bar
-•	A bedsit above a shop
-•	A boring 3 bed, 2 bath in suburbia, far away from the action
+* 	An abandoned warehouse
+* 	A top floor apartment … in a bad part of town
+* 	A shipping container, cramped but mobile 
+* 	The back room behind a bar
+* 	A bedsit above a shop
+* 	A boring 3 bed, 2 bath in suburbia, far away from the action
  
 Once a location has been selected, roll +Cred spent. On a 10+ choose 3, on a 7-9 choose 1:
-•	It has some security
-•	It is relatively anonymous
-•	The neighbors aren't suspicious. Yet. 
-•	It has someone who looks after it when you're not there
-•	You are the rightful owner and your presence is uncontested
-•	You discover something valuable hidden in a wall safe
-•	Your location, or the entrance to it, is hard to find
-•	You share in the profits, and the danger [Shop or Bar only]
+* 	It has some security
+* 	It is relatively anonymous
+* 	The neighbors aren't suspicious. Yet. 
+* 	It has someone who looks after it when you're not there
+* 	You are the rightful owner and your presence is uncontested
+* 	You discover something valuable hidden in a wall safe
+* 	Your location, or the entrance to it, is hard to find
+* 	You share in the profits, and the danger [Shop or Bar only]
  
 Home Improvement:
 When you spend Cred to improve your HQ, tell the MC what you want to add (from the list above or something else) and roll +Cred spent. On a 10+ you add, on a 7-9 the GM will tell you the consequences or cost to add this.
 On a 10+, you may also select:
-•	+Dossiers: You have +1 ongoing to Research when performed within your HQ
-•	+Medical: You can perform Go Under the Knife within your HQ and heal between missions
-•	+Weaponized: You have +1 ongoing to Play Hardball and Mix It Up within your HQ
-•	+Encrypted: Your gateway to the Matrix is secure
-•	+Satellite: You have control of a spy satellite from (only) within your HQ 
+* 	+Dossiers: You have +1 ongoing to Research when performed within your HQ
+* 	+Medical: You can perform Go Under the Knife within your HQ and heal between missions
+* 	+Weaponized: You have +1 ongoing to Play Hardball and Mix It Up within your HQ
+* 	+Encrypted: Your gateway to the Matrix is secure
+* 	+Satellite: You have control of a spy satellite from (only) within your HQ 
 
 
