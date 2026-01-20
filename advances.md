@@ -15,7 +15,7 @@ There are two additional statistics:
 * Stress: the number of stress-causing cybernetics installed
 
 # Basic Moves
-There are 9 basic moves which everyone has access to:
+There are 10 basic moves which everyone has access to:
 
 * Mix It Up:  Deal damage to an enemy (Tough)
 * Fight Another Day:  Survive when on 0 hp (Tough)
@@ -26,6 +26,11 @@ There are 9 basic moves which everyone has access to:
 * Fast Talk: Convince someone to do something (Style)
 * Hit the Streets: Get something from someone you know (Style)
 * Assist: Help another character (Links)
+* Stressed Out: Retain your sanity and humanity (Chrome)
+
+There is one additional move that several playbooks get:
+
+* Do Science: Research, create, fix or improve technology or other science (Sharp)
 
 ## Move: Mix It Up
 
@@ -361,6 +366,33 @@ When a player describes something about their character’s past, such as a Cont
 
 When you try to help someone, roll +Links with that character (max +3). On a hit, they take +1 forward, +2 armor or +d6 damage as appropriate for what you’re trying to help with.  
 
+## Move: Stressed Out
+
+### Description:
+
+When the rules or GM demands it because your sanity or humanity is being eroded by cyberware, roll +Chrome. Subtract your Stress from the result. On a 10+, no problem. On a 7-9, pick one:
+
+* You experience hallucinations or otherwise temporarily lose grasp on reality
+* You shutdown a piece of cyberware and cannot access the end of the session
+* You take -1 ongoing to a stat of your choice until the end of the session
+
+On a 2-6, pick one:
+
+* Your fragile grip on reality pushes people away: reduce all links by 1
+* Your crew abandons you for self-preservation: Lose three between your contacts and followers. If you are the Streamer, also lose three Influence.
+* You have -1 ongoing until you spend 3 CP to remove it
+
+On a 1 or below, pick one that you haven't picked before:
+
+* You lose yourself to Stress. Go out in a blaze of total crazy, then make a new character.
+* Your struggle is hard, permanently lose 1 from a stat other than Chrome
+* Your ability to interface with your cyberware is faltering. Pick one piece of Stress causing cyberware that you can no longer use without making a Stressed Out roll.
+* Permanently add 1 to your Stress
+
+### Advances
+
+* [4] Reduce your Stress by 1.
+
 
 ## Move: Do Science!
 
@@ -387,13 +419,12 @@ When you spend at least half a day to work with technology in order to fix or im
 On a miss, you cannot perform the Science! as described. There may also be unexpected consequences for failing.
 
 
-# System: 
+# Health
 
-## Health and Statistics
+You start with 25 + Tough HP (e.g. between 24 and 27).
 
-You start with 25 + Tough HP.
+HP 10 and below cannot be healed with first aid, they require a Juicer with the right gear, a Trauma Team, or a Hospital.
 
-HP 10 and below cannot be healed with first aid, they require a Juicer with the right gear.
 Cyberware damaged below 10 HP requires a Tech with the right gear to fix it.
 
 At 0 hp: Dying, make a “Fight another day” roll
@@ -404,19 +435,61 @@ At 10 hp: GM chooses stat for -1
 At 12 hp: damage cyberware
 At 17 hp: damage cyberware
 
-### Advances:
+In order to take the stat increase advances, you must have spent at least 5 * new value CP in move advances for moves that use that stat. e.g. To increase Style from +2 to +3, you need to have spent 15 CP in Style move advances.
+
+## Advances:
 
 * [1] hp1: 27+Tough HP
 	* [2] hp2: 29+Tough HP
 		* [2] hp3: 32+Tough HP
 			* [3] hp4: 35+Tough HP
-				* [3] hp5: 40+Tough HP
-	* [2] stat1: Add +1 to a stat at -1,0
-		* [3] stat2: Add +1 to stat at -1,0,1
-			* [4] stat3: Add +1 to any stat
-		* [3] stat4: Add +1 to stat at -1,0,1
+	* [3] stat1: Add +1 to a stat at -1,0
+		* [4] stat2: Add +1 to stat at -1,0,1
+			* [5] stat3: Add +1 to any stat
+		* [4] stat4: Add +1 to stat at -1,0,1
 
 # Playbooks
+
+There are 11 playbooks to choose from:
+
+* Courier: Apollo had winged boots; you have powered rollerblades and crazy parkour moves
+* Driver: You drive a custom ride
+* Face: You can talk yourself into and out of trouble
+* Infiltrator: You sneak up, into, out of and through danger without being noticed
+* Investigator: You can find anything, information, people, items and trouble
+* Juicer: You can patch people up, or tank them up on chemical concoctions
+* Killer: You ... well ... you kill people. With guns. Lots of guns.
+* Netrunner: You cruise the Matrix, hacking your way into servers for paydata and system control
+* Razor: Your sword (or other melee weapon) is just as dangerous as the Killer's guns
+* Streamer: You broadcast what's happening, and pull in favors from your fans
+* Tech: You can build, improve, disable or modify technology including cyberware
+
+
+## Courier
+
+### Description:
+
+You must start with at least 0 Chrome and Overclocked Reflexes.
+
+While in constant motion, you have +1 armor. 
+
+Take +1 when you Act Under Pressure using motion or momentum to resolve the danger.
+
+When attacking while in motion, you can roll +Cool.
+
+### Move: Expert 'blader
+
+At the start of the session, roll +Cool. On a 10+, hold 3+Cool. On a 7-9, hold 1+Cool. On a miss, hold 1 anyway, but during the session you will ... The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
+* 	Grab an object as you pass by
+* 	Move along vertical surfaces such as walls, or grind along thin objects like power lines or zip lines
+* 	Parkour your way out of a sticky situation
+
+### Advances:
+
+* [2] +1 hold for Expert 'blader
+* [2] +2 armor for Constant Motion
+* [3] something: something
+
 
 ## Driver
 
@@ -473,6 +546,133 @@ At the start of the session, roll +Style. On a 10+, hold 3+Style. On a 7-9, hold
 * [2] Hold +1 for Con Artist
 * [3] mask: If you are in a Mask, and roll 12+ on Fast Talk, you can increase or decrease a relevant countdown clock. The GM will tell you which clock, you decide to move it up or down.
 
+
+## Infiltrator
+
+### Description:
+
+```This is boring ... need a more interesting base move```
+
+Active Camoflage: When you are by yourself, you take +1 to Act Under Pressure for stealth.
+
+
+### Move: Black Operative
+
+At the start of the session, roll +Cool. On a 10+, hold 3+Cool. On a 7-9, hold 1+Cool. On a miss, hold 1 anyway, but during the session you will ... The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
+* Bypass a security system or guard
+* Disable a bypassed system or guard
+* Escape notice
+* Bring someone with you
+
+### Advances:
+* [2] +1 hold for Black Operative
+* [2] When you spend hold to bring someone, you can bring a second person as well
+* [1] Add option for Black Operative: There's always an air duct: get from one part of a building to another quickly and quietly.
+* [2] Gain the move: Sensor Ghost
+* [2] Gain the move: Spiderclimb
+
+### Move Details
+
+**Sensor Ghost**
+
+If you have a Neural Interface and Comms, when you hack to edit yourself out of live recording devices, roll +Chrome. On a 10+, you're invisible to electronic sensors for the scene. On a 7-9, there's a glitch, pick one: 
+
+* Security eventually traces it back to you; the GM will increase a countdown clock.
+* Security comes to investigate, time to move!
+* It takes a lot of effort to confuse the sensors, take -1 ongoing.
+
+**Spiderclimb**
+
+When you use technology or cybernetics to quickly scale vertical surfaces, ceilings or otherwise traverse an "impossible" space, roll +Cool.  On a 10+, you make it safely and ____. On a 7-9, you drop something, leave an identifying trace, or attract unwanted attention.
+
+
+## Investigator
+
+### Description:
+
+Get a new research question and a new assess question for free.
+
+### Move: Expert Hunter
+
+At the start of the session, roll +Sharp. On a 10+, hold 3+Sharp. On a 7-9, hold 1+Sharp. On a miss, hold 1 anyway, but during the session you will miss a crucial clue or opportunity. The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
+* Take [intel]
+* Ask a question from the Research list
+* Ask a question from the Assess list
+* Consult the rolodex: Declare a contact
+
+### Advances:
+* [2] Hold +1 for Expert Hunter
+* [3] Prepared: At the start of the session, take +[intel] and +[gear]
+* [3] On the Trail: When you want to find someone or something, name your target. When you gain [intel] you can say whether it is about your target or not. Spend three such [intel] and the GM will tell you where the target is, you tell the GM how the clues led to that knowledge.
+
+## Juicer
+
+### Description:
+
+You have access to a medical and pharmacology facilities, either one location or separate, where you can perform surgery and make drugs. If have an HQ, then it can be there. Explain your choices to the GM.
+
+You can Do Science! to research drugs (including medicines) at an appropriate facility.
+
+You can Act Under Pressure (instead of Do Science!) with the right facilities to make d6 doses of any drug that you know.
+
+You can buy the Juicer only upgrades to First Aid.
+
+You start with knowledge of three of the following drugs:
+* ‘face:  +1 Chrome for 10 minutes, then -1 Tough for 12 hours
+* Speed: React as if you had synthetic nerves for 1 scene
+* Flesh Knitter: +2d6 healing with First Aid
+* Blue Starfire: +1 Style, -1 Cool, -1 Sharp for 1 hour.
+* Glass: +1 Sharp, take d6 extra damage if hurt
+* Sandman: Knockout drug (inhaled or ingested)
+* Immunoblockers: Remove a -1 caused by Stress and make the Stressed Out move.
+
+
+### Move: Expert Biohacker
+
+At the start of the session, roll +Sharp. On a 10+, hold 3+Sharp. On a 7-9, hold 1+Sharp. On a miss, hold 1 anyway, but during the session your attention will lapse at a critical moment, causing greivous harm. The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
+* Have a stash of the right drug when you need it: You can spend hold as [gear] for a drug you know about
+* Surgical Strike: When you hit with Mix It Up, select one of the bonus options you have access to.
+* Autopsy: Ask a question (like Assess) about a dead body
+* Organ Legger: Harvest organs or cyberware from bodies
+
+### Advances:
+
+* [2] +1 hold for Expert Biohacker
+* [1] Know another drug without researching it with Science (repeatable)
+
+
+
+
+## Killer
+
+### Description:
+
+You start with a custom firearm. Pick a base type. It can be +linked for free. Pick two:
+
+* Hi-powered: +2 damage
+* Super-hi-powered: +d6 damage (requires hi-powered)
+* Big and Dangerous: +reroll, +loud
+* Silenced: -loud
+* Shaped: +2 Piercing
+* Recognizable: +1 to Fast Talk if brandished
+* Discreet: Can be hidden on your person
+* DNA-keyed: Only you can use it without consequences
+
+### Move: Total Badass
+
+At the start of the session, roll +Tough. On a 10+, hold 3+Tough. On a 7-9, hold 1+Tough. On a miss, hold 1 anyway, but during the session you will be outmatched or outgunned. The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
+
+* Disable or kill an unnamed NPC in combat
+* Deal +d6 damage on a hit for Mix It Up
+* Choose one less option for Hit the Streets when you go in search of weapons, explosives or other military gear
+
+### Advances:
+
+* [2] Hold +1 for Total Badass
+* [2] Gain a second custom weapon
+* [2] Add another feature to one of your weapons (repeatable)
+* [2] Add a piece of cyberware, explain how you got it.
+
 ## Netrunner
 
 ### Description:
@@ -522,153 +722,6 @@ When you use your Neural Interface and Comms to quickly hack a networked system 
 When you are in control of a system, you may spend a hold to create misinformation and modify a countdown clock. The GM will tell you which one, and you decide whether to modify it up or down.
 
 
-## Investigator
-
-### Description:
-
-Get a new research question and a new assess question for free.
-
-### Move: Expert Hunter
-
-At the start of the session, roll +Sharp. On a 10+, hold 3+Sharp. On a 7-9, hold 1+Sharp. On a miss, hold 1 anyway, but during the session you will miss a crucial clue or opportunity. The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
-* Take [intel]
-* Ask a question from the Research list
-* Ask a question from the Assess list
-* Consult the rolodex: Declare a contact
-
-### Advances:
-* [2] Hold +1 for Expert Hunter
-* [3] Prepared: At the start of the session, take +[intel] and +[gear]
-* [3] On the Trail: When you want to find someone or something, name your target. When you gain [intel] you can say whether it is about your target or not. Spend three such [intel] and the GM will tell you where the target is, you tell the GM how the clues led to that knowledge.
-
-## Killer
-
-### Description:
-
-You start with a custom firearm. Pick a base type. It can be +linked for free. Pick two:
-
-* Hi-powered: +2 damage
-* Super-hi-powered: +d6 damage (requires hi-powered)
-* Big and Dangerous: +reroll, +loud
-* Silenced: -loud
-* Shaped: +2 Piercing
-* Recognizable: +1 to Fast Talk if brandished
-* Discreet: Can be hidden on your person
-* DNA-keyed: Only you can use it without consequences
-
-### Move: Total Badass
-
-At the start of the session, roll +Tough. On a 10+, hold 3+Tough. On a 7-9, hold 1+Tough. On a miss, hold 1 anyway, but during the session you will be outmatched or outgunned. The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
-
-* Disable or kill an unnamed NPC in combat
-* Deal +d6 damage on a hit for Mix It Up
-* Choose one less option for Hit the Streets when you go in search of weapons, explosives or other military gear
-
-### Advances:
-
-* [2] Hold +1 for Total Badass
-* [2] Gain a second custom weapon
-* [2] Add another feature to one of your weapons (repeatable)
-* [2] Add a piece of cyberware, explain how you got it.
-
-## Tech
-
-### Description:
-
-Pick one specialization:
-
-* Weapons
-* Cyberware
-* Decks and Computers
-* Vehicles and Drones
-* Security Equipment
-* Scientific (including Medical) Equipment
-
-You have access to a facility for each of your specializations, as if you had it at HQ per downtime moves. If have an HQ, then it can be there, your choice. 
-
-You have Do Science! for each of your specializations.
-
-### Move: Total Geek
-
-At the start of the session, roll +Sharp. On a 10+, hold 3+Sharp. On a 7-9, hold 1+Sharp. On a miss, hold 1 anyway, but during the session you will miss a crucial clue or opportunity. The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
-* +[gear]
-* Blow something up
-* Quickly setup or configure something for which you have a specialization
-* Fix an item for which you have a specialization
-
-### Advances:
-
-* [2] Hold +1 for Total Geek
-    * [2] Gain the move: Void the Warranty
-* [2] Gain the move: Technobabble
-* [2] Gain another specialization (repeatable)
-* [3] Gain the move: Now Pay Attention
-    * [3] Gain the move: Try To Return It Intact
-    * [2] Gain the move: Hacked Firmware
-
-### Move Details
-
-**Now Pay Attention**
-
-When you have time, at your HQ or in a facility, to outfit *another* character, roll +Links with that character. On a 10+, they take +[gear] and +1 forward. On a 7-9, they take +[gear] or +1 forward. On a miss, when they try to use [gear] this session, there will be a critical malfunction, either because you messed something up, or they didn't pay attention to how to use it.
-
-**Try To Return It Intact**
-
-If the [gear] from Pay Attention is used to generate something that should be valuable and should not be destroyed, but the player narrates how it *is* destroyed as part of using it, then both you and the other character gain 1 CP at the end of the session. You can gain a maximum of 1 CP per session in this way.
-
-**Technobabble**
-
-When you baffle, confuse or just stall an NPC by spouting technical jargon at them, roll +Sharp. On a 10+, they are baffled or impressed and give you what you want. On a 7-9, they are confused but suspicious. 
-
-**Hacked Firmware**
-
-When another character uses [gear] and misses a roll related to that [gear], spend a hold to declare that you had hacked the firmware, allowing the miss to be rerolled. If the new roll is also a miss, then you will share in the complications generated.
-
-**Void the Warranty**
-
-When you try to overclock any sort of technology and push it past its normal limits, spend a [gear] and roll +Sharp. If you have Comms and a Neural Interface, you can do this remotely on cybernetics. On a hit, the technology can go beyond normal limits. On a 7-9, also pick one:
-* It burns out and is useless until you can fix it ... hopefully
-* It damages the user, and malfunctions until the end of the scene
-* The GM will advance a relevant countdown clock
-
-
-## Infiltrator
-
-### Description:
-
-```This is boring ... need a more interesting base move```
-
-Active Camoflage: When you are by yourself, you take +1 to Act Under Pressure for stealth.
-
-
-### Move: Black Operative
-
-At the start of the session, roll +Cool. On a 10+, hold 3+Cool. On a 7-9, hold 1+Cool. On a miss, hold 1 anyway, but during the session you will ... The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
-* Bypass a security system or guard
-* Disable a bypassed system or guard
-* Escape notice
-* Bring someone with you
-
-### Advances:
-* [2] +1 hold for Black Operative
-* [2] When you spend hold to bring someone, you can bring a second person as well
-* [1] Add option for Black Operative: There's always an air duct: get from one part of a building to another quickly and quietly.
-* [2] Gain the move: Sensor Ghost
-* [2] Gain the move: Spiderclimb
-
-### Move Details
-
-**Sensor Ghost**
-
-If you have a Neural Interface and Comms, when you hack to edit yourself out of live recording devices, roll +Chrome. On a 10+, you're invisible to electronic sensors for the scene. On a 7-9, there's a glitch, pick one: 
-
-* Security eventually traces it back to you; the GM will increase a countdown clock.
-* Security comes to investigate, time to move!
-* It takes a lot of effort to confuse the sensors, take -1 ongoing.
-
-**Spiderclimb**
-
-When you use technology or cybernetics to quickly scale vertical surfaces, ceilings or otherwise traverse an "impossible" space, roll +Cool.  On a 10+, you make it safely and ____. On a 7-9, you drop something, leave an identifying trace, or attract unwanted attention.
 
 
 ## Razor
@@ -780,67 +833,66 @@ You are known for a particular sort of stream. When you buy this move pick one o
 * Maven: In a social situation, temporarily gain 3 Influence
 * Rocker: If you are actively being entertaining by Performing your Art, temporarily gain 5 Influence and an extra hold for Perform
 
- 
-## Juicer
+## Tech
 
 ### Description:
 
-You have access to a medical and pharmacology facilities, either one location or separate, where you can perform surgery and make drugs. If have an HQ, then it can be there. Explain your choices to the GM.
+Pick one specialization:
 
-You can Do Science! to research drugs (including medicines) at an appropriate facility.
+* Weapons
+* Cyberware
+* Decks and Computers
+* Vehicles and Drones
+* Security Equipment
+* Scientific (including Medical) Equipment
 
-You can Act Under Pressure (instead of Do Science!) with the right facilities to make d6 doses of any drug that you know.
+You have access to a facility for each of your specializations, as if you had it at HQ per downtime moves. If have an HQ, then it can be there, your choice. 
 
-You can buy the Juicer only upgrades to First Aid.
+You have Do Science! for each of your specializations.
 
-You start with knowledge of three of the following drugs:
-* ‘face:  +1 Chrome for 10 minutes, then -1 Tough for 12 hours
-* Speed: React as if you had synthetic nerves for 1 scene
-* Flesh Knitter: +2d6 healing with First Aid
-* Blue Starfire: +1 Style, -1 Cool, -1 Sharp for 1 hour.
-* Glass: +1 Sharp, take d6 extra damage if hurt
-* Sandman: Knockout drug (inhaled or ingested)
-* Immunoblockers: Reduce Stress by 1 for the game session. + Something Bad. 
+### Move: Total Geek
 
-
-### Move: Expert Biohacker
-
-At the start of the session, roll +Sharp. On a 10+, hold 3+Sharp. On a 7-9, hold 1+Sharp. On a miss, hold 1 anyway, but during the session your attention will lapse at a critical moment, causing greivous harm. The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
-* Have a stash of the right drug when you need it: You can spend hold as [gear] for a drug you know about
-* Surgical Strike: When you hit with Mix It Up, select one of the bonus options you have access to.
-* Autopsy: Ask a question (like Assess) about a dead body
-* Organ Legger: Harvest organs or cyberware from bodies
+At the start of the session, roll +Sharp. On a 10+, hold 3+Sharp. On a 7-9, hold 1+Sharp. On a miss, hold 1 anyway, but during the session you will miss a crucial clue or opportunity. The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
+* +[gear]
+* Blow something up
+* Quickly setup or configure something for which you have a specialization
+* Fix an item for which you have a specialization
 
 ### Advances:
 
-* [2] +1 hold for Expert Biohacker
-* [1] Know another drug without researching it with Science (repeatable)
+* [2] Hold +1 for Total Geek
+    * [2] Gain the move: Void the Warranty
+* [2] Gain the move: Technobabble
+* [2] Gain another specialization (repeatable)
+* [3] Gain the move: Now Pay Attention
+    * [3] Gain the move: Try To Return It Intact
+    * [2] Gain the move: Hacked Firmware
 
+### Move Details
 
-## Courier
+**Now Pay Attention**
 
-### Description:
+When you have time, at your HQ or in a facility, to outfit *another* character, roll +Links with that character. On a 10+, they take +[gear] and +1 forward. On a 7-9, they take +[gear] or +1 forward. On a miss, when they try to use [gear] this session, there will be a critical malfunction, either because you messed something up, or they didn't pay attention to how to use it.
 
-You must start with at least 0 Chrome and Overclocked Reflexes.
+**Try To Return It Intact**
 
-While in constant motion, you have +1 armor. 
+If the [gear] from Pay Attention is used to generate something that should be valuable and should not be destroyed, but the player narrates how it *is* destroyed as part of using it, then both you and the other character gain 1 CP at the end of the session. You can gain a maximum of 1 CP per session in this way.
 
-Take +1 when you Act Under Pressure using motion or momentum to resolve the danger.
+**Technobabble**
 
-When attacking while in motion, you can roll +Cool.
+When you baffle, confuse or just stall an NPC by spouting technical jargon at them, roll +Sharp. On a 10+, they are baffled or impressed and give you what you want. On a 7-9, they are confused but suspicious. 
 
-### Move: Expert 'blader
+**Hacked Firmware**
 
-At the start of the session, roll +Cool. On a 10+, hold 3+Cool. On a 7-9, hold 1+Cool. On a miss, hold 1 anyway, but during the session you will ... The GM will tell you when, and what happens. You may spend hold during the session one for one for any of these situations:
-* 	Grab an object as you pass by
-* 	Move along vertical surfaces such as walls, or grind along thin objects like power lines or zip lines
-* 	Parkour your way out of a sticky situation
+When another character uses [gear] and misses a roll related to that [gear], spend a hold to declare that you had hacked the firmware, allowing the miss to be rerolled. If the new roll is also a miss, then you will share in the complications generated.
 
-### Advances:
+**Void the Warranty**
 
-* [2] +1 hold for Expert 'blader
-* [2] +2 armor for Constant Motion
-* [3] something: something
+When you try to overclock any sort of technology and push it past its normal limits, spend a [gear] and roll +Sharp. If you have Comms and a Neural Interface, you can do this remotely on cybernetics. On a hit, the technology can go beyond normal limits. On a 7-9, also pick one:
+* It burns out and is useless until you can fix it ... hopefully
+* It damages the user, and malfunctions until the end of the scene
+* The GM will advance a relevant countdown clock
+
 
 
 # Equipment
