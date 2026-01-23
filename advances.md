@@ -14,6 +14,10 @@ There are two additional statistics:
 * Links: between the character and another PC/NPC, with individual values for each
 * Stress: the number of stress-causing cybernetics installed
 
+The Streamer playbook has an additional statistic:
+
+* Influence: The amount of influence you have with your audiences
+
 # Basic Moves
 There are 10 basic moves which everyone has access to:
 
@@ -43,14 +47,7 @@ On a 10+ you may choose to either deal no damage or take an attack against you, 
 * Target is pushed backwards
 * Target is knocked off their feet
 
-Potential Complications (beyond a counterattack):
-
-* You lose your footing
-* You lose your grip on whatever you’re holding
-* You lose track of someone/something important
-* You are surprised by someone or something
-
-The base damage is d6. The target takes the damage from the weapon used, minus their armor value. The target’s armor value is reduced by the amount of piercing that an attack has for this calculation. This move will be further modified by any weapon used to make the attack.
+The base damage is d6. 
 
 ### Advances:
 
@@ -453,10 +450,10 @@ In order to take the stat increase advances, you must have spent at least 5 * ne
 There are 11 playbooks to choose from:
 
 * Courier: Apollo had winged boots; you have powered rollerblades and crazy parkour moves
-* Driver: You drive a custom ride
-* Face: You can talk yourself into and out of trouble
+* Driver: You drive your custom ride, better and faster than anyone
+* Face: You can talk yourself into and out of all sorts of sticky situations
 * Infiltrator: You sneak up, into, out of and through danger without being noticed
-* Investigator: You can find anything, information, people, items and trouble
+* Investigator: You can find anything: information, people, items or trouble
 * Juicer: You can patch people up, or tank them up on chemical concoctions
 * Killer: You ... well ... you kill people. With guns. Lots of guns.
 * Netrunner: You cruise the Matrix, hacking your way into servers for paydata and system control
@@ -679,12 +676,17 @@ At the start of the session, roll +Tough. On a 10+, hold 3+Tough. On a 7-9, hold
 
 You can Do Science! for programs and cyberdecks.
 
+You may spend [gear] to have just the right program to use. Pick any program, you have it, but it burns out completely after the run.
+
+You may spend [intel] to increase your Hacking hold by 2. 
+
 ### Move: Console Cowboy
-At the start of a session, when you're tooling up to cut some ICE, roll +Sharp. On a 10+ hold 3+Chrome for hacking. On a 7-9 hold 1+Synth. On a miss, hold 1 anyway … you'll need it. On a miss, the GM will have your connection interrupted, your deck go on the fritz, or you'll be unable to jack out … at just the wrong time.
+
+At the start of a session, when you're tooling up to cut some ICE, roll +Sharp. On a 10+ hold 3+Chrome for Hacking. On a 7-9 hold 1+Synth. On a miss, hold 1 anyway … you'll need it. On a miss, the GM will have your connection interrupted, your deck go on the fritz, or you'll be unable to jack out … at just the wrong time.
 
 ### Move: Sleaze
 
-When you want to appear to a system as legitimate sysop and it should follow the commands you give it, roll +Synth. On a 10+ you're root with full administrator privileges (for now), increase your hacking hold by 2. On a 7-9, you're an admin, increase your hold by 1. The system will execute the commands but your reduced privileges make it harder, pick one:
+When you want to appear to a system as legitimate sysop and it should follow the commands you give it, roll +Synth. On a 10+ you're root with full administrator privileges (for now), increase your Hacking hold by 2. On a 7-9, you're an admin, increase your hold by 1. The system will execute the commands but your reduced privileges make it harder, pick one:
 * The commands are logged and someone will find out in due course. The MC will increase an appropriate countdown clock by 1.
 * The system launches a routine traceroute. Increase your trace countdown clock by 1.
 * You need to constantly pay attention to fighting the system. You have -1 ongoing until you jack out.
@@ -692,12 +694,25 @@ On a miss, your connection is blocked and ICE is triggered against you: the MC w
 
 ### Move: Crash
 
-When you want to crash your way into a system and seize control of it, roll +Synth. On a 10+ you cut through the ICE and take forceful control of the system, for now. Increase your hacking hold by 2. On a 7-9, you're through, increase your hold by 1 and pick one:
+When you want to crash your way into a system and seize control of it, roll +Synth. On a 10+ you cut through the ICE and take forceful control of the system, for now. Increase your Hacking hold by 2. On a 7-9, you're through, increase your hold by 1 and pick one:
 * Your deck is damaged until repaired: -1 to a stat or remove a positive tag
 * Your neural interface is damaged until repaired: give it +unreliable, +damaging, +decay, or +substandard or remove a positive tag
 * One of your programs is deleted or otherwise irrecoverably corrupted, the MC picks which one.
 * Visible/Audible Alarms go off on site. Advance the Mission clock by 1.
 On a miss, the ICE blocks you: you pick one and the MC picks one.
+
+### Move: Hacking
+
+When you are jacked into the matrix and have some control of a computer system via Sleaze or Crash, you can spend a hold to:
+
+* Get past a piece of inactive ICE or other subsystem without triggering it
+* Prevent an alarm from triggering
+* Control a connected piece of hardware for a limited time
+* Decrease your Trace clock by 1 (once)
+* Take +1 forward for a roll against the system or in the system (once per roll)
+
+If you have no hold, you can get past ICE, activate routines or control hardware by Acting Under Pressure where the danger is being detected by the system that you're manipulating.
+
 
 ### Advances:
 * [2] Hold +1 for Console Cowboy
@@ -1057,7 +1072,27 @@ Negative vehicle tags: +damaged, +unreliable, +fragile, +tracked, +expensive, +e
 
 ## Combat
 
+### Initiative
+
+The character that instigates combat typically goes first, however if any character has Overclocked Reflexes, then they go first.  To break ties, use the Cool stat, then the Tough stat, then the Sharp stat if necessary.
+
+### Damage
+
+If you're attempting to cause damage to another character, you use Mix It Up. If the roll is successful, then the target will take damage. The damage is calculated from:
+
+* The base damage from Mix It Up, plus advances
+* The damage modifier from the weapon
+* Additional modifiers from abilities, such as Sneak Attack
+* Additional modifiers from situational factors
+
+You can then reroll any dice that show numbers equal to or less than the number of +rerolls you have. If you have two stacking +reroll tags, then you can reroll dice that show 1 or 2.
+
+The attack's piercing value is subtracted from the target's armor value, and the resulting armor value is subtracted from the damage. Neither Armor nor Damage can go below 0.
+
 ### Ranges
+
+Weapons have ranges at which they are effective. Melee weapons are only close range.
+
 The range levels for combat are as follows:
 * 	Close:     Touchable, certainly hittable with a stick
 * 	Near:       Not touchable, but easy move-and-hit distance
@@ -1066,34 +1101,13 @@ The range levels for combat are as follows:
 * 	Visible:    Far away, but at least visible
 
 
-
 ## The Matrix
-
-Jack In: This isn't an actual move, just fictional positioning.
-Recon: This is just Research on the system
-Jack Out: This is just Act Under Pressure
-Find the File: This is just Assess
-
-Hacking:
-When you are jacked into the matrix and have some control of a computer system via Sleaze or Crash, you can spend a hold to:
-* 	Get past a piece of inactive ICE or other subsystem without triggering it
-* 	Prevent an alarm from triggering
-* 	Control a connected piece of hardware for a limited time
-* 	Decrease your Trace clock by 1 (once)
-* 	[Any of the other routines in the Matrix rules]
-* 	Take +1 forward for a roll against the system or in the system (once per roll)
-
-You may spend [intel] to increase your hold by 2. 
-
-You may spend [gear] to have just the right program to slot into an unused Memory. Pick any program, you have it, but it burns out completely after the run.
-
-If you have no hold, you can activate routines by Acting Under Pressure where the danger is being detected by the system that you're manipulating.
 
 Traces:
 Trace clock for each run starts with three filled, minus one for each point of stealth, minus one if you're portaling through a remote backdoor, to a minimum of 0 filled. Once the trace is complete, the tracer knows where you're connected from.
 
 Backdoors:
-Instead of Declaring a Contact, the Hacker can Declare a Backdoor. If you have a backdoor into a system you get an additional +2 on Sleaze or Crash for that system. Or you can connect without the ability to use hold without rolling. If you're running another system through a connected system with a backdoor, you get +1 stealth, but if a trace succeeds, you lose the backdoor as a contact.
+Instead of Declaring a Contact, the Hacker can Declare a Backdoor. If you have a backdoor into a system you roll Sleaze or Crash with Advantage for that system. Or you can connect without the ability to use hold without rolling. If you're running another system through a connected system with a backdoor, you get +1 stealth, but if a trace succeeds, you lose the backdoor as a contact.
 
 Programs:
 * Viruses give you +1 to Sleaze
@@ -1101,11 +1115,8 @@ Programs:
 * Fuse gives you +1 to AUP when you want to Jack Out fast
 * Scanner gives you +1 for online research, and +1 hold when you convert [intel]
 * Sifter gives you +1 for Assess in the system, and +1 credits for paydata
-* Pocket AI gives you +1 hold [convert memory to processor]
-* Compactor doubles your storage, but if trashed, you lose your data [memory to storage]
-* Ghost gives you +1 stealth [convert memory to stealth]
-* Daemon gives you +2/+3 memory, but if Daemon is trashed, you lose the programs in it too
-* Honey-Pot will be trashed before any other program is trashed, the MC must pick it first
+* Pocket AI gives you +1 hold
+* Ghost gives you +1 stealth
 
 Can't run more than one copy of any program type. Can't swap programs mid-run, but can slot a new one to an empty slot.
 
@@ -1114,10 +1125,9 @@ Deck:
 * Storage: 1,2,3 (data you can hold)  
 * Co-Processors: 0,1,2 (hold per run)
 * Stealth:  0,1,2
-* Neural Cutout: 0,1,2 (armor for neural damage)
 
+A base deck is 2 Memory, 2 Storage, 0 Co-Processors and 0 Stealth.
 1 storage = 1 credit worth of data (or 2 with Sifter)
-
 
 
 # Downtime Moves
