@@ -38,11 +38,16 @@ async def get_ability_tree():
 @app.post("/characters", response_model=Character)
 async def create_character(char: CharacterCreate):
     pool = app.state.pool
+    import random
+    stats_vals = [2, 1, 1, 0, -1]
+    random.shuffle(stats_vals)
+    tough, cool, sharp, style, chrome = stats_vals
+    
     async with pool.acquire() as conn:
-        # Initial stats/setup based on playbook could happen here, but keeping it simple
         row = await conn.fetchrow(
-            "INSERT INTO characters (name, playbook) VALUES ($1, $2) RETURNING *",
-            char.name, char.playbook
+            """INSERT INTO characters (name, playbook, tough, cool, sharp, style, chrome) 
+               VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *""",
+            char.name, char.playbook, tough, cool, sharp, style, chrome
         )
         return Character(**dict(row))
 
@@ -81,12 +86,8 @@ async def update_character(char_id: int, char_update: CharacterUpdate):
     set_clauses = []
     values = []
     for i, (key, value) in enumerate(update_data.items(), start=1):
-        if key == 'stats' or key == 'advances' or key == 'items':
-            # Ensure JSONB compat? asyncpg handles dict to json automatically if type is jsonb?
-            # Usually need json.dumps if using text, but asyncpg has codecs.
-            # Assuming asyncpg handles it or we pass string. 
-            # In schema.sql they are JSONB. asyncpg + PostgreSQL handles python dict -> jsonb usually.
-            pass
+        if key == 'advances' or key == 'items':
+             pass # Handled by codec
         set_clauses.append(f"{key} = ${i}")
         values.append(value)
     
@@ -127,7 +128,6 @@ async def character_websocket(websocket: WebSocket, char_id: int):
                         row = await pool.fetchrow("SELECT advances FROM characters WHERE id = $1", char_id)
                         advances = row['advances'] or []
                         # Check if exists (assuming advances is list of dicts with 'key')
-                        # We accept simpler list of keys too, but let's standardize on list of objects {key: '...'}
                         exists = False
                         new_advances = []
                         for adv in advances:
@@ -175,17 +175,12 @@ async def character_websocket(websocket: WebSocket, char_id: int):
                             response = f"Max Health set to {value}"
                             updated = True
                         else:
-                            # Assume it's a stat in the 'stats' jsonb
-                            char_row = await pool.fetchrow("SELECT stats FROM characters WHERE id = $1", char_id)
-                            stats = char_row['stats'] or {}
-                            # Normalize stat name? The user might say "cool", "style".
-                            # Capitalize first letter to match frontend keys? Frontend uses "Cool", "Tough".
-                            # But let's save as is, or normalize to capitalized.
-                            formatted_key = stat_name.capitalize()
-                            stats[formatted_key] = value
-                            await pool.execute("UPDATE characters SET stats = $1 WHERE id = $2", stats, char_id)
-                            response = f"Stat {formatted_key} set to {value}"
-                            updated = True
+                            # Stats: tough, cool, sharp, style, chrome
+                            valid_stats = ["tough", "cool", "sharp", "style", "chrome"]
+                            if stat_name in valid_stats:
+                                await pool.execute(f"UPDATE characters SET {stat_name} = $1 WHERE id = $2", value, char_id)
+                                response = f"Stat {stat_name} set to {value}"
+                                updated = True
 
                     # 2. Damage/Heal: "Take [N] damage", "Heal [N]"
                     if "damage" in command_text:
@@ -206,7 +201,6 @@ async def character_websocket(websocket: WebSocket, char_id: int):
                             
                 # Send confirmation
                 if updated:
-                     # Redundant info message possibly, but good for feedback
                      await websocket.send_text(json.dumps({"type": "info", "message": response}))
             
             except Exception as e:

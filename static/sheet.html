@@ -378,11 +378,19 @@
         }
 
         function renderStats(stats) {
+            // stats arg is legacy or can be ignored if we use char directly, or we reconstruct it
             const container = document.getElementById('stats-container');
             container.innerHTML = '';
-            // Default stats if empty
-            const defaultStats = { "Tough": 0, "Cool": 0, "Sharp": 0, "Style": 0, "Chrome": 0, "Links": 0 };
-            const currentStats = { ...defaultStats, ...stats };
+
+            // Reconstruct stats object from characterData root fields
+            // Capitalized to match UI expectation
+            const currentStats = {
+                "Tough": characterData.tough || 0,
+                "Cool": characterData.cool || 0,
+                "Sharp": characterData.sharp || 0,
+                "Style": characterData.style || 0,
+                "Chrome": characterData.chrome || 0
+            };
 
             for (const [key, value] of Object.entries(currentStats)) {
                 const hex = document.createElement('div');

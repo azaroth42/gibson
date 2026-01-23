@@ -9,7 +9,11 @@ class Character(BaseModel):
     id: int
     name: str
     playbook: str
-    stats: Dict[str, Any] = {}
+    tough: int = 0
+    cool: int = 0
+    sharp: int = 0
+    style: int = 0
+    chrome: int = 0
     health: int = 0
     max_health: int = 0
     experience: int = 0
@@ -19,7 +23,11 @@ class Character(BaseModel):
 class CharacterUpdate(BaseModel):
     name: Optional[str] = None
     playbook: Optional[str] = None
-    stats: Optional[Dict[str, Any]] = None
+    tough: Optional[int] = None
+    cool: Optional[int] = None
+    sharp: Optional[int] = None
+    style: Optional[int] = None
+    chrome: Optional[int] = None
     health: Optional[int] = None
     max_health: Optional[int] = None
     experience: Optional[int] = None
