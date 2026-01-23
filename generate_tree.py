@@ -19,17 +19,12 @@ def parse_advances(filepath):
     
     # Parsing State
     current_root = None # The dict where we are adding items (e.g. mix-it-up, driver)
-    root_key = None     # The key name of current_root in tree
     
     stack = []          # Stack of node dicts for current advances tree
     indent_stack = []   # Stack of indentation levels
     
     context = "TOP"     # TOP, PLAYBOOKS, LIFE
     
-    last_root_name = "" # Track for debug/logging
-    
-    
-    # Re-impl loop
     i = 0
     while i < len(lines):
         line = lines[i]
@@ -40,17 +35,17 @@ def parse_advances(filepath):
             continue
 
         # Header detection
-        if stripped.startswith('# '):
-            header = stripped.lstrip('# ').strip().lower()
-            if header == "playbooks":
-                context = "PLAYBOOKS"
-            elif header == "system:":
-                context = "SYSTEM" # Or just continue parsing subheaders
-            elif header == "basic moves":
-                context = "MOVES"
-            
-            # Reset current root when switching major contexts? 
-            # Not strict, handled by ## Headers
+        if stripped.lower().startswith('# playbooks'):
+            context = "PLAYBOOKS"
+            i += 1
+            continue
+        
+        if stripped.lower().startswith('# health'):
+            current_root = {"cost": 0, "children": []}
+            tree["life"] = current_root
+            stack = []
+            indent_stack = []
+            context = "LIFE"
             i += 1
             continue
             
@@ -64,132 +59,115 @@ def parse_advances(filepath):
                 name = move_match.group(1).strip()
                 key = to_kebab_case(name)
                 
-                # Determine where this move belongs
-                if context == "PLAYBOOKS":
-                    # Moves inside playbooks are typically moves *of* that playbook.
-                    # But the request format for playbooks is:
-                    # playbooks -> driver -> children -> (advances)
-                    # "Move: Expert Wheelman" describes a starting move usually.
-                    # Does it have advances? 
-                    # If it has an "Advances:" section later, yes.
-                    # BUT wait, the advances.md file structure:
-                    # ## Driver
-                    # ...
-                    # ### Move: Expert Wheelman
-                    # ...
-                    # ### Advances:
-                    # [2] ...
-                    
-                    # The advances usually hang off the Playbook Root, not the Move Root?
-                    # Let's check `ability-tree.json` target format.
-                    # drivers -> children -> (list of advances)
-                    
-                    # So "Move: Expert Wheelman" is just descriptive text unless it has its own tree?
-                    # In `advances.md`:
-                    # ## Driver
-                    # ...
-                    # ### Advances:
-                    # [2] sweet-ride ...
-                    
-                    # So the advances belong to "Driver". 
-                    # "Move: Expert Wheelman" doesn't seem to start a new tree root in JSON.
-                    
-                    pass 
+                # If we are in PLAYBOOKS context, usually the moves are just descriptive details 
+                # UNTIL we hit the "Advances" section for that Playbook.
+                # However, looking at the file, Playbooks have their own sections.
+                # ## Driver -> ### Move: Wheelman -> ### Advances
                 
-                else: 
-                    # Top level move (Mix It Up, etc)
+                # So if we are in TOP context, "Move: Mix It Up" defines a root.
+                if context != "PLAYBOOKS":
                     current_root = {"cost": 0, "children": []}
                     tree[key] = current_root
-                    stack = [] # Reset invalidates stack
+                    stack = [] 
                     indent_stack = []
-                    last_root_name = key
                 
-            elif header == "Health and Statistics":
+            elif header == "Health" or header == "Basic Statistics":
+                 # Wait, "Health" is the section in new file.
+                 # "## Health"
+                 # It has "### Advances:"
+                 # But in ability-tree.json target is "life".
+                 pass
+
+            # In "Health" section specifically
+            if header == "Health":
                 current_root = {"cost": 0, "children": []}
                 tree["life"] = current_root
                 stack = []
                 indent_stack = []
-                last_root_name = "life"
             
-            elif context == "PLAYBOOKS":
+            elif context == "PLAYBOOKS" and not move_match:
                 # Likely a Playbook Name e.g. "Driver"
+                # But headers might be "## Driver"
                 name = header
                 key = to_kebab_case(name)
                 current_root = {"cost": 0, "children": []}
                 tree["playbooks"][key] = current_root
                 stack = []
                 indent_stack = []
-                last_root_name = f"playbooks/{key}"
             
             i += 1
             continue
 
-        # Subheaders "### Advances:"
-        if stripped.startswith('### Advances'):
+        # Subheaders "### Advances:" / "## Advances:" (Health uses ## Advances?)
+        # Just check for "Advances" in header
+        if "Advances" in stripped and stripped.startswith('#'):
             # This confirms we are ready to parse items for the current_root
-            # Clear stack just in case, though headers did it.
-            stack = [current_root]
-            indent_stack = [-1] 
+            if current_root is not None:
+                stack = [current_root]
+                indent_stack = [-1] 
             i += 1
             continue
 
-        # Parse Items: [Cost] key: Description
-        # Regex: optional whitespace, [N], whitespace, key, colon, description
-        # OR just [N] key: description?
-        
-        # Example: [1] damage1: Base damage is d6+1
-        item_match = re.match(r'^(\s*)\[(\d+)\]\s+([^:]+):\s*(.*)', line)
+        # Parse Items: * [Cost] Text
+        # Regex to capture indent, cost, and full text
+        item_match = re.match(r'^(\s*)(?:[*+-]\s+)?\[(\d+)\]\s+(.*)', line)
         if item_match:
             if not stack:
-                # Orphaned item or "Advances" header missing?
-                # If we are in a section that implies root (like after ## Driver), 
-                # maybe we can assume root is active?
-                # But logical safety: if stack is empty, we can't add to parent.
-                # However, if we just saw a header and created a root, we should have pushed it?
-                # Ah, my logic above only pushed to stack on "### Advances". 
-                # If "### Advances" is missing, we might fail.
-                # Let's auto-push root if valid and stack empty.
-                if current_root and not stack:
+                if current_root:
                      stack = [current_root]
                      indent_stack = [-1]
-                elif not current_root:
-                    print(f"Warning: Orphaned item (no root) at line {i+1}: {stripped}")
+                else:
                     i += 1
                     continue
             
             indent_str = item_match.group(1)
-            cost = int(item_match.group(2))
-            key_slug = item_match.group(3).strip() # Explicit key!
-            desc = item_match.group(4).strip()
+            current_indent_len = 0
+            for char in indent_str:
+                if char == '\t':
+                    current_indent_len += 4
+                else:
+                    current_indent_len += 1
             
-            # Multiline description handling?
-            # Check next lines
+            cost = int(item_match.group(2))
+            raw_text = item_match.group(3).strip()
+            
+            # Key extraction logic
+            # Check for explicit key "key: description" where key has no spaces
+            key_match = re.match(r'^([^:\s]+):\s*(.*)', raw_text)
+            if key_match:
+                key_slug = key_match.group(1)
+                desc = key_match.group(2)
+            else:
+                # No explicit key found (or key has spaces which means it's likely part of desc)
+                desc = raw_text
+                # Generate key from description
+                # Take first few words? Or full slug?
+                # User prefers concise keys, but we can't be too magical. 
+                # Let's use full slug but maybe truncate if too long?
+                # For now, standard slugify.
+                key_slug = to_kebab_case(desc)
+                # Ensure unique keys? (Not strictly handled here but tree dict overwrites checks?)
+                # Actually tree is list of children, so duplicates allowed in list but keys in wrapper?
+                # JSON structure: children: [ { "key": { ... } } ]
+            
+            # Multiline content handling
             j = i + 1
             while j < len(lines):
                 next_line = lines[j]
                 next_stripped = next_line.strip()
                 if not next_stripped:
-                    j += 1 # Include empty lines or break? usually break on next item
-                    continue # loop to next line
+                    j += 1 
+                    continue 
                 
-                # Check if next line is a new item or header
-                if re.match(r'^\s*\[\d+\]', next_line) or next_stripped.startswith('#'):
+                if re.match(r'^\s*(?:[*+-]\s+)?\[\d+\]', next_line) or next_stripped.startswith('#'):
                      break
                 
-                # Append
                 desc += " " + next_stripped
                 j += 1
                 
             # Hierarchy Logic
-            current_indent_len = len(indent_str)
-            
-            # If indent > parent_indent -> Child of last added
-            # If indent <= parent_indent -> Pop until parent is found (indent > parent's_indent ?)
-            # Actually, standard logic:
-            # stack[-1] is potential parent.
-            # parent's indent was indent_stack[-1].
-            # If current > parent_indent: valid child.
-            # Else: pop stack.
+            # "Strict" > check
+            # Logic: valid child if indent > parent's indent.
             
             while len(indent_stack) > 1 and current_indent_len <= indent_stack[-1]:
                 stack.pop()
@@ -197,6 +175,19 @@ def parse_advances(filepath):
                 
             parent = stack[-1]
             
+            # Additional logic: 
+            # If the current indent is exactly the same as parent indent, it is a SIBLING of the parent?
+            # No, if same indent as previous item, it's a sibling.
+            # wait, stack[-1] is the PARENT node.
+            # indent_stack[-1] is the indent of that PARENT node.
+            # So current_indent MUST be > indent_stack[-1] to be a child.
+            
+            if current_indent_len <= indent_stack[-1]:
+                 # This shouldn't happen if we popped correctly?
+                 # If we popped everything and still <= top level parent (indent -1), 
+                 # then it's a top level item.
+                 pass
+
             new_node = {
                 "cost": cost,
                 "description": desc,

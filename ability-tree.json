@@ -1,12 +1,80 @@
 {
     "playbooks": {
+        "courier": {
+            "cost": 0,
+            "children": [
+                {
+                    "1-hold-for-expert-blader": {
+                        "cost": 2,
+                        "description": "+1 hold for Expert 'blader",
+                        "children": []
+                    }
+                },
+                {
+                    "2-armor-for-constant-motion": {
+                        "cost": 2,
+                        "description": "+2 armor for Constant Motion",
+                        "children": []
+                    }
+                },
+                {
+                    "something": {
+                        "cost": 3,
+                        "description": "something",
+                        "children": []
+                    }
+                }
+            ]
+        },
         "driver": {
             "cost": 0,
             "children": [
                 {
+                    "hold-1-for-wheelman": {
+                        "cost": 2,
+                        "description": "Hold +1 for Wheelman",
+                        "children": []
+                    }
+                },
+                {
                     "sweet-ride": {
                         "cost": 2,
-                        "description": "Sweet Ride: When you Hit the Streets in your vehicle, take +1.",
+                        "description": "Sweet Ride: If your vehicle has the +looks tag, when you Hit the Streets in your vehicle, take +1.",
+                        "children": []
+                    }
+                },
+                {
+                    "doc-wagon": {
+                        "cost": 2,
+                        "description": "Doc Wagon: If your vehicle has the +ambulance tag, when you do First Aid, take +1. A Juicer can use your vehicle for surgery (but not to install cyberware).",
+                        "children": []
+                    }
+                },
+                {
+                    "muscle-car": {
+                        "cost": 2,
+                        "description": "Muscle Car: If your vehicle has the +intimidating tag, when you Fast Talk from your vehicle in an intimidating way, take +1",
+                        "children": []
+                    }
+                },
+                {
+                    "weapons": {
+                        "cost": 2,
+                        "description": "Military: If your vehicle has the +military tag, deal and additional +d6 damage when you Mix It Up. You can spend a hold to kill an unnamed NPC.",
+                        "children": []
+                    }
+                },
+                {
+                    "ai-pilot": {
+                        "cost": 1,
+                        "description": "If your vehicle has the +ai tag, then you spend a hold to have the vehicle appear exactly when and where it's needed (without a neural interface).",
+                        "children": []
+                    }
+                },
+                {
+                    "fast": {
+                        "cost": 1,
+                        "description": "If your vehicle has the +fast or +agile tag, then you can spend a hold to escape any pursuing vehicle, or catch a vehicle you are in pursuit of",
                         "children": []
                     }
                 }
@@ -16,6 +84,13 @@
             "cost": 0,
             "children": [
                 {
+                    "hold-1-for-con-artist": {
+                        "cost": 2,
+                        "description": "Hold +1 for Con Artist",
+                        "children": []
+                    }
+                },
+                {
                     "mask": {
                         "cost": 3,
                         "description": "If you are in a Mask, and roll 12+ on Fast Talk, you can increase or decrease a relevant countdown clock. The GM will tell you which clock, you decide to move it up or down.",
@@ -24,13 +99,41 @@
                 }
             ]
         },
-        "netrunner": {
+        "infiltrator": {
             "cost": 0,
             "children": [
                 {
-                    "quick-hack": {
-                        "cost": 3,
-                        "description": "Quick Hack",
+                    "1-hold-for-black-operative": {
+                        "cost": 2,
+                        "description": "+1 hold for Black Operative",
+                        "children": []
+                    }
+                },
+                {
+                    "when-you-spend-hold-to-bring-someone-you-can-bring-a-second-person-as-well": {
+                        "cost": 2,
+                        "description": "When you spend hold to bring someone, you can bring a second person as well",
+                        "children": []
+                    }
+                },
+                {
+                    "add-option-for-black-operative-theres-always-an-air-duct-get-from-one-part-of-a-building-to-another-quickly-and-quietly": {
+                        "cost": 1,
+                        "description": "Add option for Black Operative: There's always an air duct: get from one part of a building to another quickly and quietly.",
+                        "children": []
+                    }
+                },
+                {
+                    "gain-the-move-sensor-ghost": {
+                        "cost": 2,
+                        "description": "Gain the move: Sensor Ghost",
+                        "children": []
+                    }
+                },
+                {
+                    "gain-the-move-spiderclimb": {
+                        "cost": 2,
+                        "description": "Gain the move: Spiderclimb",
                         "children": []
                     }
                 }
@@ -40,37 +143,23 @@
             "cost": 0,
             "children": [
                 {
-                    "something": {
-                        "cost": 3,
-                        "description": "something",
+                    "hold-1-for-expert-hunter": {
+                        "cost": 2,
+                        "description": "Hold +1 for Expert Hunter",
                         "children": []
                     }
-                }
-            ]
-        },
-        "killer": {
-            "cost": 0,
-            "children": []
-        },
-        "tech": {
-            "cost": 0,
-            "children": []
-        },
-        "infiltrator": {
-            "cost": 0,
-            "children": []
-        },
-        "razor": {
-            "cost": 0,
-            "children": []
-        },
-        "streamer": {
-            "cost": 0,
-            "children": [
+                },
                 {
-                    "Dedicated Followers": {
+                    "Prepared": {
                         "cost": 3,
-                        "description": "You are known for a particular sort of stream. When you buy this move pick one of the following to gain temporary Influence when Live and on the Air in certain circumstances. \u2022\tCombat Vlogger: In a firefight, temporarily gain 3 Influence \u2022\tHigh Speed: In a vehicle, temporarily gain 3 Influence \u2022\tPenetration: In a high security area, temporarily gain 3 Influence \u2022\tBlackhat: Whenever a friendly Netrunner does something obvious to help the group, temporarily gain 1 Influence \u2022\tMaven: In a social situation, temporarily gain 3 Influence \u2022\tRocker: If you are actively being entertaining by Performing your Art, temporarily gain 5 Influence and an extra hold for Perform",
+                        "description": "At the start of the session, take +[intel] and +[gear]",
+                        "children": []
+                    }
+                },
+                {
+                    "on-the-trail-when-you-want-to-find-someone-or-something-name-your-target-when-you-gain-intel-you-can-say-whether-it-is-about-your-target-or-not-spend-three-such-intel-and-the-gm-will-tell-you-where-the-target-is-you-tell-the-gm-how-the-clues-led-to-that-knowledge": {
+                        "cost": 3,
+                        "description": "On the Trail: When you want to find someone or something, name your target. When you gain [intel] you can say whether it is about your target or not. Spend three such [intel] and the GM will tell you where the target is, you tell the GM how the clues led to that knowledge.",
                         "children": []
                     }
                 }
@@ -78,16 +167,231 @@
         },
         "juicer": {
             "cost": 0,
-            "children": []
+            "children": [
+                {
+                    "1-hold-for-expert-biohacker": {
+                        "cost": 2,
+                        "description": "+1 hold for Expert Biohacker",
+                        "children": []
+                    }
+                },
+                {
+                    "know-another-drug-without-researching-it-with-science-repeatable": {
+                        "cost": 1,
+                        "description": "Know another drug without researching it with Science (repeatable)",
+                        "children": []
+                    }
+                }
+            ]
         },
-        "courier": {
+        "killer": {
             "cost": 0,
             "children": [
                 {
-                    "something": {
-                        "cost": 3,
-                        "description": "something",
+                    "hold-1-for-total-badass": {
+                        "cost": 2,
+                        "description": "Hold +1 for Total Badass",
                         "children": []
+                    }
+                },
+                {
+                    "gain-a-second-custom-weapon": {
+                        "cost": 2,
+                        "description": "Gain a second custom weapon",
+                        "children": []
+                    }
+                },
+                {
+                    "add-another-feature-to-one-of-your-weapons-repeatable": {
+                        "cost": 2,
+                        "description": "Add another feature to one of your weapons (repeatable)",
+                        "children": []
+                    }
+                },
+                {
+                    "add-a-piece-of-cyberware-explain-how-you-got-it": {
+                        "cost": 2,
+                        "description": "Add a piece of cyberware, explain how you got it.",
+                        "children": []
+                    }
+                }
+            ]
+        },
+        "netrunner": {
+            "cost": 0,
+            "children": [
+                {
+                    "hold-1-for-console-cowboy": {
+                        "cost": 2,
+                        "description": "Hold +1 for Console Cowboy",
+                        "children": []
+                    }
+                },
+                {
+                    "quick-hack": {
+                        "cost": 3,
+                        "description": "Gain the move Quick Hack.",
+                        "children": [
+                            {
+                                "select-another-option-for-quick-hack": {
+                                    "cost": 2,
+                                    "description": "Select another option for Quick Hack.",
+                                    "children": []
+                                }
+                            },
+                            {
+                                "add-an-option-you-can-take-momentary-control-of-a-component-or-system": {
+                                    "cost": 3,
+                                    "description": "Add an option: You can take momentary control of a component or system",
+                                    "children": []
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "false-flag": {
+                        "cost": 3,
+                        "description": "Gain the move False Flag Operation.",
+                        "children": []
+                    }
+                }
+            ]
+        },
+        "razor": {
+            "cost": 0,
+            "children": [
+                {
+                    "1-hold-for-street-samurai": {
+                        "cost": 2,
+                        "description": "+1 hold for Street Samurai",
+                        "children": []
+                    }
+                },
+                {
+                    "active-defence-gives-you-2-armor": {
+                        "cost": 2,
+                        "description": "Active Defence gives you +2 armor",
+                        "children": []
+                    }
+                },
+                {
+                    "gain-a-second-custom-weapon": {
+                        "cost": 2,
+                        "description": "Gain a second custom weapon",
+                        "children": []
+                    }
+                },
+                {
+                    "add-another-feature-to-one-of-your-weapons-repeatable": {
+                        "cost": 2,
+                        "description": "Add another feature to one of your weapons (repeatable)",
+                        "children": []
+                    }
+                },
+                {
+                    "add-a-piece-of-cyberware-explain-how-you-got-it": {
+                        "cost": 2,
+                        "description": "Add a piece of cyberware, explain how you got it.",
+                        "children": []
+                    }
+                },
+                {
+                    "gain-the-move-ginsu-sword": {
+                        "cost": 2,
+                        "description": "Gain the move: Ginsu Sword",
+                        "children": [
+                            {
+                                "gain-the-move-but-wait-theres-more": {
+                                    "cost": 2,
+                                    "description": "Gain the move: But Wait, There's More",
+                                    "children": []
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "streamer": {
+            "cost": 0,
+            "children": [
+                {
+                    "1-hold-for-mega-influencer": {
+                        "cost": 2,
+                        "description": "+1 hold for Mega-Influencer",
+                        "children": []
+                    }
+                },
+                {
+                    "you-gain-the-move-dedicated-followers": {
+                        "cost": 3,
+                        "description": "You gain the move: Dedicated Followers",
+                        "children": [
+                            {
+                                "diverse-followers-pick-a-second-following": {
+                                    "cost": 2,
+                                    "description": "Diverse Followers: Pick a second following",
+                                    "children": []
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "tech": {
+            "cost": 0,
+            "children": [
+                {
+                    "hold-1-for-total-geek": {
+                        "cost": 2,
+                        "description": "Hold +1 for Total Geek",
+                        "children": [
+                            {
+                                "gain-the-move-void-the-warranty": {
+                                    "cost": 2,
+                                    "description": "Gain the move: Void the Warranty",
+                                    "children": []
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "gain-the-move-technobabble": {
+                        "cost": 2,
+                        "description": "Gain the move: Technobabble",
+                        "children": []
+                    }
+                },
+                {
+                    "gain-another-specialization-repeatable": {
+                        "cost": 2,
+                        "description": "Gain another specialization (repeatable)",
+                        "children": []
+                    }
+                },
+                {
+                    "gain-the-move-now-pay-attention": {
+                        "cost": 3,
+                        "description": "Gain the move: Now Pay Attention",
+                        "children": [
+                            {
+                                "gain-the-move-try-to-return-it-intact": {
+                                    "cost": 3,
+                                    "description": "Gain the move: Try To Return It Intact",
+                                    "children": []
+                                }
+                            },
+                            {
+                                "gain-the-move-hacked-firmware": {
+                                    "cost": 2,
+                                    "description": "Gain the move: Hacked Firmware",
+                                    "children": []
+                                }
+                            }
+                        ]
                     }
                 }
             ]
@@ -101,6 +405,10 @@
             "children": []
         },
         "combat": {
+            "cost": 0,
+            "children": []
+        },
+        "the-matrix": {
             "cost": 0,
             "children": []
         }
@@ -194,42 +502,42 @@
                                     }
                                 ]
                             }
-                        }
-                    ]
-                }
-            },
-            {
-                "target-reload": {
-                    "cost": 3,
-                    "description": "+1 target, or -reload",
-                    "children": []
-                }
-            },
-            {
-                "piercing1": {
-                    "cost": 2,
-                    "description": "1 piercing",
-                    "children": [
+                        },
                         {
-                            "piercing2": {
+                            "target-reload": {
+                                "cost": 3,
+                                "description": "+1 target, or -reload",
+                                "children": []
+                            }
+                        },
+                        {
+                            "piercing1": {
                                 "cost": 2,
-                                "description": "2 piercing",
+                                "description": "1 piercing",
                                 "children": [
                                     {
-                                        "piercing3": {
+                                        "piercing2": {
+                                            "cost": 2,
+                                            "description": "2 piercing",
+                                            "children": [
+                                                {
+                                                    "piercing3": {
+                                                        "cost": 3,
+                                                        "description": "3 piercing",
+                                                        "children": []
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "reroll": {
                                             "cost": 3,
-                                            "description": "3 piercing",
+                                            "description": "+Reroll",
                                             "children": []
                                         }
                                     }
                                 ]
-                            }
-                        },
-                        {
-                            "reroll": {
-                                "cost": 3,
-                                "description": "+Reroll",
-                                "children": []
                             }
                         }
                     ]
@@ -311,15 +619,14 @@
                             "backstab-option2": {
                                 "cost": 3,
                                 "description": "You remain hidden (explain how)",
-                                "children": [
-                                    {
-                                        "backstab-option3": {
-                                            "cost": 2,
-                                            "description": "Ask an Assess question after the attack",
-                                            "children": []
-                                        }
-                                    }
-                                ]
+                                "children": []
+                            }
+                        },
+                        {
+                            "backstab-option3": {
+                                "cost": 2,
+                                "description": "Ask an Assess question after the attack",
+                                "children": []
                             }
                         },
                         {
@@ -456,13 +763,13 @@
             },
             {
                 "specialized": {
-                    "cost": 1,
-                    "description": "Specialized: You have a specialization from the list below. If you are researching a topic you have a specialization for, before you roll, choose to either take +1 on the roll, or if successful gain an additional [intel]. \u2022\tWeapons and Armor \u2022\tCybernetics \u2022\tThe Matrix, Software and Decks \u2022\tVehicles, Drones and Geography \u2022\tTechnology (other than above) \u2022\tStreet Politics, People and Places \u2022\tCorporate Politics, People and Places",
+                    "cost": 2,
+                    "description": "Gain a specialization.",
                     "children": [
                         {
                             "specialized2": {
                                 "cost": 2,
-                                "description": "Gain another specialization (repeatable)",
+                                "description": "Gain another specialization",
                                 "children": []
                             }
                         },
@@ -726,15 +1033,14 @@
                 "good-for-it": {
                     "cost": 1,
                     "description": "Good for it: You can pay the extra cost later instead",
-                    "children": [
-                        {
-                            "hit-forward": {
-                                "cost": 1,
-                                "description": "On a 10+, take +1 forward for the next time you Hit the Streets.",
-                                "children": []
-                            }
-                        }
-                    ]
+                    "children": []
+                }
+            },
+            {
+                "hit-forward": {
+                    "cost": 1,
+                    "description": "On a 10+, take +1 forward for the next time you Hit the Streets.",
+                    "children": []
                 }
             },
             {
@@ -749,6 +1055,18 @@
     "assist": {
         "cost": 0,
         "children": []
+    },
+    "stressed-out": {
+        "cost": 0,
+        "children": [
+            {
+                "reduce-your-stress-by-1": {
+                    "cost": 4,
+                    "description": "Reduce your Stress by 1.",
+                    "children": []
+                }
+            }
+        ]
     },
     "do-science": {
         "cost": 0,
@@ -776,38 +1094,7 @@
                                                     "hp4": {
                                                         "cost": 3,
                                                         "description": "35+Tough HP",
-                                                        "children": [
-                                                            {
-                                                                "hp5": {
-                                                                    "cost": 3,
-                                                                    "description": "40+Tough HP",
-                                                                    "children": []
-                                                                }
-                                                            }
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "stat1": {
-                                            "cost": 2,
-                                            "description": "Add +1 to a stat at -1,0",
-                                            "children": [
-                                                {
-                                                    "stat2": {
-                                                        "cost": 3,
-                                                        "description": "Add +1 to stat at -1,0,1",
-                                                        "children": [
-                                                            {
-                                                                "stat3": {
-                                                                    "cost": 4,
-                                                                    "description": "Add +1 to any stat",
-                                                                    "children": []
-                                                                }
-                                                            }
-                                                        ]
+                                                        "children": []
                                                     }
                                                 }
                                             ]
@@ -817,10 +1104,33 @@
                             }
                         },
                         {
-                            "stat4": {
+                            "stat1": {
                                 "cost": 3,
-                                "description": "Add +1 to stat at -1,0,1",
-                                "children": []
+                                "description": "Add +1 to a stat at -1,0",
+                                "children": [
+                                    {
+                                        "stat2": {
+                                            "cost": 4,
+                                            "description": "Add +1 to stat at -1,0,1",
+                                            "children": [
+                                                {
+                                                    "stat3": {
+                                                        "cost": 5,
+                                                        "description": "Add +1 to any stat",
+                                                        "children": []
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "stat4": {
+                                            "cost": 4,
+                                            "description": "Add +1 to stat at -1,0,1",
+                                            "children": []
+                                        }
+                                    }
+                                ]
                             }
                         }
                     ]
