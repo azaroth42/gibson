@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Gibson Character Dashboard</title>
+</head>
+
+<body>
+    <h1>All Characters</h1>
+    <ul id="char-list"></ul>
+
+    <h3>Create New Character</h3>
+    <input type="text" id="new-name" placeholder="Name">
+    <input type="text" id="new-playbook" placeholder="Playbook">
+    <button onclick="createChar()">Create</button>
+
+    <script>
+        async function loadChars() {
+            const res = await fetch('/characters');
+            const chars = await res.json();
+            const list = document.getElementById('char-list');
+            list.innerHTML = '';
+            chars.forEach(char => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="/static/sheet.html?id=${char.id}">${char.name} (${char.playbook})</a>`;
+                list.appendChild(li);
+            });
+        }
+
+        async function createChar() {
+            const name = document.getElementById('new-name').value;
+            const playbook = document.getElementById('new-playbook').value;
+            await fetch('/characters', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, playbook })
+            });
+            loadChars();
+        }
+
+        loadChars();
+    </script>
+</body>
+
+</html>

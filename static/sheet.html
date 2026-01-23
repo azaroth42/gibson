@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Gibson Character Sheet</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        .stat-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 5px;
+            display: inline-block;
+            width: 100px;
+            text-align: center;
+        }
+
+        .control-panel {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #eee;
+            background: #f9f9f9;
+        }
+
+        #mic-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .recording {
+            background-color: red;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Character Sheet: <span id="char-name">Loading...</span></h1>
+    <h3>Playbook: <span id="char-playbook"></span></h3>
+
+    <div id="stats-container">
+        <!-- Stats will be rendered here -->
+    </div>
+
+    <div>
+        <strong>Health:</strong> <span id="health">0</span> / <span id="max-health">0</span> <br>
+        <strong>XP:</strong> <span id="xp">0</span>
+    </div>
+
+    <div class="control-panel">
+        <h3>Voice Command</h3>
+        <button id="mic-btn">Microphone: OFF</button>
+        <p>Status: <span id="status">Disconnected</span></p>
+        <p>Last Command: <span id="last-cmd">None</span></p>
+    </div>
+
+    <script>
+        const charId = new URLSearchParams(window.location.search).get('id');
+        const wsUrl = `ws://${window.location.host}/ws/${charId}`;
+        let socket;
+        let recognition;
+
+        // Fetch Character Data
+        async function fetchCharacter() {
+            const res = await fetch(`/characters/${charId}`);
+            if (!res.ok) return alert("Character not found");
+            const char = await res.json();
+            renderCharacter(char);
+            connectWebSocket();
+        }
+
+        function renderCharacter(char) {
+            document.getElementById('char-name').textContent = char.name;
+            document.getElementById('char-playbook').textContent = char.playbook;
+            document.getElementById('health').textContent = char.health;
+            // document.getElementById('max-health').textContent = char.max_health;
+            document.getElementById('xp').textContent = char.experience;
+
+            const statsContainer = document.getElementById('stats-container');
+            statsContainer.innerHTML = '';
+            for (const [key, value] of Object.entries(char.stats)) {
+                const div = document.createElement('div');
+                div.className = 'stat-box';
+                div.innerHTML = `<strong>${key}</strong><br>${value}`;
+                statsContainer.appendChild(div);
+            }
+        }
+
+        function connectWebSocket() {
+            socket = new WebSocket(wsUrl);
+            socket.onopen = () => {
+                document.getElementById('status').textContent = "Connected";
+            };
+            socket.onmessage = (event) => {
+                const msg = JSON.parse(event.data);
+                if (msg.type === 'update') {
+                    renderCharacter(msg.character);
+                } else if (msg.type === 'info') {
+                    console.log("Info:", msg.message);
+                }
+            };
+            socket.onclose = () => {
+                document.getElementById('status').textContent = "Disconnected";
+            };
+        }
+
+        // Voice Recognition Setup
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                const btn = document.getElementById('mic-btn');
+                btn.textContent = "Microphone: ON";
+                btn.className = "recording";
+            };
+
+            recognition.onend = () => {
+                const btn = document.getElementById('mic-btn');
+                btn.textContent = "Microphone: OFF";
+                btn.className = "";
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('last-cmd').textContent = transcript;
+
+                // Send to Server
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({ type: 'command', text: transcript }));
+                }
+            };
+        } else {
+            alert("Web Speech API not supported in this browser.");
+        }
+
+        document.getElementById('mic-btn').addEventListener('click', () => {
+            if (recognition) {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    recognition.stop();
+                }
+            }
+        });
+
+        fetchCharacter();
+    </script>
+</body>
+
+</html>

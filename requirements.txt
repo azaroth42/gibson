@@ -1,0 +1,7 @@
+fastapi
+hypercorn
+asyncpg
+pydantic
+jinja2
+python-multipart
+websockets

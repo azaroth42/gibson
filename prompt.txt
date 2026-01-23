@@ -1,5 +1,5 @@
 
-Create a character sheet server, with AI voice integration, and a web interface for managing characters.
+Create a character sheet server, with voice command integration, and a web interface for managing characters.
 
 Use the following technologies:
 - Python
@@ -8,12 +8,15 @@ Use the following technologies:
 - PostgreSQL to persist character data
 - HTML
 - JavaScript
-- WebRTC
+- WebSockets
 
 
 The server should have the following features:
 - Create, read, update, and delete character sheets
-- AI voice integration for setting values on the character sheet
+- Voice command integration for setting values on the character sheet
 - Web interface for viewing and editing character sheets
 
-The rules system is detailed in the file rules.md.
+The rules system is detailed in the file advances.md
+The advances are parsed out already using generate_tree.py to write the ability-tree.json file.
+
+
