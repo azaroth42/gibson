@@ -3,59 +3,330 @@
 
 <head>
     <title>Gibson Character Sheet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-color: #050505;
+            --panel-bg: #0a0a0a;
+            --main-color: #00f3ff;
+            /* Cyan */
+            --accent-color: #ff0055;
+            /* Pink */
+            --text-color: #e0e0e0;
+            --dim-text: #666;
+            --border-color: #333;
+            --glow-text: 0 0 5px rgba(0, 243, 255, 0.7);
+            --glow-box: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
         body {
-            font-family: sans-serif;
+            background-color: var(--bg-color);
+            background-image: url('/static/cyberpunk-bg.png');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: var(--text-color);
+            font-family: 'Share Tech Mono', monospace;
+            /* Cyberpunkish font */
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Scanline effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 1000;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        h1,
+        h2,
+        h3 {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--main-color);
+            text-shadow: var(--glow-text);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            grid-gap: 20px;
+        }
+
+        /* Header / Vitals */
+        .header {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid var(--main-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .char-title h1 {
+            margin: 0;
+            font-size: 3em;
+        }
+
+        .char-playbook {
+            font-size: 1.5em;
+            color: var(--accent-color);
+        }
+
+        .vitals {
+            text-align: right;
+        }
+
+        .bar-container {
+            width: 300px;
+            background: #222;
+            height: 20px;
+            margin-top: 5px;
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        /* Sidebar: Stats */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .stat-hex {
+            width: 100%;
+            aspect-ratio: 1;
+            background: transparent;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .hex-svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 5px rgba(0, 243, 255, 0.5));
+        }
+
+        .hex-path {
+            fill: rgba(10, 10, 10, 0.9);
+            stroke: var(--main-color);
+            stroke-width: 2;
+        }
+
+        .stat-value-text {
+            font-size: 40px;
+            fill: var(--text-color);
+            text-anchor: middle;
+            dominant-baseline: central;
+            font-family: 'Share Tech Mono', monospace;
+            text-shadow: 0 0 5px var(--main-color);
+        }
+
+        .stat-label-text {
+            font-size: 14px;
+            fill: var(--dim-text);
+            text-anchor: middle;
+            dominant-baseline: central;
+            font-family: 'Share Tech Mono', monospace;
+            text-transform: uppercase;
+        }
+
+        .stat-label {
+            font-size: 0.3em;
+            color: var(--dim-text);
+            text-transform: uppercase;
+        }
+
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        /* Main Content */
+        .main-panel {
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid var(--border-color);
             padding: 20px;
         }
 
-        .stat-box {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin: 5px;
-            display: inline-block;
-            width: 100px;
-            text-align: center;
+        .section-title {
+            border-bottom: 1px solid var(--dim-text);
+            margin-bottom: 15px;
+            padding-bottom: 5px;
         }
 
-        .control-panel {
-            margin-top: 20px;
-            padding: 20px;
-            border: 1px solid #eee;
-            background: #f9f9f9;
+        /* Ability Tree */
+        .ability-node {
+            margin-left: 20px;
+            border-left: 1px solid #333;
+            padding-left: 15px;
+            margin-bottom: 10px;
         }
 
-        #mic-btn {
-            padding: 10px 20px;
-            font-size: 16px;
+        .ability-header {
             cursor: pointer;
+            padding: 5px;
+            background: rgba(0, 243, 255, 0.05);
+            border: 1px solid transparent;
         }
 
-        .recording {
-            background-color: red;
-            color: white;
+        .ability-header:hover {
+            border-color: var(--main-color);
         }
+
+        .ability-header.taken {
+            background: rgba(0, 243, 255, 0.2);
+            border-color: var(--main-color);
+            color: #fff;
+        }
+
+        .cost-badge {
+            background: #222;
+            padding: 2px 6px;
+            font-size: 0.8em;
+            color: var(--accent-color);
+            margin-right: 10px;
+        }
+
+        /* Voice Control */
+        .voice-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #000;
+            border: 2px solid var(--accent-color);
+            padding: 15px;
+            z-index: 2000;
+            width: 250px;
+        }
+
+        .voice-status {
+            font-size: 0.8em;
+            color: var(--dim-text);
+        }
+
+        .voice-active {
+            animation: pulse-border 1.5s infinite;
+            background: rgba(255, 0, 85, 0.1);
+        }
+
+        @keyframes pulse-border {
+            0% {
+                border-color: var(--accent-color);
+                box-shadow: 0 0 5px var(--accent-color);
+            }
+
+            50% {
+                border-color: #fff;
+                box-shadow: 0 0 20px var(--accent-color);
+            }
+
+            100% {
+                border-color: var(--accent-color);
+                box-shadow: 0 0 5px var(--accent-color);
+            }
+        }
+
+        /* Glitch Animation */
+        .glitch {
+            position: relative;
+        }
+
+        /* Add standardized glitch keyframes if needed later */
     </style>
 </head>
 
 <body>
-    <h1>Character Sheet: <span id="char-name">Loading...</span></h1>
-    <h3>Playbook: <span id="char-playbook"></span></h3>
 
-    <div id="stats-container">
-        <!-- Stats will be rendered here -->
+    <div class="header">
+        <div class="char-title">
+            <h1 id="char-name" class="glitch">Accessing...</h1>
+            <div id="char-playbook" class="char-playbook"></div>
+        </div>
+        <div class="vitals">
+            <div>HEALTH <span id="health-val">0</span> / <span id="max-health-val">0</span></div>
+            <div class="bar-container">
+                <div id="health-bar" class="bar-fill" style="width: 50%;"></div>
+            </div>
+            <div style="margin-top: 10px;">XP <span id="xp-val">0</span></div>
+            <div class="bar-container">
+                <div id="xp-bar" class="bar-fill" style="width: 0%; background: var(--main-color);"></div>
+            </div>
+        </div>
     </div>
 
-    <div>
-        <strong>Health:</strong> <span id="health">0</span> / <span id="max-health">0</span> <br>
-        <strong>XP:</strong> <span id="xp">0</span>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h3>Statistics</h3>
+            <div class="stat-row" id="stats-container">
+                <!-- JS will populate -->
+            </div>
+
+            <div class="main-panel" style="margin-top: 20px;">
+                <h3>Equipment</h3>
+                <ul id="equipment-list" style="list-style: none; padding: 0;">
+                    <li>No equipment loaded.</li>
+                </ul>
+                <button onclick="addItem()">+ Add Item</button>
+            </div>
+
+            <div class="main-panel">
+                <h3>Cyberware</h3>
+                <ul id="cyberware-list" style="list-style: none; padding: 0;">
+                    <li>No chrome installed.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-panel">
+            <h3 class="section-title">Ability Tree / Moves</h3>
+            <div id="ability-tree-container">
+                Loading Matrix...
+            </div>
+        </div>
     </div>
 
-    <div class="control-panel">
-        <h3>Voice Command</h3>
-        <button id="mic-btn">Microphone: OFF</button>
-        <p>Status: <span id="status">Disconnected</span></p>
-        <p>Last Command: <span id="last-cmd">None</span></p>
+    <!-- Voice Panel -->
+    <div class="voice-panel" id="voice-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong>VOICE LINK</strong>
+            <button id="mic-btn"
+                style="background:none; border: 1px solid var(--main-color); color: var(--main-color); cursor: pointer;">OFF</button>
+        </div>
+        <div class="voice-status">STATUS: <span id="ws-status">DISCONNECTED</span></div>
+        <div style="margin-top: 10px; font-size: 0.9em; border-top: 1px solid #333; padding-top:5px;">
+            Input: <span id="last-cmd" style="color: #fff;">...</span>
+        </div>
     </div>
 
     <script>
@@ -63,52 +334,199 @@
         const wsUrl = `ws://${window.location.host}/ws/${charId}`;
         let socket;
         let recognition;
+        let abilityTree = {};
+        let characterData = {};
 
-        // Fetch Character Data
+        async function init() {
+            // Fetch Rules
+            const treeRes = await fetch('/tree');
+            abilityTree = await treeRes.json();
+
+            // Fetch Char
+            await fetchCharacter();
+        }
+
         async function fetchCharacter() {
             const res = await fetch(`/characters/${charId}`);
             if (!res.ok) return alert("Character not found");
-            const char = await res.json();
-            renderCharacter(char);
+            characterData = await res.json();
+            renderAll();
             connectWebSocket();
         }
 
-        function renderCharacter(char) {
+        function renderAll() {
+            renderHeader(characterData);
+            renderStats(characterData.stats);
+            renderTree(abilityTree, characterData);
+        }
+
+        function renderHeader(char) {
             document.getElementById('char-name').textContent = char.name;
             document.getElementById('char-playbook').textContent = char.playbook;
-            document.getElementById('health').textContent = char.health;
-            // document.getElementById('max-health').textContent = char.max_health;
-            document.getElementById('xp').textContent = char.experience;
 
-            const statsContainer = document.getElementById('stats-container');
-            statsContainer.innerHTML = '';
-            for (const [key, value] of Object.entries(char.stats)) {
-                const div = document.createElement('div');
-                div.className = 'stat-box';
-                div.innerHTML = `<strong>${key}</strong><br>${value}`;
-                statsContainer.appendChild(div);
+            // Health
+            const health = char.health;
+            const maxHealth = char.max_health || 25; // Default if 0
+            document.getElementById('health-val').textContent = health;
+            document.getElementById('max-health-val').textContent = maxHealth;
+            document.getElementById('health-bar').style.width = Math.min((health / maxHealth) * 100, 100) + '%';
+
+            // XP
+            document.getElementById('xp-val').textContent = char.experience;
+            // XP usually goes to 5 or 10?
+            document.getElementById('xp-bar').style.width = Math.min((char.experience / 10) * 100, 100) + '%';
+        }
+
+        function renderStats(stats) {
+            const container = document.getElementById('stats-container');
+            container.innerHTML = '';
+            // Default stats if empty
+            const defaultStats = { "Tough": 0, "Cool": 0, "Sharp": 0, "Style": 0, "Chrome": 0, "Links": 0 };
+            const currentStats = { ...defaultStats, ...stats };
+
+            for (const [key, value] of Object.entries(currentStats)) {
+                const hex = document.createElement('div');
+                hex.className = 'stat-hex';
+                hex.innerHTML = `
+                    <svg class="hex-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+                        <polygon class="hex-path" points="50 5, 93 28, 93 72, 50 95, 7 72, 7 28" />
+                        <text x="50" y="50" class="stat-value-text">${value}</text>
+                        <text x="50" y="78" class="stat-label-text">${key}</text>
+                    </svg>
+                `;
+                container.appendChild(hex);
             }
         }
 
+        function renderTree(tree, char) {
+            const container = document.getElementById('ability-tree-container');
+            container.innerHTML = '';
+
+            // Filter tree moves relevant to playbook + Global moves?
+            // Global moves: mix-it-up, life, etc.
+            // Playbook moves: tree.playbooks[char.playbookSlug]
+
+            // Common Moves
+            const globalKeys = ["mix-it-up", "battle-hardened", "act-under-pressure", "flash-back", "life", "do-science", "assist", "hit-the-streets", "fast-talk", "assess", "research", "stressed-out"];
+            // NOTE: Check valid keys from JSON payload which is simpler in Python logic
+
+            // Playbook Section
+            if (tree.playbooks) {
+                // Convert playbook name to keys?
+                // Simple lowercase match or we iterate to find match?
+                // For now, let's render the playbook specific stuff first.
+                // We don't have the slug in char data, only "playbook" string.
+                // Need normalized slug. 
+                // Simple hack: iterate keys and partial match?
+            }
+
+            // Helper to render a node recursively
+            function createNode(key, data) {
+                const el = document.createElement('div');
+                el.className = 'ability-node';
+
+                // Check if taken
+                // Assuming char.advances is a list of keys?
+                const isTaken = (char.advances || []).some(adv => {
+                    // specific check for object vs string
+                    return (adv.key === key) || (adv === key);
+                });
+
+                const header = document.createElement('div');
+                header.className = `ability-header ${isTaken ? 'taken' : ''}`;
+                header.onclick = (e) => {
+                    e.stopPropagation(); // prevent bubbling if nested
+                    toggleAdvance(key);
+                };
+                header.innerHTML = `<span class="cost-badge">[${data.cost}]</span> <strong>${key}</strong>: ${data.description || ''}`;
+
+                el.appendChild(header);
+
+                if (data.children && data.children.length > 0) {
+                    data.children.forEach(child => {
+                        // child is { "key": {node} }
+                        const childKey = Object.keys(child)[0];
+                        const childData = child[childKey];
+                        el.appendChild(createNode(childKey, childData));
+                    });
+                }
+                return el;
+            }
+
+            // Render ALL top level keys for now (debug mode)
+            // Or better: Render Playbook specific, then General.
+
+            // Heuristic for Playbook Key
+            let playbookKey = null;
+            if (tree.playbooks) {
+                // Find key in playbooks matching char.playbook
+                const pbName = (char.playbook || "").toLowerCase().replace(" ", "-");
+                // Check direct or partial
+                for (const k of Object.keys(tree.playbooks)) {
+                    if (pbName.includes(k)) playbookKey = k;
+                }
+
+                if (playbookKey) {
+                    const h3 = document.createElement('h3');
+                    h3.innerText = `Class Moves: ${char.playbook}`;
+                    container.appendChild(h3);
+
+                    const pbRoot = tree.playbooks[playbookKey];
+                    // Playbook root usually has "children" array
+                    if (pbRoot.children) {
+                        pbRoot.children.forEach(c => {
+                            const k = Object.keys(c)[0];
+                            container.appendChild(createNode(k, c[k]));
+                        });
+                    }
+                }
+            }
+
+            // Global Moves
+            const h3 = document.createElement('h3');
+            h3.innerText = "General Moves";
+            container.appendChild(h3);
+
+            Object.keys(tree).forEach(k => {
+                if (k === 'playbooks') return;
+                // Render top level moves like Mix It Up
+                container.appendChild(createNode(k, tree[k]));
+            });
+        }
+
+        function toggleAdvance(key) {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ type: 'action', action: 'toggle_advance', key: key }));
+            } else {
+                console.log("WebSocket not connected");
+            }
+        }
+
+        // Web Socket Logic
         function connectWebSocket() {
             socket = new WebSocket(wsUrl);
             socket.onopen = () => {
-                document.getElementById('status').textContent = "Connected";
+                document.getElementById('ws-status').textContent = "CONNECTED";
+                document.getElementById('ws-status').style.color = "var(--main-color)";
             };
             socket.onmessage = (event) => {
                 const msg = JSON.parse(event.data);
                 if (msg.type === 'update') {
-                    renderCharacter(msg.character);
+                    characterData = msg.character;
+                    renderAll(); // Re-render logic
                 } else if (msg.type === 'info') {
-                    console.log("Info:", msg.message);
+                    console.log("Server Info:", msg.message);
                 }
             };
             socket.onclose = () => {
-                document.getElementById('status').textContent = "Disconnected";
+                document.getElementById('ws-status').textContent = "OFFLINE";
+                document.getElementById('ws-status').style.color = "red";
+                // Reconect?
+                setTimeout(connectWebSocket, 3000);
             };
         }
 
-        // Voice Recognition Setup
+        // Voice Logic
         if ('webkitSpeechRecognition' in window) {
             recognition = new webkitSpeechRecognition();
             recognition.continuous = false;
@@ -116,40 +534,33 @@
 
             recognition.onstart = () => {
                 const btn = document.getElementById('mic-btn');
-                btn.textContent = "Microphone: ON";
-                btn.className = "recording";
+                btn.textContent = "ON";
+                document.getElementById('voice-panel').classList.add('voice-active');
             };
 
             recognition.onend = () => {
                 const btn = document.getElementById('mic-btn');
-                btn.textContent = "Microphone: OFF";
-                btn.className = "";
+                btn.textContent = "OFF";
+                document.getElementById('voice-panel').classList.remove('voice-active');
             };
 
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
                 document.getElementById('last-cmd').textContent = transcript;
 
-                // Send to Server
                 if (socket && socket.readyState === WebSocket.OPEN) {
                     socket.send(JSON.stringify({ type: 'command', text: transcript }));
                 }
             };
-        } else {
-            alert("Web Speech API not supported in this browser.");
         }
 
         document.getElementById('mic-btn').addEventListener('click', () => {
             if (recognition) {
-                try {
-                    recognition.start();
-                } catch (e) {
-                    recognition.stop();
-                }
+                try { recognition.start(); } catch (e) { recognition.stop(); }
             }
         });
 
-        fetchCharacter();
+        init();
     </script>
 </body>
 

@@ -61,6 +61,15 @@ async def get_character(char_id: int):
         raise HTTPException(status_code=404, detail="Character not found")
     return Character(**dict(row))
 
+@app.delete("/characters/{char_id}", status_code=204)
+async def delete_character(char_id: int):
+    pool = app.state.pool
+    result = await pool.execute("DELETE FROM characters WHERE id = $1", char_id)
+    if result == "DELETE 0":
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Character not found")
+    return None
+
 @app.put("/characters/{char_id}", response_model=Character)
 async def update_character(char_id: int, char_update: CharacterUpdate):
     pool = app.state.pool
@@ -99,7 +108,7 @@ async def character_websocket(websocket: WebSocket, char_id: int):
     # Verify character exists
     row = await pool.fetchrow("SELECT * FROM characters WHERE id = $1", char_id)
     if not row:
-        await websocket.close(code=4004, reason="Character not found")
+        await websocket.close(code=404, reason="Character not found")
         return
 
     try:
@@ -109,69 +118,106 @@ async def character_websocket(websocket: WebSocket, char_id: int):
             
             try:
                 message = json.loads(data)
-                command_text = message.get("text", "").lower()
-            except:
-                command_text = data.lower()
-                
-            response = "Command not recognized"
-            updated = False
-            
-            # Regex Command Parsing
-            # 1. Set Stat: "Set [Stat] to [Value]"
-            stat_match = re.search(r"set (\w+) to (-?\d+)", command_text)
-            if stat_match:
-                stat_name = stat_match.group(1)
-                value = int(stat_match.group(2))
-                
-                # Check if it is a main field (health, experience, max_health)
-                if stat_name in ["health", "hp"]:
-                     await pool.execute("UPDATE characters SET health = $1 WHERE id = $2", value, char_id)
-                     response = f"Health set to {value}"
-                     updated = True
-                elif stat_name in ["xp", "experience"]:
-                     await pool.execute("UPDATE characters SET experience = $1 WHERE id = $2", value, char_id)
-                     response = f"Experience set to {value}"
-                     updated = True
+                # Check for structured action or text command
+                if message.get("type") == "action":
+                    action = message.get("action")
+                    if action == "toggle_advance":
+                        key = message.get("key")
+                        # Fetch current advances
+                        row = await pool.fetchrow("SELECT advances FROM characters WHERE id = $1", char_id)
+                        advances = row['advances'] or []
+                        # Check if exists (assuming advances is list of dicts with 'key')
+                        # We accept simpler list of keys too, but let's standardize on list of objects {key: '...'}
+                        exists = False
+                        new_advances = []
+                        for adv in advances:
+                            # Handle if adv is just a string or dict
+                            k = adv.get('key') if isinstance(adv, dict) else adv
+                            if k == key:
+                                exists = True # Remove it (toggle off)
+                            else:
+                                if isinstance(adv, dict):
+                                    new_advances.append(adv)
+                                else:
+                                    new_advances.append({"key": adv})
+                        
+                        if not exists:
+                            new_advances.append({"key": key, "timestamp": 0}) # Add it
+                            response = f"Added advance: {key}"
+                        else:
+                            response = f"Removed advance: {key}"
+                        
+                        await pool.execute("UPDATE characters SET advances = $1 WHERE id = $2", new_advances, char_id)
+                        updated = True
+
                 else:
-                    # Assume it's a stat in the 'stats' jsonb
-                    # Need to read, update, write? Or use jsonb_set?
-                    # Using jsonb_set is more atomic but complex with variables.
-                    # easier: read, update, write
-                    char_row = await pool.fetchrow("SELECT stats FROM characters WHERE id = $1", char_id)
-                    stats = char_row['stats'] or {}
-                    stats[stat_name] = value
-                    await pool.execute("UPDATE characters SET stats = $1 WHERE id = $2", stats, char_id)
-                    response = f"Stat {stat_name} set to {value}"
-                    updated = True
+                    # Text Command
+                    command_text = message.get("text", "").lower() if isinstance(message, dict) else str(message).lower()
+                    
+                    # Regex Command Parsing
+                    # 1. Set Stat: "Set [Stat] to [Value]"
+                    stat_match = re.search(r"set ([\w\s]+) to (-?\d+)", command_text)
+                    if stat_match:
+                        stat_name = stat_match.group(1).lower().replace(" ", "_")
+                        value = int(stat_match.group(2))
+                        
+                        # Check if it is a main field (health, experience, max_health)
+                        if stat_name in ["health", "hp"]:
+                            await pool.execute("UPDATE characters SET health = $1 WHERE id = $2", value, char_id)
+                            response = f"Health set to {value}"
+                            updated = True
+                        elif stat_name in ["xp", "experience"]:
+                            await pool.execute("UPDATE characters SET experience = $1 WHERE id = $2", value, char_id)
+                            response = f"Experience set to {value}"
+                            updated = True
+                        elif stat_name in ["max_health", "max_hp"]:
+                            await pool.execute("UPDATE characters SET max_health = $1 WHERE id = $2", value, char_id)
+                            response = f"Max Health set to {value}"
+                            updated = True
+                        else:
+                            # Assume it's a stat in the 'stats' jsonb
+                            char_row = await pool.fetchrow("SELECT stats FROM characters WHERE id = $1", char_id)
+                            stats = char_row['stats'] or {}
+                            # Normalize stat name? The user might say "cool", "style".
+                            # Capitalize first letter to match frontend keys? Frontend uses "Cool", "Tough".
+                            # But let's save as is, or normalize to capitalized.
+                            formatted_key = stat_name.capitalize()
+                            stats[formatted_key] = value
+                            await pool.execute("UPDATE characters SET stats = $1 WHERE id = $2", stats, char_id)
+                            response = f"Stat {formatted_key} set to {value}"
+                            updated = True
 
-            # 2. Damage/Heal: "Take [N] damage", "Heal [N]"
-            if "damage" in command_text:
-                dmg_match = re.search(r"take (\d+) damage", command_text)
-                if dmg_match:
-                    amount = int(dmg_match.group(1))
-                    await pool.execute("UPDATE characters SET health = health - $1 WHERE id = $2", amount, char_id)
-                    response = f"Took {amount} damage"
-                    updated = True
+                    # 2. Damage/Heal: "Take [N] damage", "Heal [N]"
+                    if "damage" in command_text:
+                        dmg_match = re.search(r"take (\d+) damage", command_text)
+                        if dmg_match:
+                            amount = int(dmg_match.group(1))
+                            await pool.execute("UPDATE characters SET health = health - $1 WHERE id = $2", amount, char_id)
+                            response = f"Took {amount} damage"
+                            updated = True
+                    
+                    if "heal" in command_text:
+                        heal_match = re.search(r"heal (\d+)", command_text)
+                        if heal_match:
+                            amount = int(heal_match.group(1))
+                            await pool.execute("UPDATE characters SET health = health + $1 WHERE id = $2", amount, char_id)
+                            response = f"Healed {amount} points"
+                            updated = True
+                            
+                # Send confirmation
+                if updated:
+                     # Redundant info message possibly, but good for feedback
+                     await websocket.send_text(json.dumps({"type": "info", "message": response}))
             
-            if "heal" in command_text:
-                heal_match = re.search(r"heal (\d+)", command_text)
-                if heal_match:
-                    amount = int(heal_match.group(1))
-                    await pool.execute("UPDATE characters SET health = health + $1 WHERE id = $2", amount, char_id)
-                    response = f"Healed {amount} points"
-                    updated = True
-
-            # Send confirmation
-            await websocket.send_text(json.dumps({"type": "info", "message": response}))
+            except Exception as e:
+                print(f"Error processing message: {e}")
+                await websocket.send_text(json.dumps({"type": "info", "message": f"Error: {str(e)}"}))
             
             # If updated, send new character state
             if updated:
                 new_row = await pool.fetchrow("SELECT * FROM characters WHERE id = $1", char_id)
                 char_data = dict(new_row)
-                # json dumps handled by default? no we need to serialize for websocket
-                # Character model serialization
                 model = Character(**char_data)
-                # Use model_dump_json?
                 await websocket.send_text(json.dumps({"type": "update", "character": model.model_dump()}))
 
     except Exception as e:
