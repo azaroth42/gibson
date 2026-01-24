@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Audio Recorder to WAV</title>
+        <style>
+            body {
+                font-family: sans-serif;
+                padding: 20px;
+                text-align: center;
+            }
+            button {
+                padding: 10px 20px;
+                font-size: 16px;
+                cursor: pointer;
+            }
+            #status {
+                margin-top: 10px;
+                font-weight: bold;
+                color: #555;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Microphone Recorder</h1>
+        <button id="btnToggle">Start Recording</button>
+        <div id="status">Ready</div>
+
+        <script>
+            // Configuration
+            const TARGET_URI = "https://your-api-endpoint.com/process-audio"; // REPLACE THIS
+            const SAMPLE_RATE = 44100;
+            const BIT_DEPTH = 16;
+            const CHANNELS = 2; // Stereo
+
+            // State variables
+            let mediaRecorder;
+            let audioContext;
+            let scriptProcessor;
+            let chunks = [];
+            let isRecording = false;
+            let stream;
+
+            const btnToggle = document.getElementById("btnToggle");
+            const statusDiv = document.getElementById("status");
+
+            btnToggle.addEventListener("click", async () => {
+                if (!isRecording) {
+                    await startRecording();
+                } else {
+                    stopRecording();
+                }
+            });
+
+            async function startRecording() {
+                try {
+                    // 1. Request Microphone Access
+                    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    statusDiv.textContent = "Recording...";
+
+                    // 2. Setup Audio Context
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    audioContext.resume();
+
+                    // 3. Setup ScriptProcessor (Deprecated but reliable for raw PCM)
+                    // bufferSize: 4096, inputChannels: 2, outputChannels: 2
+                    scriptProcessor = audioContext.createScriptProcessor(4096, CHANNELS, CHANNELS);
+
+                    // Connect the stream to the processor
+                    const source = audioContext.createMediaStreamSource(stream);
+                    source.connect(scriptProcessor);
+                    scriptProcessor.connect(audioContext.destination); // Connect to speakers so you can hear yourself
+
+                    // 4. Process Audio Data
+                    scriptProcessor.onaudioprocess = (e) => {
+                        const inputData = e.inputBuffer.getChannelData(0); // Get Left
+                        const rightData = e.inputBuffer.getChannelData(1); // Get Right
+
+                        // Convert Float32 (-1.0 to 1.0) to Int16
+                        const leftInt16 = convertFloatToInt16(inputData);
+                        const rightInt16 = convertFloatToInt16(rightData);
+
+                        // Combine into one buffer (Interleaved)
+                        // Array.from() creates a standard array from the typed array
+                        const interleaved = new Int16Array(inputData.length + rightData.length);
+                        interleaved.set(leftInt16);
+                        interleaved.set(rightInt16, leftInt16.length);
+
+                        chunks.push(interleaved);
+                    };
+
+                    isRecording = true;
+                    btnToggle.textContent = "Stop Recording";
+                    btnToggle.style.backgroundColor = "#ff5555";
+                } catch (err) {
+                    console.error("Error accessing microphone:", err);
+                    statusDiv.textContent = "Error: " + err.message;
+                }
+            }
+
+            function stopRecording() {
+                if (!stream) return;
+
+                // Stop tracks to release microphone
+                stream.getTracks().forEach((track) => track.stop());
+                if (scriptProcessor) scriptProcessor.disconnect();
+                if (audioContext) audioContext.close();
+
+                statusDiv.textContent = "Processing...";
+                btnToggle.disabled = true;
+
+                // Combine all audio chunks
+                const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+                const buffer = new Int16Array(totalLength);
+                let offset = 0;
+                for (const chunk of chunks) {
+                    buffer.set(chunk, offset);
+                    offset += chunk.length;
+                }
+
+                // Convert to WAV and Send
+                const wavBlob = createWavBlob(buffer, SAMPLE_RATE);
+                uploadWav(wavBlob);
+
+                // Optional: Download locally to verify
+                // saveFile(wavBlob, "recording.wav");
+
+                isRecording = false;
+                btnToggle.textContent = "Start Recording";
+                btnToggle.disabled = false;
+                chunks = [];
+            }
+
+            // --- Helper: Convert Float32 audio data to Int16 (PCM) ---
+            function convertFloatToInt16(float32Array) {
+                const l = float32Array.length;
+                const int16Array = new Int16Array(l);
+                for (let i = 0; i < l; i++) {
+                    const s = Math.max(-1, Math.min(1, float32Array[i]));
+                    int16Array[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+                }
+                return int16Array;
+            }
+
+            // --- Helper: Create WAV Header and Blob ---
+            function createWavBlob(buffer, sampleRate) {
+                const numChannels = CHANNELS;
+                const byteRate = sampleRate * numChannels * (BIT_DEPTH / 8);
+                const blockAlign = numChannels * (BIT_DEPTH / 8);
+
+                // WAV Header Data
+                const header = new ArrayBuffer(44);
+                const view = new DataView(header);
+
+                // RIFF chunk descriptor
+                writeString(view, 0, "RIFF");
+                view.setUint32(4, 36 + buffer.length, true); // File length - 8
+                writeString(view, 8, "WAVE");
+
+                // fmt sub-chunk
+                writeString(view, 12, "fmt ");
+                view.setUint32(16, 16, true); // Subchunk1Size (16 for PCM)
+                view.setUint16(20, 1, true); // AudioFormat (1 for PCM)
+                view.setUint16(22, numChannels, true); // NumChannels
+                view.setUint32(24, sampleRate, true); // SampleRate
+                view.setUint32(28, byteRate, true); // ByteRate
+                view.setUint16(32, blockAlign, true); // BlockAlign
+                view.setUint16(34, BIT_DEPTH, true); // BitsPerSample
+
+                // data sub-chunk
+                writeString(view, 36, "data");
+                view.setUint32(40, buffer.length, true); // DataSize
+
+                // Combine Header and Audio Data
+                const wavData = new Uint8Array(header);
+                const finalBuffer = new Uint8Array(header.byteLength + buffer.byteLength);
+                finalBuffer.set(wavData, 0);
+                finalBuffer.set(new Uint8Array(buffer.buffer), wavData.byteLength);
+
+                return new Blob([finalBuffer], { type: "audio/wav" });
+            }
+
+            // --- Helper: Write ASCII string to DataView ---
+            function writeString(view, offset, string) {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            }
+
+            // --- Helper: Upload to Server ---
+            function uploadWav(blob) {
+                const formData = new FormData();
+                formData.append("audio", blob, "recording.wav");
+
+                fetch(TARGET_URI, {
+                    method: "POST",
+                    body: formData,
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        statusDiv.textContent = "Success! Server response: " + JSON.stringify(data);
+                        console.log("Server response:", data);
+                    })
+                    .catch((error) => {
+                        statusDiv.textContent = "Error uploading: " + error;
+                        console.error("Upload error:", error);
+                    });
+            }
+
+            // --- Helper: Download file (Optional) ---
+            function saveFile(blob, fileName) {
+                const a = document.createElement("a");
+                document.body.appendChild(a);
+                a.style = "display: none";
+                a.href = URL.createObjectURL(blob);
+                a.download = fileName;
+                a.click();
+                window.URL.revokeObjectURL(a.href);
+            }
+        </script>
+    </body>
+</html>

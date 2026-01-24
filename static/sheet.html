@@ -309,9 +309,16 @@
 
         <!-- Main Content -->
         <div class="main-panel">
-            <h3 class="section-title">Ability Tree / Moves</h3>
-            <div id="ability-tree-container">
-                Loading Matrix...
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--dim-text); margin-bottom:15px; padding-bottom:5px;">
+                <h3 style="margin:0">Known Moves</h3>
+                <a href="#" id="manage-advances-btn"
+                    style="color:var(--main-color); text-decoration:none; border:1px solid var(--main-color); padding:5px 10px;">+
+                    MANAGE / BUY</a>
+            </div>
+
+            <div id="moves-container">
+                <!-- Moves List -->
             </div>
         </div>
     </div>
@@ -334,14 +341,12 @@
         const wsUrl = `ws://${window.location.host}/ws/${charId}`;
         let socket;
         let recognition;
-        let abilityTree = {};
         let characterData = {};
 
-        async function init() {
-            // Fetch Rules
-            const treeRes = await fetch('/tree');
-            abilityTree = await treeRes.json();
+        // Setup Link
+        document.getElementById('manage-advances-btn').href = `/characters/${charId}/view-advances`;
 
+        async function init() {
             // Fetch Char
             await fetchCharacter();
         }
@@ -357,7 +362,7 @@
         function renderAll() {
             renderHeader(characterData);
             renderStats(characterData.stats);
-            renderTree(abilityTree, characterData);
+            renderMoves(characterData.advances);
         }
 
         function renderHeader(char) {
@@ -406,99 +411,39 @@
             }
         }
 
-        function renderTree(tree, char) {
-            const container = document.getElementById('ability-tree-container');
+        function renderMoves(advances) {
+            const container = document.getElementById('moves-container');
             container.innerHTML = '';
 
-            // Filter tree moves relevant to playbook + Global moves?
-            // Global moves: mix-it-up, life, etc.
-            // Playbook moves: tree.playbooks[char.playbookSlug]
-
-            // Common Moves
-            const globalKeys = ["mix-it-up", "battle-hardened", "act-under-pressure", "flash-back", "life", "do-science", "assist", "hit-the-streets", "fast-talk", "assess", "research", "stressed-out"];
-            // NOTE: Check valid keys from JSON payload which is simpler in Python logic
-
-            // Playbook Section
-            if (tree.playbooks) {
-                // Convert playbook name to keys?
-                // Simple lowercase match or we iterate to find match?
-                // For now, let's render the playbook specific stuff first.
-                // We don't have the slug in char data, only "playbook" string.
-                // Need normalized slug. 
-                // Simple hack: iterate keys and partial match?
+            if (!advances || advances.length === 0) {
+                container.innerHTML = '<div style="color:var(--dim-text)">No moves learned yet.</div>';
+                return;
             }
 
-            // Helper to render a node recursively
-            function createNode(key, data) {
+            // Sort by acquisition? or name?
+            // advances is list of objects {key, description, cost, timestamp}
+
+            advances.forEach(adv => {
                 const el = document.createElement('div');
-                el.className = 'ability-node';
+                el.className = 'ability-node'; // reuse class or style inline
+                el.style.borderLeft = '2px solid var(--main-color)';
+                el.style.padding = '10px';
+                el.style.background = 'rgba(255,255,255,0.05)';
 
-                // Check if taken
-                // Assuming char.advances is a list of keys?
-                const isTaken = (char.advances || []).some(adv => {
-                    // specific check for object vs string
-                    return (adv.key === key) || (adv === key);
-                });
+                const title = document.createElement('div');
+                title.style.color = 'var(--main-color)';
+                title.style.fontWeight = 'bold';
+                title.style.marginBottom = '5px';
+                title.textContent = adv.key;
 
-                const header = document.createElement('div');
-                header.className = `ability-header ${isTaken ? 'taken' : ''}`;
-                header.onclick = (e) => {
-                    e.stopPropagation(); // prevent bubbling if nested
-                    toggleAdvance(key);
-                };
-                header.innerHTML = `<span class="cost-badge">[${data.cost}]</span> <strong>${key}</strong>: ${data.description || ''}`;
+                const desc = document.createElement('div');
+                desc.style.color = '#ccc';
+                desc.style.fontSize = '0.9em';
+                desc.textContent = adv.description || "(No description)";
 
-                el.appendChild(header);
-
-                if (data.children && data.children.length > 0) {
-                    data.children.forEach(child => {
-                        // child is { "key": {node} }
-                        const childKey = Object.keys(child)[0];
-                        const childData = child[childKey];
-                        el.appendChild(createNode(childKey, childData));
-                    });
-                }
-                return el;
-            }
-
-            // Render ALL top level keys for now (debug mode)
-            // Or better: Render Playbook specific, then General.
-
-            // Heuristic for Playbook Key
-            let playbookKey = null;
-            if (tree.playbooks) {
-                // Find key in playbooks matching char.playbook
-                const pbName = (char.playbook || "").toLowerCase().replace(" ", "-");
-                // Check direct or partial
-                for (const k of Object.keys(tree.playbooks)) {
-                    if (pbName.includes(k)) playbookKey = k;
-                }
-
-                if (playbookKey) {
-                    const h3 = document.createElement('h3');
-                    h3.innerText = `Class Moves: ${char.playbook}`;
-                    container.appendChild(h3);
-
-                    const pbRoot = tree.playbooks[playbookKey];
-                    // Playbook root usually has "children" array
-                    if (pbRoot.children) {
-                        pbRoot.children.forEach(c => {
-                            const k = Object.keys(c)[0];
-                            container.appendChild(createNode(k, c[k]));
-                        });
-                    }
-                }
-            }
-
-            // Global Moves
-            const h3 = document.createElement('h3');
-            h3.innerText = "General Moves";
-            container.appendChild(h3);
-
-            Object.keys(tree).forEach(k => {
-                if (k === 'playbooks') return;
-                // Render top level moves like Mix It Up
-                container.appendChild(createNode(k, tree[k]));
+                el.appendChild(title);
+                el.appendChild(desc);
+                container.appendChild(el);
             });
         }
 

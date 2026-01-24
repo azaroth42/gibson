@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Advances</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #00ff9d;
+            --bg-color: #0a0a0a;
+            --panel-bg: rgba(20, 20, 20, 0.9);
+            --border-color: #333;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            background-image: url('/static/cyberpunk-bg.png'); /* Use existing image */
+            background-size: cover;
+            background-attachment: fixed;
+            color: #eee;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--panel-bg);
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+            padding: 30px;
+            backdrop-filter: blur(5px);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--neon-pink);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .char-info span {
+            display: block;
+            font-size: 1.2em;
+            color: var(--neon-green);
+        }
+
+        .tree-container {
+            margin-top: 20px;
+        }
+
+        .node {
+            margin-left: 20px;
+            border-left: 1px dashed var(--border-color);
+            padding-left: 10px;
+            position: relative;
+        }
+
+        .node-content {
+            background: rgba(40, 40, 40, 0.8);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .node-content:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        .node-content.owned {
+            border-color: var(--neon-green);
+            background: rgba(0, 255, 157, 0.1);
+        }
+
+        .node-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding-left: 10px;
+            color: #ccc;
+            font-size: 0.9em;
+        }
+        
+        .node.expanded > .node-details {
+            max-height: 500px; /* Arbitrary large number */
+            margin-bottom: 10px;
+        }
+
+        .node-title {
+            font-weight: bold;
+            color: var(--neon-blue);
+        }
+        
+        .node-cost {
+            font-size: 0.8em;
+            color: var(--neon-pink);
+            margin-left: 10px;
+        }
+
+        .btn-add {
+            background: transparent;
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8em;
+            transition: all 0.2s;
+        }
+
+        .btn-add:hover {
+            background: var(--neon-green);
+            color: #000;
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+        
+        .btn-add:disabled {
+            border-color: grey;
+            color: grey;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .children {
+            display: none;
+        }
+        
+        .node.expanded > .children {
+            display: block;
+        }
+
+        .toggle-icon {
+            margin-right: 5px;
+            font-size: 0.8em;
+            width: 15px;
+            display: inline-block;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Advances</h1>
+        <div class="char-info">
+            <span id="charName">Loading...</span>
+            <small>Points Used: <span id="pointsUsed">0</span></small> <br>
+            <small>XP Available: <span id="xpAvailable">0</span></small>
+        </div>
+    </div>
+
+    <div id="tree-root" class="tree-container">
+        <!-- Tree nodes will be injected here -->
+        Loading tree data...
+    </div>
+</div>
+
+<script>
+    const charId = window.location.pathname.split('/')[2];
+    let characterData = null;
+    let treeData = null;
+
+    async function init() {
+        try {
+            // Fetch character
+            const charRes = await fetch(`/characters/${charId}`);
+            if (!charRes.ok) throw new Error("Failed to load character");
+            characterData = await charRes.json();
+            
+            updateHeader();
+
+            // Fetch tree
+            const treeRes = await fetch('/api/tree');
+            if (!treeRes.ok) throw new Error("Failed to load tree");
+            treeData = await treeRes.json();
+            
+            renderTree();
+
+        } catch (e) {
+            document.getElementById('tree-root').innerHTML = `<p style="color:red">Error: ${e.message}</p>`;
+        }
+    }
+    
+    function updateHeader() {
+        document.getElementById('charName').textContent = characterData.name;
+        document.getElementById('pointsUsed').textContent = characterData.points_used || 0;
+        document.getElementById('xpAvailable').textContent = characterData.experience || 0;
+    }
+
+    function isOwned(key) {
+        // Advances is a list of objects or strings (legacy)
+        return characterData.advances.some(adv => {
+            if (typeof adv === 'string') return adv === key;
+            return adv.key === key;
+        });
+    }
+
+    // Helper to see if parent is owned (for prerequisites)
+    // We need to know parent key from tree structure, but tree logic might be recursive.
+    // The simplified requirement doesn't strictly ask for prerequisite validation in UI but it's good practice.
+    // However, I'll allow adding any node for now unless strict rules are needed.
+    // But typically you can only add if parent is owned.
+    
+    function renderTree() {
+        const root = document.getElementById('tree-root');
+        root.innerHTML = '';
+        
+        // Tree data comes as a list of roots? Or a hierarchical structure?
+        // My API will return a list of root nodes with 'children' populated.
+        
+        treeData.forEach(node => {
+            root.append(createNodeElement(node));
+        });
+    }
+
+    function createNodeElement(node) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'node';
+        if (node.children && node.children.length > 0) {
+            // wrapper.classList.add('expanded'); // Optional: Expand by default? No.
+        }
+
+        const content = document.createElement('div');
+        content.className = 'node-content';
+        const owned = isOwned(node.key);
+        if (owned) content.classList.add('owned');
+        
+        // Toggle expansion
+        content.onclick = (e) => {
+            // Prevent triggering when button clicked
+            if (e.target.tagName === 'BUTTON') return;
+            wrapper.classList.toggle('expanded');
+            const icon = content.querySelector('.toggle-icon');
+            if(icon) icon.textContent = wrapper.classList.contains('expanded') ? '▼' : '▶';
+        };
+
+        const titleSection = document.createElement('div');
+        const icon = node.children && node.children.length > 0 ? '▶' : '•';
+        titleSection.innerHTML = `<span class="toggle-icon">${icon}</span> <span class="node-title">${node.key}</span> <span class="node-cost">[${node.cost} CP]</span>`;
+        
+        const actionSection = document.createElement('div');
+        
+        if (!owned) {
+            const btn = document.createElement('button');
+            btn.className = 'btn-add';
+            btn.textContent = "+ ADD";
+            btn.onclick = () => addAdvance(node);
+            actionSection.appendChild(btn);
+        } else {
+            actionSection.innerHTML = '<span style="color:var(--neon-green)">✓ OWNED</span>';
+        }
+
+        content.appendChild(titleSection);
+        content.appendChild(actionSection);
+        
+        wrapper.appendChild(content);
+
+        // Details (Description)
+        if (node.description) {
+            const details = document.createElement('div');
+            details.className = 'node-details';
+            details.textContent = node.description;
+            wrapper.appendChild(details);
+        }
+
+        // Children
+        if (node.children && node.children.length > 0) {
+            const childrenContainer = document.createElement('div');
+            childrenContainer.className = 'children';
+            node.children.forEach(child => {
+                childrenContainer.appendChild(createNodeElement(child));
+            });
+            wrapper.appendChild(childrenContainer);
+        }
+        
+        return wrapper;
+    }
+
+    async function addAdvance(node) {
+        if(!confirm(`Buy ${node.key} for ${node.cost} CP?`)) return;
+
+        try {
+            const res = await fetch(`/characters/${charId}/advances`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: node.key, cost: node.cost })
+            });
+
+            if(!res.ok) {
+                const err = await res.json();
+                throw new Error(err.detail || "Failed to add advance");
+            }
+
+            const updatedChar = await res.json();
+            characterData = updatedChar;
+            updateHeader();
+            renderTree(); // Re-render to update buttons
+        } catch (e) {
+            alert("Error: " + e.message);
+        }
+    }
+
+    init();
+</script>
+
+</body>
+</html>

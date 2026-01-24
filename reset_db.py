@@ -5,7 +5,8 @@ from db import DATABASE_URL
 async def reset():
     print("Connecting to DB...")
     conn = await asyncpg.connect(DATABASE_URL)
-    print("Dropping table characters...")
+    print("Dropping tables...")
+    await conn.execute('DROP TABLE IF EXISTS ability_nodes CASCADE')
     await conn.execute('DROP TABLE IF EXISTS characters CASCADE')
     print("Table dropped.")
     

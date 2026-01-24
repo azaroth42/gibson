@@ -17,6 +17,7 @@ class Character(BaseModel):
     health: int = 0
     max_health: int = 0
     experience: int = 0
+    points_used: int = 0
     advances: List[Dict[str, Any]] = []
     items: List[Dict[str, Any]] = []
 
@@ -31,6 +32,7 @@ class CharacterUpdate(BaseModel):
     health: Optional[int] = None
     max_health: Optional[int] = None
     experience: Optional[int] = None
+    points_used: Optional[int] = None
     # advances/items updates logic might be complex, generic for now
     advances: Optional[List[Dict[str, Any]]] = None
     items: Optional[List[Dict[str, Any]]] = None
