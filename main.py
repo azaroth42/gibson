@@ -52,43 +52,34 @@ async def create_character(char: CharacterCreate):
         
         # Grant free (0 CP) advances
         # ONLY grant basic moves and the specific playbook move
-        # Basic moves names:
-        basic_moves = [
-            'Mix It Up', 'Fight Another Day', 'Act Under Pressure', 'First Aid', 
-            'Research', 'Assess', 'Fast Talk', 'Hit the Streets', 'Assist', 'Stressed Out'
-        ]
+        # We need to find the IDs.
+        # Basic Moves are under 'Basic Moves' root.
+        basic_moves_root = await conn.fetchrow("SELECT id FROM ability_nodes WHERE key = 'basic_moves'")
+        target_ids = []
         
-        # Add playbook move - need to find move associated with playbook
-        # We can look up the Playbook node by name, then find 0 cost children of that playbook node?
-        # Or simplistic name matching if names are standard.
-        # But Playbook names are capitalization sensitive in DB?
-        # Let's just grant basic moves for now, matching on names.
+        if basic_moves_root:
+             # Get all children of Basic Moves with cost 0 (most are cost 0 usually?)
+             # Actually basic moves list was explicit. 
+             # Let's just grab all children of "Basic Moves" node.
+             bm_rows = await conn.fetch("SELECT id FROM ability_nodes WHERE parent_id = $1", basic_moves_root['id'])
+             target_ids.extend([r['id'] for r in bm_rows])
+
+        # Playbook Intrinsic Moves (Cost 0)
+        # Find Playbook node by key (slugified name)
+        pb_slug = f"playbooks_{char.playbook.lower()}"
+        pb_node = await conn.fetchrow("SELECT id FROM ability_nodes WHERE key = $1", pb_slug)
         
-        target_names = basic_moves
-        # + Playbook Intrinsics? "Total Badass" etc. 
-        # Hard to map dynamic playbook name to move name without a lookup or strict naming.
-        # But we can find the Playbook node, and grab its 0-cost children?
-        
-        # Let's try finding the Playbook node
-        pb_node = await conn.fetchrow("SELECT id FROM ability_nodes WHERE name = $1", char.playbook)
         if pb_node:
              # Find children of playbook with cost 0 (intrinsic moves)
              intrinsic_rows = await conn.fetch("SELECT id FROM ability_nodes WHERE parent_id = $1 AND cost = 0", pb_node['id'])
-             target_ids = [r['id'] for r in intrinsic_rows]
+             target_ids.extend([r['id'] for r in intrinsic_rows])
              
-             # Also add basic moves
-             # Basic Moves are under a "Basic Moves" container?
-             # Or just by name.
-             bm_rows = await conn.fetch("SELECT id FROM ability_nodes WHERE name = ANY($1)", basic_moves)
-             target_ids.extend([r['id'] for r in bm_rows])
-             
-             if target_ids:
-                 # Batch insert
-                 records = [(row['id'], tid) for tid in set(target_ids)] # dedup just in case
-                 await conn.executemany(
-                    "INSERT INTO character_advances (character_id, advance_id) VALUES ($1, $2)",
-                    records
-                 )
+        if target_ids:
+             records = [(row['id'], tid) for tid in set(target_ids)] 
+             await conn.executemany(
+                "INSERT INTO character_advances (character_id, advance_id) VALUES ($1, $2)",
+                records
+             )
 
         return await get_character_internal(conn, row['id'])
 
@@ -126,7 +117,6 @@ async def update_character(char_id: int, char_update: CharacterUpdate):
     set_clauses = []
     values = []
     
-    # Remove complex fields from direct update
     complex_fields = ['advances', 'items', 'links']
     for field in complex_fields:
         if field in update_data:
@@ -149,10 +139,14 @@ async def update_character(char_id: int, char_update: CharacterUpdate):
         return await get_character_internal(conn, char_id)
 
 class AdvanceAdd(BaseModel):
-    name: str # was key
-    cost: int
+    # API now expects ID? Or should we keep name for convenience if unique?
+    # User asked for "Identifiers separately".
+    # Best is to use ID (int) from tree.
+    # But for backward compat with my frontend changes, I might need to update frontend FIRST?
+    # No, I should update backend to accept ID.
+    node_id: int
 
-# ... (ws handler updates below) ...
+# ... 
 
 @app.websocket("/ws/{char_id}")
 async def websocket_endpoint(websocket: WebSocket, char_id: int):
@@ -168,16 +162,16 @@ async def websocket_endpoint(websocket: WebSocket, char_id: int):
             if message.get("type") == "action":
                 action = message.get("action")
                 if action == "toggle_advance":
-                    name = message.get("key") # Frontend sends 'key' as the identifier still? 
-                    # I'll update frontend to send 'name' or just treat 'key' field as 'name' content.
-                    # Let's assume frontend sends { key: "Mix It Up" } which is the name.
+                    # key here refers to the identifier used by frontend. 
+                    # If I update frontend to use ID, this should be an int.
+                    # Or it could be the new 'key' string.
+                    # Let's support ID if int, or name lookup if string (but name is ambiguous now).
+                    # Actually, let's enforce ID or Key.
+                    # Let's assume frontend sends { id: 123 }.
+                    node_identifier = message.get("id")
                     
-                    # First get the ID for the name
-                    node_row = await pool.fetchrow("SELECT id FROM ability_nodes WHERE name = $1", name)
-                    if not node_row:
-                        response = f"Error: Advance {name} not found"
-                    else:
-                        node_id = node_row['id']
+                    if node_identifier:
+                        node_id = int(node_identifier)
                         exists_row = await pool.fetchrow(
                             "SELECT id FROM character_advances WHERE character_id = $1 AND advance_id = $2", 
                             char_id, node_id
@@ -189,18 +183,18 @@ async def websocket_endpoint(websocket: WebSocket, char_id: int):
                                 "DELETE FROM character_advances WHERE id = $1", 
                                 exists_row['id']
                             )
-                            response = f"Removed advance: {name}"
+                            # Maybe fetch name for response
+                            response = f"Removed advance (ID: {node_id})"
                         else:
                             # Add
                             await pool.execute(
                                 "INSERT INTO character_advances (character_id, advance_id) VALUES ($1, $2)", 
                                 char_id, node_id
                             )
-                            response = f"Added advance: {name}"
+                            response = f"Added advance (ID: {node_id})"
                             
-                            # Update points used if needed
+                            # Update points
                             cost = await pool.fetchval("SELECT cost FROM ability_nodes WHERE id = $1", node_id)
-                            # Need to acquire connection for transaction or update
                             async with pool.acquire() as conn:
                                 await conn.execute("UPDATE characters SET points_used = points_used + $1 WHERE id = $2", cost or 0, char_id)
 
@@ -263,10 +257,10 @@ async def add_character_advance(char_id: int, advance: AdvanceAdd):
         if not char_exists:
             raise HTTPException(status_code=404, detail="Character not found")
 
-        # Get node info
-        node = await conn.fetchrow("SELECT id, parent_id, cost FROM ability_nodes WHERE name = $1", advance.name)
+        # Get node info via ID
+        node = await conn.fetchrow("SELECT id, name, parent_id, cost FROM ability_nodes WHERE id = $1", advance.node_id)
         if not node:
-             raise HTTPException(status_code=400, detail=f"Advance '{advance.name}' not found in tree")
+             raise HTTPException(status_code=400, detail=f"Advance ID '{advance.node_id}' not found")
         
         node_id = node['id']
         parent_id = node['parent_id']
@@ -282,19 +276,13 @@ async def add_character_advance(char_id: int, advance: AdvanceAdd):
         
         # Check parent requirement
         if parent_id is not None:
-             # Check if parent is ROOT (Playbooks or Basic Moves)
              parent_node = await conn.fetchrow("SELECT name, parent_id FROM ability_nodes WHERE id = $1", parent_id)
+             # Only check parent if grandparent exists (i.e. parent is not a root category like "Playbooks" or "Basic Moves")
              if parent_node and parent_node['parent_id'] is not None: 
-                  # Only enforce if parent is not a root Category
-                  # "Mix It Up" has parent "Basic Moves" (root). We don't "buy" Basic Moves root.
-                  # "Basic Moves" has parent None.
                   parent_owned = await conn.fetchval(
                       "SELECT 1 FROM character_advances WHERE character_id = $1 AND advance_id = $2",
                       char_id, parent_id
                   )
-                  # If parent is a container (0 cost?) we might skip check?
-                  # But usually we must own the Move to buy its advances.
-                  # Basic Moves are owned by default.
                   if not parent_owned:
                       raise HTTPException(status_code=400, detail=f"Parent advance '{parent_node['name']}' must be purchased first.")
              
@@ -317,18 +305,17 @@ async def get_character_internal(conn, char_id: int) -> Character:
     
     char_data = dict(row)
     
-    # Fetch advances
-    # Changed an.key to an.name
+    # Fetch advances including ID
     adv_rows = await conn.fetch("""
-        SELECT an.name, an.description, an.cost, ca.added_at 
+        SELECT an.id, an.key, an.name, an.description, an.cost, ca.added_at 
         FROM character_advances ca
         JOIN ability_nodes an ON ca.advance_id = an.id
         WHERE ca.character_id = $1
     """, char_id)
     
     char_data['advances'] = [{
-        "key": r['name'], # Keeping JSON key as 'key' for frontend compatibility or changing to 'name'? Frontend uses 'key' as prop. Let's map name -> key for now to minimize frontend breakage, OR update frontend. User said "Update sheet.html".
-        # Better: use 'name' in JSON and update frontend.
+        "id": r['id'],
+        "key": r['key'], 
         "name": r['name'],
         "description": r['description'],
         "cost": r['cost'], 

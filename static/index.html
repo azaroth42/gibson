@@ -39,7 +39,8 @@
             text-decoration: underline;
         }
 
-        input {
+        input,
+        select {
             background: #222;
             border: 1px solid #444;
             color: white;
@@ -62,7 +63,20 @@
 
     <h3>Create New Character</h3>
     <input type="text" id="new-name" placeholder="Name">
-    <input type="text" id="new-playbook" placeholder="Playbook">
+    <select id="new-playbook">
+        <option value="" disabled selected>Select Playbook</option>
+        <option value="Courier">Courier</option>
+        <option value="Driver">Driver</option>
+        <option value="Face">Face</option>
+        <option value="Infiltrator">Infiltrator</option>
+        <option value="Investigator">Investigator</option>
+        <option value="Juicer">Juicer</option>
+        <option value="Killer">Killer</option>
+        <option value="Netrunner">Netrunner</option>
+        <option value="Razor">Razor</option>
+        <option value="Streamer">Streamer</option>
+        <option value="Tech">Tech</option>
+    </select>
     <button onclick="createChar()">Create</button>
 
     <script>

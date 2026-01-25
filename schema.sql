@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS characters (
 
 CREATE TABLE IF NOT EXISTS ability_nodes (
     id SERIAL PRIMARY KEY,
+    key TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     description TEXT,
     cost INTEGER DEFAULT 0,

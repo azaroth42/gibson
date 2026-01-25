@@ -339,13 +339,13 @@
             }
         }
 
-        // Global Set for tracking rendered names
-        const renderedNames = new Set();
+        // Global Set for tracking rendered IDs
+        const renderedIds = new Set();
 
         function renderMoves(advances) {
             const container = document.getElementById('moves-container');
             container.innerHTML = '';
-            renderedNames.clear();
+            renderedIds.clear();
 
             if (!advances || advances.length === 0) {
                 container.innerHTML = '<div style="color:var(--dim-text)">No moves learned yet.</div>';
@@ -353,69 +353,82 @@
             }
 
             const ownedMap = {};
-            // advances items have .name now (from main.py mapping)
-            advances.forEach(a => ownedMap[a.name.toLowerCase()] = a);
-            const ownedNames = new Set(Object.keys(ownedMap));
+            // advances items should have 'id' (will update main.py next to ensure it)
+            // if not, logic breaks, but we are moving to ID-based.
+            advances.forEach(a => {
+                // If main.py sends ID in advance dict (which it should)
+                if (a.id !== undefined) ownedMap[a.id] = a;
+                else ownedMap[a.name.toLowerCase()] = a; // Fallback? No, try to stick to ID
+            });
+
+            const ownedIds = new Set(Object.keys(ownedMap).map(k => isNaN(k) ? k : parseInt(k)));
+            // Note: mixing string keys from fallback might be messy but we aim for int IDs.
 
             const pbName = (characterData.playbook || "").toLowerCase().trim();
 
             // 1. Playbook
             let playbookRoot = null;
-            // Tree nodes have .name
             const playbooksNode = abilityTree.find(n => n.name.toLowerCase() === 'playbooks');
             if (playbooksNode && playbooksNode.children) {
                 playbookRoot = playbooksNode.children.find(n => n.name.toLowerCase() === pbName);
             }
-            if (!playbookRoot) {
-                playbookRoot = abilityTree.find(n => n.name.toLowerCase() === pbName);
-            }
 
-            if (playbookRoot && ownedNames.has(playbookRoot.name.toLowerCase())) {
+            if (playbookRoot) {
                 const section = document.createElement('div');
                 section.innerHTML = `<h4 style="color:var(--accent-color); border-bottom:1px solid #333; margin-top:0;">${characterData.playbook} Moves</h4>`;
                 container.appendChild(section);
-                container.appendChild(renderHierarchicalNode(playbookRoot, ownedNames, ownedMap));
+                container.appendChild(renderHierarchicalNode(playbookRoot, ownedIds, ownedMap));
             }
 
             // 2. Basics
-            // Names from advances.md
-            const basicMoves = [
-                'Mix It Up', 'Fight Another Day', 'Act Under Pressure', 'First Aid',
-                'Research', 'Assess', 'Fast Talk', 'Hit the Streets', 'Assist', 'Stressed Out'
-            ];
-            const basicSection = document.createElement('div');
-            basicSection.innerHTML = `<h4 style="color:var(--main-color); border-bottom:1px solid #333; margin-top:20px;">Basic Moves</h4>`;
-            let hasBasic = false;
+            // We can't lookup by name efficiently if duplicates exist (which is the point).
+            // But Basic Moves usually are in the "Basic Moves" tree root.
+            const basicRoot = abilityTree.find(n => n.name === 'Basic Moves');
 
-            basicMoves.forEach(name => {
-                const lowerName = name.toLowerCase();
-                if (ownedNames.has(lowerName)) {
-                    // Find node in tree. Since tree is hierarchical, might be deep.
-                    // But usually Basic Moves are top level or under "Basic Moves" node if we structured it so.
-                    // My rebuild script put them under "Basic Moves".
-                    const basicRoot = abilityTree.find(n => n.name === "Basic Moves");
-                    let node = null;
-                    if (basicRoot) {
-                        node = findNodeByName(basicRoot.children, name);
-                    }
-                    if (!node) node = findNodeByName(abilityTree, name);
+            if (basicRoot) {
+                const basicSection = document.createElement('div');
+                basicSection.innerHTML = `<h4 style="color:var(--main-color); border-bottom:1px solid #333; margin-top:20px;">Basic Moves</h4>`;
 
-                    if (node) {
-                        hasBasic = true;
-                        basicSection.appendChild(renderHierarchicalNode(node, ownedNames, ownedMap));
-                    } else {
-                        // Fallback if not found in tree but owned
-                        console.warn("Basic move not found in tree:", name);
-                    }
+                // If we have an ID-based tree, we just check which children of BasicMoves are owned
+                let hasBasic = false;
+                // Flatten basic move tree? Or just recurs
+                // Actually basic moves might be flat or nested.
+                // We only want to render what is OWNED.
+                // So we can traverse the Basic Moves tree and render owned nodes.
+
+                const renderedBasic = renderHierarchicalNode(basicRoot, ownedIds, ownedMap);
+                // But renderHierarchicalNode returns the node itself.
+                // We probably want the children of Basic Moves root, not the root "Basic Moves" header itself?
+                // Up to UI preference. Usually standard UI shows specific moves.
+                // Let's invoke renderHierarchicalNode on CHILDREN of basic root.
+
+                if (basicRoot.children) {
+                    basicRoot.children.forEach(child => {
+                        // Only if owned or has owned child (logic inside renderHierarchicalNode checks this)
+                        const el = renderHierarchicalNode(child, ownedIds, ownedMap);
+                        // Check if el is "empty" (we returned empty wrapper if not owned)?
+                        // My helper returns wrapper always but maybe hidden?
+                        // Let's improve helper to return null if empty.
+                        if (el) {
+                            hasBasic = true;
+                            basicSection.appendChild(el);
+                        }
+                    });
                 }
-            });
 
-            if (hasBasic) container.appendChild(basicSection);
+                if (hasBasic) container.appendChild(basicSection);
+            }
 
-            // 3. Others
+            // 3. Others (Fallback for IDs not found in tree or under headers?)
+            // If ID is valid but not encountered in tree traversal?
+            // Since we traverse relevant roots (Playbooks and Basic), others might be orphan nodes or from other playbooks?
+            // Let's just list anything owned not in renderedIds.
+
             const others = [];
             advances.forEach(adv => {
-                if (!renderedNames.has(adv.name.toLowerCase())) {
+                // If adv has ID, check if rendered
+                const key = adv.id !== undefined ? adv.id : adv.name.toLowerCase();
+                if (!renderedIds.has(key)) {
                     others.push(adv);
                 }
             });
@@ -436,56 +449,66 @@
             }
         }
 
-        function findNodeByName(nodes, name) {
-            if (!nodes) return null;
-            name = name.toLowerCase();
-            for (const node of nodes) {
-                if (node.name.toLowerCase() === name) return node;
-                if (node.children) {
-                    const found = findNodeByName(node.children, name);
-                    if (found) return found;
-                }
-            }
-            return null;
-        }
+        function renderHierarchicalNode(node, ownedIds, ownedMap) {
+            // Recurse first to see if children need rendering
+            const childrenEls = [];
+            let hasOwnedDescendants = false;
 
-        function renderHierarchicalNode(node, ownedNames, ownedMap) {
+            if (node.children && node.children.length > 0) {
+                node.children.forEach(child => {
+                    const el = renderHierarchicalNode(child, ownedIds, ownedMap);
+                    if (el) {
+                        childrenEls.push(el);
+                        hasOwnedDescendants = true;
+                    }
+                });
+            }
+
+            const isOwned = ownedIds.has(node.id);
+
+            if (!isOwned && !hasOwnedDescendants) return null; // Don't render
+
             const wrapper = document.createElement('div');
             wrapper.className = 'ability-node';
             wrapper.style.marginLeft = '10px';
             wrapper.style.borderLeft = '1px dashed var(--dim-text)';
             wrapper.style.paddingLeft = '10px';
+            wrapper.style.marginBottom = '5px';
 
-            const advanceData = ownedMap[node.name.toLowerCase()];
+            const advanceData = isOwned ? ownedMap[node.id] : null;
 
             const header = document.createElement('div');
             const displayName = node.name;
-            header.innerHTML = `<strong style="color:var(--main-color)">${displayName}</strong>`;
+            const styleColor = isOwned ? "var(--main-color)" : "var(--dim-text)";
+
+            let html = `<strong style="color:${styleColor}">${displayName}</strong>`;
+
+            if (isOwned) {
+                html += ` <span style="cursor:pointer; font-size:0.8em; color:var(--accent-color)" onclick="toggleAdvance(${node.id})">[x]</span>`;
+            }
+            header.innerHTML = html;
 
             const descText = (advanceData && advanceData.description) || node.description;
-            if (descText) {
+            // Only show description if owned? Or always?
+            // "More opaque background so move text is easier to read" -> implies we read it.
+            // Usually we want to read it.
+            if (descText && isOwned) {
                 const desc = document.createElement('div');
                 desc.style.fontSize = '0.9em';
                 desc.style.color = '#ccc';
-                // Render markdown
                 desc.innerHTML = marked.parse(descText);
                 header.appendChild(desc);
             }
 
             wrapper.appendChild(header);
 
-            renderedNames.add(node.name.toLowerCase());
+            if (isOwned) renderedIds.add(node.id);
 
-            if (node.children && node.children.length > 0) {
-                node.children.forEach(child => {
-                    if (ownedNames.has(child.name.toLowerCase())) {
-                        wrapper.appendChild(renderHierarchicalNode(child, ownedNames, ownedMap));
-                    }
-                });
-            }
+            childrenEls.forEach(c => wrapper.appendChild(c));
 
             return wrapper;
         }
+
 
         function renderAll() {
             if (!characterData.name) return;
