@@ -69,7 +69,61 @@
             grid-gap: 20px;
         }
 
-        /* ... existing styles ... */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .char-title {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        #char-name {
+            font-size: 48px;
+            margin: 0;
+            padding-left: 25px;
+            margin color: var(--text-color);
+            text-shadow: none;
+            letter-spacing: 1px;
+        }
+
+        #char-playbook {
+            font-size: 25px;
+            padding-left: 25px;
+            font-weight: bold;
+            color: var(--main-color);
+            text-transform: uppercase;
+            text-shadow: var(--glow-text);
+            line-height: 1;
+        }
+
+        .vitals {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 250px;
+        }
+
+        .bar-container {
+            width: 100%;
+            height: 8px;
+            background: #222;
+            border: 1px solid #444;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: var(--accent-color);
+            box-shadow: 0 0 5px var(--accent-color);
+            transition: width 0.3s ease;
+        }
 
         /* Links Hexes */
         .links-row {
@@ -376,8 +430,11 @@
             if (playbookRoot) {
                 const section = document.createElement('div');
                 section.innerHTML = `<h4 style="color:var(--accent-color); border-bottom:1px solid #333; margin-top:0;">${characterData.playbook} Moves</h4>`;
-                container.appendChild(section);
-                container.appendChild(renderHierarchicalNode(playbookRoot, ownedIds, ownedMap));
+                const nodeEl = renderHierarchicalNode(playbookRoot, ownedIds, ownedMap);
+                if (nodeEl) {
+                    container.appendChild(section);
+                    container.appendChild(nodeEl);
+                }
             }
 
             // 2. Basics
@@ -441,8 +498,46 @@
                     el.className = 'ability-node';
                     el.style.borderLeft = '2px solid #555';
                     el.style.padding = '5px';
-                    const desc = adv.description ? marked.parse(adv.description) : "";
-                    el.innerHTML = `<strong>${adv.name}</strong>: <span style="font-size:0.9em; color:#999;">${desc}</span>`;
+
+                    const header = document.createElement('div');
+                    header.innerHTML = `<strong>${adv.name}</strong>`;
+                    el.appendChild(header);
+
+                    if (adv.description) {
+                        const descContainer = document.createElement('div');
+                        descContainer.style.fontSize = '0.9em';
+                        descContainer.style.color = '#999';
+
+                        if (adv.description.length < 100) {
+                            descContainer.innerHTML = marked.parse(adv.description);
+                        } else {
+                            const toggle = document.createElement('div');
+                            toggle.textContent = "▶ Show Description";
+                            toggle.style.cursor = "pointer";
+                            toggle.style.color = "var(--dim-text)";
+                            toggle.style.fontSize = "0.8em";
+                            toggle.style.marginTop = "2px";
+                            toggle.style.fontStyle = "italic";
+
+                            const content = document.createElement('div');
+                            content.innerHTML = marked.parse(adv.description);
+                            content.style.display = "none";
+
+                            toggle.onclick = () => {
+                                if (content.style.display === "none") {
+                                    content.style.display = "block";
+                                    toggle.textContent = "▼ Hide Description";
+                                } else {
+                                    content.style.display = "none";
+                                    toggle.textContent = "▶ Show Description";
+                                }
+                            };
+
+                            descContainer.appendChild(toggle);
+                            descContainer.appendChild(content);
+                        }
+                        el.appendChild(descContainer);
+                    }
                     otherSection.appendChild(el);
                 });
                 container.appendChild(otherSection);
@@ -484,20 +579,47 @@
             let html = `<strong style="color:${styleColor}">${displayName}</strong>`;
 
             if (isOwned) {
-                html += ` <span style="cursor:pointer; font-size:0.8em; color:var(--accent-color)" onclick="toggleAdvance(${node.id})">[x]</span>`;
+                // html += ` <span style="cursor:pointer; font-size:0.8em; color:var(--accent-color)" onclick="toggleAdvance(${node.id})">[x]</span>`;
             }
             header.innerHTML = html;
 
             const descText = (advanceData && advanceData.description) || node.description;
-            // Only show description if owned? Or always?
-            // "More opaque background so move text is easier to read" -> implies we read it.
-            // Usually we want to read it.
             if (descText && isOwned) {
-                const desc = document.createElement('div');
-                desc.style.fontSize = '0.9em';
-                desc.style.color = '#ccc';
-                desc.innerHTML = marked.parse(descText);
-                header.appendChild(desc);
+                const descContainer = document.createElement('div');
+                descContainer.style.fontSize = '0.9em';
+                descContainer.style.color = '#ccc';
+
+                if (descText.length < 100) {
+                    descContainer.innerHTML = marked.parse(descText);
+                } else {
+                    const toggle = document.createElement('div');
+                    toggle.textContent = "▶ Show Description";
+                    toggle.style.cursor = "pointer";
+                    toggle.style.color = "var(--dim-text)";
+                    toggle.style.fontSize = "0.8em";
+                    toggle.style.marginTop = "2px";
+                    toggle.style.fontStyle = "italic";
+
+                    const content = document.createElement('div');
+                    content.innerHTML = marked.parse(descText);
+                    content.style.display = "none";
+                    content.style.marginTop = "5px";
+
+                    toggle.onclick = (e) => {
+                        e.stopPropagation();
+                        if (content.style.display === "none") {
+                            content.style.display = "block";
+                            toggle.textContent = "▼ Hide Description";
+                        } else {
+                            content.style.display = "none";
+                            toggle.textContent = "▶ Show Description";
+                        }
+                    };
+
+                    descContainer.appendChild(toggle);
+                    descContainer.appendChild(content);
+                }
+                header.appendChild(descContainer);
             }
 
             wrapper.appendChild(header);

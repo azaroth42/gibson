@@ -105,25 +105,32 @@ async def rebuild():
             
             raw_name = line_s.replace("## Move:", "").strip()
             
-            if current_section == "Playbooks":
-                 if current_playbook_id:
-                     parent_slug = node_keys[current_playbook_id]
-                     curr_slug = f"{parent_slug}_{raw_name}"
-                     
-                     active_node_id = await insert_node(curr_slug, raw_name, "", 0, current_playbook_id)
-                     node_keys[active_node_id] = curr_slug
-                     
-                     current_parent_stack = [(-1, active_node_id)] 
-            else:
-                 # Basic Move
-                 parent_slug = basic_slug
-                 curr_slug = f"{parent_slug}_{raw_name}"
+            # Basic Move
+            parent_slug = basic_slug
+            curr_slug = f"{parent_slug}_{raw_name}"
+            
+            active_node_id = await insert_node(curr_slug, raw_name, "", 0, basic_moves_root)
+            node_keys[active_node_id] = curr_slug
+            
+            current_parent_stack = [(-1, active_node_id)]
                  
-                 active_node_id = await insert_node(curr_slug, raw_name, "", 0, basic_moves_root)
-                 node_keys[active_node_id] = curr_slug
-                 
-                 current_parent_stack = [(-1, active_node_id)]
-                 
+            continue
+
+        # Playbook Child Move Header
+        if line_s.startswith("### Move:") and current_section == "Playbooks":
+            await update_desc(active_node_id, desc_buffer)
+            desc_buffer = []
+            
+            raw_name = line_s.replace("### Move:", "").strip()
+            
+            if current_playbook_id:
+                parent_slug = node_keys[current_playbook_id]
+                curr_slug = f"{parent_slug}_{raw_name}"
+                
+                active_node_id = await insert_node(curr_slug, raw_name, "", 0, current_playbook_id)
+                node_keys[active_node_id] = curr_slug
+                
+                current_parent_stack = [(-1, active_node_id)]
             continue
 
         # Playbook Header
