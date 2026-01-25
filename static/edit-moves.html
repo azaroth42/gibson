@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Gibson - Edit Moves</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --panel-bg: #0a0a0a;
+            --main-color: #00f3ff;
+            --accent-color: #ff0055;
+            --text-color: #e0e0e0;
+            --dim-text: #666;
+            --border-color: #333;
+            --glow-text: 0 0 5px rgba(0, 243, 255, 0.7);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Share Tech Mono', monospace;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: var(--main-color);
+            text-transform: uppercase;
+            text-shadow: var(--glow-text);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            height: calc(100vh - 100px);
+        }
+
+        .sidebar {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .editor-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .node-item {
+            cursor: pointer;
+            padding: 5px;
+            border-bottom: 1px solid #222;
+        }
+
+        .node-item:hover {
+            color: var(--main-color);
+            background: rgba(0, 243, 255, 0.1);
+        }
+
+        .node-item.active {
+            color: var(--bg-color);
+            background: var(--main-color);
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            background: #111;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            font-family: inherit;
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 1.1em;
+            resize: vertical;
+        }
+
+        #save-btn {
+            background: var(--main-color);
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin-top: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        #save-btn:hover {
+            opacity: 0.9;
+            box-shadow: 0 0 10px var(--main-color);
+        }
+
+        .status-msg {
+            margin-left: 10px;
+            color: var(--dim-text);
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Database Move Editor</h1>
+    <div class="container">
+        <div class="sidebar" id="tree-container">
+            Loading...
+        </div>
+        <div class="editor-panel">
+            <h2 id="edit-title">Select a move to edit</h2>
+            <div id="editor-area" style="display:none;">
+                <p>Move ID: <span id="move-id-display"></span></p>
+                <label>Description (Markdown supported):</label>
+                <textarea id="desc-input"></textarea>
+                <div style="display:flex; align-items:center;">
+                    <button id="save-btn">Save Description</button>
+                    <button id="delete-btn"
+                        style="background:#cc0000; margin-left:10px; color:white; border:none; padding:10px 20px; font-family:inherit; font-size:1.2em; cursor:pointer; text-transform:uppercase; font-weight:bold;">DELETE</button>
+                    <span id="status-msg" class="status-msg"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMoveId = null;
+        let allNodes = {};
+
+        async function loadTree() {
+            const res = await fetch('/api/tree');
+            const data = await res.json();
+            const container = document.getElementById('tree-container');
+            container.innerHTML = '';
+
+            // Flatten or Render Hierarchy?
+            // Let's render hierarchy for context
+            renderNodes(data, container, 0);
+        }
+
+        function renderNodes(nodes, container, depth) {
+            nodes.forEach(node => {
+                allNodes[node.id] = node;
+
+                const div = document.createElement('div');
+                div.className = 'node-item';
+                div.style.paddingLeft = (depth * 15 + 5) + 'px';
+                div.textContent = node.name;
+                div.onclick = () => selectNode(node.id, div);
+                container.appendChild(div);
+
+                if (node.children && node.children.length > 0) {
+                    renderNodes(node.children, container, depth + 1);
+                }
+            });
+        }
+
+        function selectNode(id, element) {
+            currentMoveId = id;
+            const node = allNodes[id];
+
+            // UI Update
+            document.querySelectorAll('.node-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            document.getElementById('edit-title').textContent = "Editing: " + node.name;
+            document.getElementById('editor-area').style.display = 'block';
+            document.getElementById('move-id-display').textContent = id;
+            document.getElementById('desc-input').value = node.description || "";
+            document.getElementById('status-msg').textContent = "";
+        }
+
+        document.getElementById('save-btn').onclick = async () => {
+            if (!currentMoveId) return;
+
+            const newDesc = document.getElementById('desc-input').value;
+            const btn = document.getElementById('save-btn');
+            const status = document.getElementById('status-msg');
+
+            status.textContent = "Saving...";
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`/api/moves/${currentMoveId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ description: newDesc })
+                });
+
+                if (res.ok) {
+                    status.textContent = "Saved!";
+                    status.style.color = "var(--main-color)";
+                    // Update local cache
+                    if (allNodes[currentMoveId]) {
+                        allNodes[currentMoveId].description = newDesc;
+                    }
+                } else {
+                    status.textContent = "Error saving.";
+                    status.style.color = "red";
+                }
+            } catch (e) {
+                console.error(e);
+                status.textContent = "Network error.";
+                status.style.color = "red";
+            } finally {
+                btn.disabled = false;
+                setTimeout(() => { if (status.textContent === "Saved!") status.textContent = ""; }, 2000);
+            }
+        };
+
+        document.getElementById('delete-btn').onclick = async () => {
+            if (!currentMoveId) return;
+            if (!confirm("Delete this move? All character advances for this move will be lost.")) return;
+
+            try {
+                const res = await fetch(`/api/moves/${currentMoveId}`, { method: 'DELETE' });
+                if (res.ok) {
+                    loadTree();
+                    document.getElementById('editor-area').style.display = 'none';
+                } else {
+                    alert("Failed to delete.");
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        loadTree();
+    </script>
+</body>
+
+</html>

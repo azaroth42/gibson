@@ -76,6 +76,7 @@
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 10px;
             margin-bottom: 20px;
+            margin-right: 25px;
         }
 
         .char-title {
@@ -229,9 +230,11 @@
             <div class="bar-container">
                 <div id="health-bar" class="bar-fill" style="width: 50%;"></div>
             </div>
-            <div style="margin-top: 10px;">XP <span id="xp-val">0</span></div>
+            <div style="margin-top: 10px;">CP <span id="cp-val">0</span></div>
+            <div style="font-size:0.7em; color:var(--dim-text); margin-bottom: 2px;">SPENT: <span id="cp-spent">0</span>
+                / TOTAL: <span id="cp-total">0</span></div>
             <div class="bar-container">
-                <div id="xp-bar" class="bar-fill" style="width: 0%; background: var(--main-color);"></div>
+                <div id="cp-bar" class="bar-fill" style="width: 0%; background: var(--main-color);"></div>
             </div>
         </div>
     </div>
@@ -363,8 +366,28 @@
             document.getElementById('health-bar').style.width = Math.min((health / maxHealth) * 100, 100) + '%';
 
             // XP
-            document.getElementById('xp-val').textContent = char.experience;
-            document.getElementById('xp-bar').style.width = Math.min((char.experience / 10) * 100, 100) + '%';
+            // CP
+            const baseCP = 6;
+            const earnedCP = char.experience || 0;
+            const spentCP = char.points_used || 0;
+            const totalCP = baseCP + earnedCP;
+            const availableCP = totalCP - spentCP;
+
+            const cpValEl = document.getElementById('cp-val');
+            if (cpValEl) cpValEl.textContent = availableCP;
+
+            const cpSpentEl = document.getElementById('cp-spent');
+            if (cpSpentEl) cpSpentEl.textContent = spentCP;
+
+            const cpTotalEl = document.getElementById('cp-total');
+            if (cpTotalEl) cpTotalEl.textContent = totalCP;
+
+            const cpBar = document.getElementById('cp-bar');
+            if (cpBar) {
+                // Bar represents Spent / Total (fills up as you spend)
+                const percent = totalCP > 0 ? Math.min((spentCP / totalCP) * 100, 100) : 0;
+                cpBar.style.width = percent + '%';
+            }
         }
 
         function renderStats(stats) {

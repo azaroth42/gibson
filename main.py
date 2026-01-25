@@ -341,6 +341,31 @@ async def get_character_internal(conn, char_id: int) -> Character:
     
     return Character(**char_data)
 
+class MoveUpdate(BaseModel):
+    description: str
+
+@app.put("/api/moves/{move_id}")
+async def update_move(move_id: int, move: MoveUpdate):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        result = await conn.execute(
+            "UPDATE ability_nodes SET description = $1 WHERE id = $2",
+            move.description, move_id
+        )
+        if result == "UPDATE 0":
+            raise HTTPException(status_code=404, detail="Move not found")
+        return {"status": "ok", "id": move_id, "description": move.description}
+
+@app.delete("/api/moves/{move_id}")
+async def delete_move(move_id: int):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        # Cascade delete is handled by DB schema
+        result = await conn.execute("DELETE FROM ability_nodes WHERE id = $1", move_id)
+        if result == "DELETE 0":
+             raise HTTPException(status_code=404, detail="Move not found")
+    return {"status": "ok", "deleted": move_id}
+
 if __name__ == "__main__":
     config = Config()
     config.bind = ["localhost:8000"]
