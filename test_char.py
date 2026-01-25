@@ -26,25 +26,27 @@ def test_create_character_starts_with_moves():
         keys = [a["key"] for a in advances]
         print("Advances:", keys)
         
-        # Expect Basic Moves
-        expected = ["mix-it-up", "act-under-pressure", "fight-another-day", "first-aid"] # etc
+        # Validate Only expected moves are present
+        expected_basics = {
+            "mix-it-up", "fight-another-day", "act-under-pressure", "first-aid", 
+            "research", "assess", "fast-talk", "hit-the-streets", "assist", "stressed-out"
+        }
+        playbook_key = "killer"
         
-        # Check if at least some basic moves are there.
-        # Note: keys in DB are normalized or raw? 'Mix It Up' or 'mix-it-up'?
-        # The json has Keys as Title Case probably? "Mix It Up". Code migration used keys from dict.
+        # We expect basics + playbook + nothing else
+        # Note: keys in advances are what we received. 
+        # Check against db keys.
         
-        found = 0
-        for exp in expected:
-            # Case insensitive check might be needed
-            if any(k.lower().replace(" ", "-") == exp for k in keys):
-                found += 1
-            # Or direct match if keys are "Mix It Up"
-            if exp in keys:
-                 found += 1
-                 
-        # We need to know what the keys actually look like.
-        # But if the list is empty, that's a fail.
-        assert len(advances) > 0, "Character should start with advances"
+        received_keys = set([k.lower() for k in keys])
+        expected_keys = expected_basics | {playbook_key}
+        
+        missing = expected_keys - received_keys
+        extra = received_keys - expected_keys
+        
+        assert not missing, f"Missing moves: {missing}"
+        assert not extra, f"Extra moves found (should not be there): {extra}"
+        
+        print("Success: Correct moves found.")
         
         # Cleanup? (Optional, DB persists)
         

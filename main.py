@@ -29,12 +29,11 @@ app = FastAPI(lifespan=lifespan)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="static")
 
-from models import Character, CharacterCreate, CharacterUpdate
+@app.get("/", response_class=HTMLResponse)
+async def read_root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
-@app.get("/tree")
-async def get_ability_tree():
-    with open("ability-tree.json", "r") as f:
-        return json.load(f)
+from models import Character, CharacterCreate, CharacterUpdate
 
 @app.post("/characters", response_model=Character)
 async def create_character(char: CharacterCreate):
@@ -51,14 +50,21 @@ async def create_character(char: CharacterCreate):
             char.name, char.playbook, tough, cool, sharp, style, chrome
         )
         
-        
         # Grant free (0 CP) advances
-        # We need to find all nodes with cost 0 (and maybe no parent? Or just all cost 0?)
-        # User said "characters start with all of the 0 CP moves".
+        # ONLY grant basic moves and the specific playbook move
+        basic_moves = [
+            'mix-it-up', 'fight-another-day', 'act-under-pressure', 'first-aid', 
+            'research', 'assess', 'fast-talk', 'hit-the-streets', 'assist', 'stressed-out'
+        ]
+        
+        # Add playbook move (normalized)
+        pb_key = char.playbook.lower().strip()
+        target_keys = basic_moves + [pb_key]
+        
         await conn.execute("""
             INSERT INTO character_advances (character_id, advance_id)
-            SELECT $1, id FROM ability_nodes WHERE cost = 0
-        """, row['id'])
+            SELECT $1, id FROM ability_nodes WHERE key = ANY($2)
+        """, row['id'], target_keys)
         
         # Newly created character has no items
         return await get_character_internal(conn, row['id'])
