@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Gibson - Requisition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --panel-bg: #0a0a0a;
+            --main-color: #00f3ff;
+            --accent-color: #ff0055;
+            --text-color: #e0e0e0;
+            --dim-text: #666;
+            --border-color: #333;
+            --glow-text: 0 0 5px rgba(0, 243, 255, 0.7);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Share Tech Mono', monospace;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: var(--main-color);
+            text-transform: uppercase;
+            text-shadow: var(--glow-text);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            color: var(--dim-text);
+            text-transform: uppercase;
+            font-size: 1.2em;
+        }
+
+        .tab.active {
+            color: var(--main-color);
+            border-color: var(--border-color);
+            background: rgba(0, 243, 255, 0.05);
+            border-bottom: 1px solid var(--bg-color);
+            margin-bottom: -1px;
+        }
+
+        .item-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .item-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .item-card.stress {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 5px rgba(255, 0, 85, 0.2);
+        }
+
+        .item-name {
+            font-size: 1.2em;
+            color: var(--main-color);
+            margin-bottom: 5px;
+        }
+
+        .stress .item-name {
+            color: var(--accent-color);
+        }
+
+        .item-desc {
+            font-size: 0.9em;
+            color: #aaa;
+            margin-bottom: 10px;
+            flex-grow: 1;
+        }
+
+        .item-tags {
+            font-size: 0.8em;
+            color: var(--dim-text);
+            margin-bottom: 10px;
+        }
+
+        .add-btn {
+            background: var(--main-color);
+            color: #000;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: inherit;
+            text-transform: uppercase;
+            font-weight: bold;
+            align-self: flex-start;
+        }
+
+        .stress .add-btn {
+            background: var(--accent-color);
+            color: #fff;
+        }
+
+        .add-btn:hover {
+            opacity: 0.9;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--dim-text);
+            text-decoration: none;
+            border: 1px solid var(--dim-text);
+            padding: 5px 10px;
+        }
+
+        .back-link:hover {
+            color: var(--main-color);
+            border-color: var(--main-color);
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="#" id="back-btn" class="back-link">&lt; Back to Sheet</a>
+
+    <h1>Requisition</h1>
+
+    <div class="tabs">
+        <div class="tab active" onclick="showTab('gear')">Equipment</div>
+        <div class="tab" onclick="showTab('cyberware')">Cyberware</div>
+    </div>
+
+    <div id="gear-container" class="item-list"></div>
+    <div id="cyberware-container" class="item-list" style="display:none;"></div>
+
+    <script>
+        // charId from URL path or injected? 
+        // The endpoint serves template with char_id logic if I used jinja2 but I am using static file?
+        // Wait, main.py uses templates.TemplateResponse("equipment.html")
+        // So I can use Jinja2 syntax like {{ char_id }}
+        // Or I can parse URL if I passed it in query.
+        // main.py passes "char_id" context.
+
+        // Let's assume Jinja2 injection works.
+        const charId = "{{ char_id }}";
+
+        document.getElementById('back-btn').href = `/characters/${charId}`;
+
+        let allItems = [];
+        let ownedItemIds = new Set();
+
+        async function init() {
+            try {
+                // Fetch Owned Items
+                const charRes = await fetch(`/characters/${charId}`);
+                if (charRes.ok) {
+                    const cData = await charRes.json();
+                    if (cData.items) {
+                        cData.items.forEach(i => ownedItemIds.add(i.item_id));
+                    }
+                }
+
+                const res = await fetch('/api/items');
+                if (res.ok) {
+                    allItems = await res.json();
+                    renderItems();
+                }
+            } catch (e) { console.error(e); }
+
+            // Auto switch tab if query param present?
+            const urlParams = new URLSearchParams(window.location.search);
+            const type = urlParams.get('type');
+            if (type === 'cyberware') showTab('cyberware');
+        }
+
+        function renderItems() {
+            const gearContainer = document.getElementById('gear-container');
+            const cyberContainer = document.getElementById('cyberware-container');
+
+            gearContainer.innerHTML = '';
+            cyberContainer.innerHTML = '';
+
+            allItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                if (item.stress) card.classList.add('stress');
+
+                let tagsHtml = '';
+                if (item.tags && item.tags.length > 0) {
+                    tagsHtml = `<div class="item-tags">[${item.tags.join(', ')}]</div>`;
+                }
+
+                let buttonHtml = `<button class="add-btn" onclick="addItem(${item.id}, this)">+ Add</button>`;
+
+                if (item.type === 'cyberware' && ownedItemIds.has(item.id)) {
+                    buttonHtml = `<div style="color:var(--dim-text); border:1px solid var(--dim-text); padding:5px 10px; text-transform:uppercase; font-weight:bold;">Added</div>`;
+                }
+
+                card.innerHTML = `
+                    <div>
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-desc">${item.description || ''}</div>
+                        ${tagsHtml}
+                    </div>
+                    ${buttonHtml}
+                `;
+
+                if (item.type === 'cyberware') {
+                    cyberContainer.appendChild(card);
+                } else {
+                    gearContainer.appendChild(card);
+                }
+            });
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.item-list').forEach(el => el.style.display = 'none');
+
+            if (tabName === 'gear') {
+                document.querySelector('.tab:nth-child(1)').classList.add('active');
+                document.getElementById('gear-container').style.display = 'grid';
+            } else {
+                document.querySelector('.tab:nth-child(2)').classList.add('active');
+                document.getElementById('cyberware-container').style.display = 'grid';
+            }
+        }
+
+        async function addItem(itemId, btn) {
+            try {
+                const originalText = btn.innerText;
+                btn.innerText = "...";
+                btn.disabled = true;
+
+                const res = await fetch(`/characters/${charId}/items`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ item_id: itemId })
+                });
+
+                if (res.ok) {
+                    ownedItemIds.add(itemId);
+
+                    const item = allItems.find(i => i.id === itemId);
+                    if (item && item.type === 'cyberware') {
+                        const addedBox = document.createElement('div');
+                        addedBox.style.color = 'var(--dim-text)';
+                        addedBox.style.border = '1px solid var(--dim-text)';
+                        addedBox.style.padding = '5px 10px';
+                        addedBox.style.textTransform = 'uppercase';
+                        addedBox.style.fontWeight = 'bold';
+                        addedBox.innerText = 'Added';
+                        btn.parentNode.replaceChild(addedBox, btn);
+                    } else {
+                        btn.innerText = "Added";
+                        setTimeout(() => {
+                            btn.innerText = "+ Add";
+                            btn.disabled = false;
+                        }, 1000);
+                    }
+                } else {
+                    btn.innerText = "Failed";
+                    setTimeout(() => { btn.innerText = "+ Add"; btn.disabled = false; }, 1000);
+                }
+            } catch (e) {
+                console.error(e);
+                btn.innerText = "Error";
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

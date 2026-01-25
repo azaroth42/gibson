@@ -37,3 +37,11 @@ class CharacterUpdate(BaseModel):
     # advances/items updates logic might be complex, generic for now
     advances: Optional[List[Dict[str, Any]]] = None
     items: Optional[List[Dict[str, Any]]] = None
+
+class ItemAdd(BaseModel):
+    item_id: int
+    name: Optional[str] = None
+    tags: Optional[List[str]] = None
+
+class LinkAdd(BaseModel):
+    target_name: str

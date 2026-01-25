@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Gibson Character Sheet</title>
+    <title>Gibson: Character Sheet</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -89,7 +89,7 @@
             font-size: 48px;
             margin: 0;
             padding-left: 25px;
-            margin color: var(--text-color);
+            color: var(--text-color);
             text-shadow: none;
             letter-spacing: 1px;
         }
@@ -273,18 +273,29 @@
         <!-- Right Column (Cyberware + Equipment) -->
         <div class="sidebar">
             <div class="main-panel" style="margin-bottom: 20px;">
-                <h3>Cyberware</h3>
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #333; margin-bottom:10px; padding-bottom:5px;">
+                    <h3 style="margin:0">Cyberware</h3>
+                    <a href="#" id="add-cyber-btn"
+                        style="color:var(--accent-color); font-size:0.8em; text-decoration:none; border:1px solid var(--accent-color); padding:2px 5px;">+
+                        ADD</a>
+                </div>
                 <ul id="cyberware-list" style="list-style: none; padding: 0;">
                     <li>No chrome installed.</li>
                 </ul>
             </div>
 
             <div class="main-panel">
-                <h3>Equipment</h3>
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #333; margin-bottom:10px; padding-bottom:5px;">
+                    <h3 style="margin:0">Equipment</h3>
+                    <a href="#" id="add-gear-btn"
+                        style="color:var(--main-color); font-size:0.8em; text-decoration:none; border:1px solid var(--main-color); padding:2px 5px;">+
+                        ADD</a>
+                </div>
                 <ul id="equipment-list" style="list-style: none; padding: 0;">
                     <li>No equipment loaded.</li>
                 </ul>
-                <button onclick="addItem()">+ Add Item</button>
             </div>
         </div>
     </div>
@@ -316,6 +327,12 @@
         const manageBtn = document.getElementById('manage-advances-btn');
         if (manageBtn) manageBtn.href = `/characters/${charId}/view-advances`;
 
+        const addCyberBtn = document.getElementById('add-cyber-btn');
+        if (addCyberBtn) addCyberBtn.href = `/characters/${charId}/view-equipment?type=cyberware`;
+
+        const addGearBtn = document.getElementById('add-gear-btn');
+        if (addGearBtn) addGearBtn.href = `/characters/${charId}/view-equipment?type=gear`;
+
         let abilityTree = [];
 
         async function init() {
@@ -339,6 +356,7 @@
                     return;
                 }
                 characterData = await res.json();
+                await loadAllCharacters();
                 renderAll();
                 connectWebSocket();
             } catch (e) {
@@ -346,13 +364,16 @@
             }
         }
 
-        // ... (renderAll, renderHeader, renderStats)
-        function renderAll() {
-            if (!characterData.name) return;
-            renderHeader(characterData);
-            renderStats(characterData.stats);
-            renderMoves(characterData.advances);
+        let allCharacters = [];
+        async function loadAllCharacters() {
+            try {
+                const res = await fetch('/characters');
+                if (res.ok) allCharacters = await res.json();
+            } catch (e) { }
         }
+
+        // ... (renderAll, renderHeader, renderStats)
+
 
         function renderHeader(char) {
             document.getElementById('char-name').textContent = char.name;
@@ -384,8 +405,8 @@
 
             const cpBar = document.getElementById('cp-bar');
             if (cpBar) {
-                // Bar represents Spent / Total (fills up as you spend)
-                const percent = totalCP > 0 ? Math.min((spentCP / totalCP) * 100, 100) : 0;
+                // Bar represents Available / Total
+                const percent = totalCP > 0 ? Math.min((availableCP / totalCP) * 100, 100) : 0;
                 cpBar.style.width = percent + '%';
             }
         }
@@ -660,7 +681,70 @@
             renderHeader(characterData);
             renderStats(characterData.stats);
             renderLinks(characterData.links);
+            renderItems(characterData.items || []);
             renderMoves(characterData.advances);
+        }
+
+        function renderItems(items) {
+            const cyberList = document.getElementById('cyberware-list');
+            const gearList = document.getElementById('equipment-list');
+
+            if (cyberList) cyberList.innerHTML = '';
+            if (gearList) gearList.innerHTML = '';
+
+            if (!items || items.length === 0) {
+                if (cyberList) cyberList.innerHTML = '<li>No chrome installed.</li>';
+                if (gearList) gearList.innerHTML = '<li>No equipment loaded.</li>';
+                return;
+            }
+
+            const cyberItems = items.filter(i => i.type === 'cyberware');
+            const gearItems = items.filter(i => i.type !== 'cyberware');
+
+            // Render Cyber
+            if (cyberItems.length === 0 && cyberList) cyberList.innerHTML = '<li>No chrome installed.</li>';
+            else if (cyberList) {
+                cyberItems.forEach(item => {
+                    const li = document.createElement('li');
+                    li.style.marginBottom = '5px';
+                    li.style.borderLeft = item.stress ? '2px solid var(--accent-color)' : '2px solid var(--main-color)';
+                    li.style.paddingLeft = '5px';
+
+                    let html = `<strong>${item.name}</strong>`;
+                    if (item.tags && item.tags.length > 0) {
+                        html += ` <span style="font-size:0.8em; color:var(--dim-text)">[${item.tags.join(', ')}]</span>`;
+                    }
+                    if (item.stress) {
+                        html += ` <span style="color:var(--accent-color); font-size:0.8em;">(STRESS)</span>`;
+                    }
+                    li.innerHTML = html;
+                    cyberList.appendChild(li);
+                });
+            }
+
+            // Render Gear
+            if (gearItems.length === 0 && gearList) gearList.innerHTML = '<li>No equipment loaded.</li>';
+            else if (gearList) {
+                gearItems.forEach(item => {
+                    const li = document.createElement('li');
+                    li.style.marginBottom = '5px';
+                    li.style.borderLeft = '2px solid #444';
+                    li.style.paddingLeft = '5px';
+
+                    let html = `<strong>${item.name}</strong>`;
+                    if (item.tags && item.tags.length > 0) {
+                        html += ` <span style="font-size:0.8em; color:var(--dim-text)">[${item.tags.join(', ')}]</span>`;
+                    }
+                    if (item.description && item.description.length < 50) {
+                        html += ` <span style="font-size:0.8em; color:#888">- ${item.description}</span>`;
+                    } else if (item.description) {
+                        // Long description truncated or tooltip?
+                        html += ` <span title="${item.description.replace(/"/g, '&quot;')}" style="font-size:0.8em; color:#888; cursor:help;">[...]</span>`;
+                    }
+                    li.innerHTML = html;
+                    gearList.appendChild(li);
+                });
+            }
         }
 
         function renderLinks(links) {
@@ -669,31 +753,70 @@
             container.innerHTML = '';
 
             for (let i = 0; i < 5; i++) {
-                const link = links && links[i] ? links[i] : { target_name: '', value: 0 };
+                const link = links && links[i] ? links[i] : null;
 
                 const item = document.createElement('div');
                 item.className = 'link-item';
 
                 const hex = document.createElement('div');
                 hex.className = 'link-hex';
+                const val = link ? link.value : 0;
                 hex.innerHTML = `
                     <svg class="hex-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
                         <polygon class="hex-path" points="50 5, 93 28, 93 72, 50 95, 7 72, 7 28" />
-                        <text x="50" y="60" class="stat-value-text" style="font-size:40px;">${link.value > 0 ? '+' + link.value : link.value}</text>
+                        <text x="50" y="60" class="stat-value-text" style="font-size:40px;">${val > 0 ? '+' + val : val}</text>
                     </svg>
                  `;
 
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.className = 'link-input';
-                input.placeholder = "Link Target";
-                input.value = link.target_name;
-                // input.readOnly = true; 
-
                 item.appendChild(hex);
-                item.appendChild(input);
+
+                if (link && link.target_name) {
+                    // Locked
+                    const input = document.createElement('div');
+                    input.className = 'link-input';
+                    input.style.background = '#222';
+                    input.style.borderColor = '#555';
+                    input.style.paddingTop = '12px'; // Adjust alignment
+                    input.textContent = link.target_name;
+                    item.appendChild(input);
+                } else {
+                    // Dropdown
+                    const select = document.createElement('select');
+                    select.className = 'link-input';
+                    select.style.background = 'rgba(0,0,0,0.5)';
+
+                    let html = `<option value="">Select Character...</option>`;
+                    allCharacters.forEach(c => {
+                        if (c.id !== characterData.id) {
+                            html += `<option value="${c.name}">${c.name}</option>`;
+                        }
+                    });
+                    select.innerHTML = html;
+
+                    select.onchange = async () => {
+                        if (select.value) {
+                            await createLink(select.value);
+                        }
+                    };
+                    item.appendChild(select);
+                }
+
                 container.appendChild(item);
             }
+        }
+
+        async function createLink(targetName) {
+            try {
+                const res = await fetch(`/characters/${charId}/links`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ target_name: targetName })
+                });
+                if (res.ok) {
+                    characterData = await res.json();
+                    renderAll();
+                }
+            } catch (e) { console.error(e); }
         }
 
         // ... existing renderMoves ...

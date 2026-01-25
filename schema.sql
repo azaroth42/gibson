@@ -28,8 +28,8 @@ CREATE TABLE IF NOT EXISTS items (
     name TEXT NOT NULL,
     description TEXT,
     tags TEXT[],
-    cost INTEGER DEFAULT 0,
-    type TEXT DEFAULT 'gear'
+    type TEXT DEFAULT 'gear',
+    stress BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS character_advances (
@@ -43,6 +43,8 @@ CREATE TABLE IF NOT EXISTS character_items (
     id SERIAL PRIMARY KEY,
     character_id INTEGER REFERENCES characters(id) ON DELETE CASCADE,
     item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
+    name TEXT,
+    tags TEXT[],
     added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

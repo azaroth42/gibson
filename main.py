@@ -33,7 +33,7 @@ templates = Jinja2Templates(directory="static")
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-from models import Character, CharacterCreate, CharacterUpdate
+from models import Character, CharacterCreate, CharacterUpdate, ItemAdd, LinkAdd
 
 @app.post("/characters", response_model=Character)
 async def create_character(char: CharacterCreate):
@@ -45,8 +45,8 @@ async def create_character(char: CharacterCreate):
     
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            """INSERT INTO characters (name, playbook, tough, cool, sharp, style, chrome) 
-               VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *""",
+            """INSERT INTO characters (name, playbook, tough, cool, sharp, style, chrome, health, max_health) 
+               VALUES ($1, $2, $3, $4, $5, $6, $7, 25, 25) RETURNING *""",
             char.name, char.playbook, tough, cool, sharp, style, chrome
         )
         
@@ -102,9 +102,14 @@ async def get_character(char_id: int):
 @app.delete("/characters/{char_id}", status_code=204)
 async def delete_character(char_id: int):
     pool = app.state.pool
-    result = await pool.execute("DELETE FROM characters WHERE id = $1", char_id)
-    if result == "DELETE 0":
-        raise HTTPException(status_code=404, detail="Character not found")
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow("DELETE FROM characters WHERE id = $1 RETURNING name", char_id)
+        if not row:
+            raise HTTPException(status_code=404, detail="Character not found")
+            
+        # Delete links pointing TO this character
+        await conn.execute("DELETE FROM character_links WHERE target_name = $1", row['name'])
+        
     return None
 
 @app.put("/characters/{char_id}", response_model=Character)
@@ -327,7 +332,29 @@ async def get_character_internal(conn, char_id: int) -> Character:
     # But sheet.html accesses .key
     # I will inject 'key' = 'name' to keep it somewhat compatible or just handle it.
 
-    # ... items ...
+    # Fetch items
+    item_rows = await conn.fetch("""
+        SELECT ci.id, ci.item_id, ci.name as custom_name, ci.tags as custom_tags,
+               i.name as base_name, i.description, i.tags as base_tags,
+               i.type, i.stress
+        FROM character_items ci
+        JOIN items i ON ci.item_id = i.id
+        WHERE ci.character_id = $1
+    """, char_id)
+    
+    char_data['items'] = []
+    for r in item_rows:
+        name = r['custom_name'] if r['custom_name'] else r['base_name']
+        tags = (r['base_tags'] or []) + (r['custom_tags'] or [])
+        char_data['items'].append({
+            "id": r['id'], 
+            "item_id": r['item_id'],
+            "name": name,
+            "description": r['description'],
+            "tags": tags,
+            "type": r['type'],
+            "stress": r['stress']
+        })
 
     # Fetch links
     link_rows = await conn.fetch("""
@@ -365,6 +392,58 @@ async def delete_move(move_id: int):
         if result == "DELETE 0":
              raise HTTPException(status_code=404, detail="Move not found")
     return {"status": "ok", "deleted": move_id}
+
+
+
+@app.get("/api/items")
+async def list_items():
+    pool = app.state.pool
+    rows = await pool.fetch("SELECT * FROM items ORDER BY type, name")
+    return [dict(r) for r in rows]
+
+@app.post("/characters/{char_id}/items", response_model=Character)
+async def add_character_item(char_id: int, item_add: ItemAdd):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        char_exists = await conn.fetchval("SELECT 1 FROM characters WHERE id = $1", char_id)
+        if not char_exists:
+             raise HTTPException(status_code=404, detail="Character not found")
+             
+        item = await conn.fetchrow("SELECT name, tags FROM items WHERE id = $1", item_add.item_id)
+        if not item:
+             raise HTTPException(status_code=404, detail="Item not found")
+
+        # Use provided name/tags or defaults (NULL in DB means fallback to item table in my query logic, 
+        # but let's store NULL to imply 'inherit' or store snapshot?
+        # My fetch logic uses coalesce.
+        # If I want to allow renaming later, storing NULL is fine for "default".
+        
+        await conn.execute("""
+            INSERT INTO character_items (character_id, item_id, name, tags)
+            VALUES ($1, $2, $3, $4)
+        """, char_id, item_add.item_id, item_add.name, item_add.tags)
+        
+        return await get_character_internal(conn, char_id)
+
+@app.get("/characters/{char_id}/view-equipment", response_class=HTMLResponse)
+async def view_equipment(request: Request, char_id: int):
+    pool = app.state.pool
+    char_exists = await pool.fetchval("SELECT 1 FROM characters WHERE id = $1", char_id)
+    if not char_exists:
+        raise HTTPException(status_code=404, detail="Character not found")
+    return templates.TemplateResponse("equipment.html", {"request": request, "char_id": char_id})
+
+@app.post("/characters/{char_id}/links", response_model=Character)
+async def add_character_link(char_id: int, link: LinkAdd):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        char_exists = await conn.fetchval("SELECT 1 FROM characters WHERE id = $1", char_id)
+        if not char_exists:
+             raise HTTPException(status_code=404, detail="Character not found")
+        
+        await conn.execute("INSERT INTO character_links (character_id, target_name) VALUES ($1, $2)", char_id, link.target_name)
+        
+        return await get_character_internal(conn, char_id)
 
 if __name__ == "__main__":
     config = Config()
