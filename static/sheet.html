@@ -61,101 +61,62 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 300px 1fr;
+            grid-template-columns: 360px 1fr 300px;
+            /* Wider left sidebar */
             grid-gap: 20px;
         }
 
-        /* Header / Vitals */
-        .header {
-            grid-column: 1 / -1;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            border-bottom: 2px solid var(--main-color);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
+        /* ... existing styles ... */
 
-        .char-title h1 {
-            margin: 0;
-            font-size: 3em;
-        }
-
-        .char-playbook {
-            font-size: 1.5em;
-            color: var(--accent-color);
-        }
-
-        .vitals {
-            text-align: right;
-        }
-
-        .bar-container {
-            width: 300px;
-            background: #222;
-            height: 20px;
-            margin-top: 5px;
-            position: relative;
-            border: 1px solid var(--border-color);
-        }
-
-        .bar-fill {
-            height: 100%;
-            background: var(--accent-color);
-            width: 0%;
-            transition: width 0.3s ease;
-            box-shadow: 0 0 10px var(--accent-color);
-        }
-
-        /* Sidebar: Stats */
-        .sidebar {
+        /* Links Hexes */
+        .links-row {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .link-item {
+            display: grid;
+            grid-template-columns: 50px 1fr;
+            gap: 10px;
+            align-items: center;
         }
 
         .stat-hex {
-            width: 100%;
-            aspect-ratio: 1;
-            background: transparent;
-            border: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
+            width: 140px;
+            /* Force smaller width to fit 2 per row */
+            height: auto;
         }
 
-        .hex-svg {
-            width: 100%;
-            height: 100%;
-            filter: drop-shadow(0 0 5px rgba(0, 243, 255, 0.5));
+        /* Update move usability via panel bg */
+        .main-panel {
+            background-color: rgba(10, 10, 10, 0.95);
+            /* More opaque */
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            box-shadow: var(--glow-box);
         }
 
         .hex-path {
-            fill: rgba(10, 10, 10, 0.9);
+            fill: rgba(30, 30, 30, 0.9);
             stroke: var(--main-color);
-            stroke-width: 2;
-        }
-
-        .stat-value-text {
-            font-size: 40px;
-            fill: var(--text-color);
-            text-anchor: middle;
-            dominant-baseline: central;
-            font-family: 'Share Tech Mono', monospace;
-            text-shadow: 0 0 5px var(--main-color);
+            stroke-width: 2px;
+            vector-effect: non-scaling-stroke;
         }
 
         .stat-label-text {
-            font-size: 14px;
-            fill: var(--dim-text);
+            font-size: 13px;
+            fill: var(--main-color);
             text-anchor: middle;
-            dominant-baseline: central;
+            dominant-baseline: middle;
             font-family: 'Share Tech Mono', monospace;
             text-transform: uppercase;
+            text-shadow: 0 0 2px var(--main-color);
+            letter-spacing: 1px;
         }
 
         .stat-label {
@@ -164,103 +125,41 @@
             text-transform: uppercase;
         }
 
-        .stat-row {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+        .stat-value-text {
+            font-size: 44px;
+            /* Slightly larger relative to smaller hex? Or keeping scale */
+            fill: #fff;
+            /* Force white text */
+            text-anchor: middle;
+            dominant-baseline: central;
+            font-family: 'Share Tech Mono', monospace;
+            text-shadow: 0 0 5px var(--main-color);
         }
 
-        /* Main Content */
-        .main-panel {
-            background: rgba(10, 10, 10, 0.8);
-            border: 1px solid var(--border-color);
-            padding: 20px;
-        }
-
-        .section-title {
-            border-bottom: 1px solid var(--dim-text);
-            margin-bottom: 15px;
-            padding-bottom: 5px;
-        }
-
-        /* Ability Tree */
-        .ability-node {
-            margin-left: 20px;
-            border-left: 1px solid #333;
-            padding-left: 15px;
-            margin-bottom: 10px;
-        }
-
-        .ability-header {
-            cursor: pointer;
-            padding: 5px;
-            background: rgba(0, 243, 255, 0.05);
-            border: 1px solid transparent;
-        }
-
-        .ability-header:hover {
-            border-color: var(--main-color);
-        }
-
-        .ability-header.taken {
-            background: rgba(0, 243, 255, 0.2);
-            border-color: var(--main-color);
-            color: #fff;
-        }
-
-        .cost-badge {
-            background: #222;
-            padding: 2px 6px;
-            font-size: 0.8em;
-            color: var(--accent-color);
-            margin-right: 10px;
-        }
-
-        /* Voice Control */
-        .voice-panel {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #000;
-            border: 2px solid var(--accent-color);
-            padding: 15px;
-            z-index: 2000;
-            width: 250px;
-        }
-
-        .voice-status {
-            font-size: 0.8em;
-            color: var(--dim-text);
-        }
-
-        .voice-active {
-            animation: pulse-border 1.5s infinite;
-            background: rgba(255, 0, 85, 0.1);
-        }
-
-        @keyframes pulse-border {
-            0% {
-                border-color: var(--accent-color);
-                box-shadow: 0 0 5px var(--accent-color);
-            }
-
-            50% {
-                border-color: #fff;
-                box-shadow: 0 0 20px var(--accent-color);
-            }
-
-            100% {
-                border-color: var(--accent-color);
-                box-shadow: 0 0 5px var(--accent-color);
-            }
-        }
-
-        /* Glitch Animation */
-        .glitch {
+        .link-hex {
+            width: 50px;
+            height: 50px;
             position: relative;
         }
 
-        /* Add standardized glitch keyframes if needed later */
+        .link-input {
+            background: rgba(0, 0, 0, 0.5);
+            /* More opaque input */
+            border: 1px solid var(--dim-text);
+            color: var(--text-color);
+            padding: 5px;
+            font-family: inherit;
+            width: 100%;
+        }
+
+        /* Stat Row Grid Correction */
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            justify-items: center;
+            /* Center hexes in their cells */
+        }
     </style>
 </head>
 
@@ -284,30 +183,22 @@
     </div>
 
     <div class="container">
-        <!-- Sidebar -->
+        <!-- Sidebar (Stats + Links) -->
         <div class="sidebar">
             <h3>Statistics</h3>
             <div class="stat-row" id="stats-container">
                 <!-- JS will populate -->
             </div>
 
-            <div class="main-panel" style="margin-top: 20px;">
-                <h3>Equipment</h3>
-                <ul id="equipment-list" style="list-style: none; padding: 0;">
-                    <li>No equipment loaded.</li>
-                </ul>
-                <button onclick="addItem()">+ Add Item</button>
-            </div>
-
-            <div class="main-panel">
-                <h3>Cyberware</h3>
-                <ul id="cyberware-list" style="list-style: none; padding: 0;">
-                    <li>No chrome installed.</li>
-                </ul>
+            <div id="links-container" style="margin-top:20px;">
+                <h3>Links</h3>
+                <div class="links-row" id="links-list">
+                    <!-- JS populate 5 slots -->
+                </div>
             </div>
         </div>
 
-        <!-- Main Content -->
+        <!-- Main Content (Moves) -->
         <div class="main-panel">
             <div
                 style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--dim-text); margin-bottom:15px; padding-bottom:5px;">
@@ -319,6 +210,24 @@
 
             <div id="moves-container">
                 <!-- Moves List -->
+            </div>
+        </div>
+
+        <!-- Right Column (Cyberware + Equipment) -->
+        <div class="sidebar">
+            <div class="main-panel" style="margin-bottom: 20px;">
+                <h3>Cyberware</h3>
+                <ul id="cyberware-list" style="list-style: none; padding: 0;">
+                    <li>No chrome installed.</li>
+                </ul>
+            </div>
+
+            <div class="main-panel">
+                <h3>Equipment</h3>
+                <ul id="equipment-list" style="list-style: none; padding: 0;">
+                    <li>No equipment loaded.</li>
+                </ul>
+                <button onclick="addItem()">+ Add Item</button>
             </div>
         </div>
     </div>
@@ -336,30 +245,53 @@
         </div>
     </div>
 
+    <!-- Add marked for markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         const charId = new URLSearchParams(window.location.search).get('id');
+        // ... (rest of simple setup variables)
         const wsUrl = `ws://${window.location.host}/ws/${charId}`;
         let socket;
         let recognition;
         let characterData = {};
 
         // Setup Link
-        document.getElementById('manage-advances-btn').href = `/characters/${charId}/view-advances`;
+        const manageBtn = document.getElementById('manage-advances-btn');
+        if (manageBtn) manageBtn.href = `/characters/${charId}/view-advances`;
+
+        let abilityTree = [];
 
         async function init() {
-            // Fetch Char
+            try {
+                const treeRes = await fetch('/api/tree');
+                if (treeRes.ok) {
+                    abilityTree = await treeRes.json();
+                } else {
+                    console.error("Failed to load ability tree");
+                }
+            } catch (e) { console.error("Tree Load Error:", e); }
+
             await fetchCharacter();
         }
 
         async function fetchCharacter() {
-            const res = await fetch(`/characters/${charId}`);
-            if (!res.ok) return alert("Character not found");
-            characterData = await res.json();
-            renderAll();
-            connectWebSocket();
+            try {
+                const res = await fetch(`/characters/${charId}`);
+                if (!res.ok) {
+                    document.body.innerHTML = "<h1>Character not found</h1>";
+                    return;
+                }
+                characterData = await res.json();
+                renderAll();
+                connectWebSocket();
+            } catch (e) {
+                console.error("Char Load Error:", e);
+            }
         }
 
+        // ... (renderAll, renderHeader, renderStats)
         function renderAll() {
+            if (!characterData.name) return;
             renderHeader(characterData);
             renderStats(characterData.stats);
             renderMoves(characterData.advances);
@@ -371,24 +303,20 @@
 
             // Health
             const health = char.health;
-            const maxHealth = char.max_health || 25; // Default if 0
+            const maxHealth = char.max_health || 25;
             document.getElementById('health-val').textContent = health;
             document.getElementById('max-health-val').textContent = maxHealth;
             document.getElementById('health-bar').style.width = Math.min((health / maxHealth) * 100, 100) + '%';
 
             // XP
             document.getElementById('xp-val').textContent = char.experience;
-            // XP usually goes to 5 or 10?
             document.getElementById('xp-bar').style.width = Math.min((char.experience / 10) * 100, 100) + '%';
         }
 
         function renderStats(stats) {
-            // stats arg is legacy or can be ignored if we use char directly, or we reconstruct it
             const container = document.getElementById('stats-container');
             container.innerHTML = '';
 
-            // Reconstruct stats object from characterData root fields
-            // Capitalized to match UI expectation
             const currentStats = {
                 "Tough": characterData.tough || 0,
                 "Cool": characterData.cool || 0,
@@ -411,75 +339,225 @@
             }
         }
 
+        // Global Set for tracking rendered names
+        const renderedNames = new Set();
+
         function renderMoves(advances) {
             const container = document.getElementById('moves-container');
             container.innerHTML = '';
+            renderedNames.clear();
 
             if (!advances || advances.length === 0) {
                 container.innerHTML = '<div style="color:var(--dim-text)">No moves learned yet.</div>';
                 return;
             }
 
-            // Sort by acquisition? or name?
-            // advances is list of objects {key, description, cost, timestamp}
+            const ownedMap = {};
+            // advances items have .name now (from main.py mapping)
+            advances.forEach(a => ownedMap[a.name.toLowerCase()] = a);
+            const ownedNames = new Set(Object.keys(ownedMap));
 
-            advances.forEach(adv => {
-                const el = document.createElement('div');
-                el.className = 'ability-node'; // reuse class or style inline
-                el.style.borderLeft = '2px solid var(--main-color)';
-                el.style.padding = '10px';
-                el.style.background = 'rgba(255,255,255,0.05)';
+            const pbName = (characterData.playbook || "").toLowerCase().trim();
 
-                const title = document.createElement('div');
-                title.style.color = 'var(--main-color)';
-                title.style.fontWeight = 'bold';
-                title.style.marginBottom = '5px';
-                title.textContent = adv.key;
+            // 1. Playbook
+            let playbookRoot = null;
+            // Tree nodes have .name
+            const playbooksNode = abilityTree.find(n => n.name.toLowerCase() === 'playbooks');
+            if (playbooksNode && playbooksNode.children) {
+                playbookRoot = playbooksNode.children.find(n => n.name.toLowerCase() === pbName);
+            }
+            if (!playbookRoot) {
+                playbookRoot = abilityTree.find(n => n.name.toLowerCase() === pbName);
+            }
 
-                const desc = document.createElement('div');
-                desc.style.color = '#ccc';
-                desc.style.fontSize = '0.9em';
-                desc.textContent = adv.description || "(No description)";
+            if (playbookRoot && ownedNames.has(playbookRoot.name.toLowerCase())) {
+                const section = document.createElement('div');
+                section.innerHTML = `<h4 style="color:var(--accent-color); border-bottom:1px solid #333; margin-top:0;">${characterData.playbook} Moves</h4>`;
+                container.appendChild(section);
+                container.appendChild(renderHierarchicalNode(playbookRoot, ownedNames, ownedMap));
+            }
 
-                el.appendChild(title);
-                el.appendChild(desc);
-                container.appendChild(el);
+            // 2. Basics
+            // Names from advances.md
+            const basicMoves = [
+                'Mix It Up', 'Fight Another Day', 'Act Under Pressure', 'First Aid',
+                'Research', 'Assess', 'Fast Talk', 'Hit the Streets', 'Assist', 'Stressed Out'
+            ];
+            const basicSection = document.createElement('div');
+            basicSection.innerHTML = `<h4 style="color:var(--main-color); border-bottom:1px solid #333; margin-top:20px;">Basic Moves</h4>`;
+            let hasBasic = false;
+
+            basicMoves.forEach(name => {
+                const lowerName = name.toLowerCase();
+                if (ownedNames.has(lowerName)) {
+                    // Find node in tree. Since tree is hierarchical, might be deep.
+                    // But usually Basic Moves are top level or under "Basic Moves" node if we structured it so.
+                    // My rebuild script put them under "Basic Moves".
+                    const basicRoot = abilityTree.find(n => n.name === "Basic Moves");
+                    let node = null;
+                    if (basicRoot) {
+                        node = findNodeByName(basicRoot.children, name);
+                    }
+                    if (!node) node = findNodeByName(abilityTree, name);
+
+                    if (node) {
+                        hasBasic = true;
+                        basicSection.appendChild(renderHierarchicalNode(node, ownedNames, ownedMap));
+                    } else {
+                        // Fallback if not found in tree but owned
+                        console.warn("Basic move not found in tree:", name);
+                    }
+                }
             });
+
+            if (hasBasic) container.appendChild(basicSection);
+
+            // 3. Others
+            const others = [];
+            advances.forEach(adv => {
+                if (!renderedNames.has(adv.name.toLowerCase())) {
+                    others.push(adv);
+                }
+            });
+
+            if (others.length > 0) {
+                const otherSection = document.createElement('div');
+                otherSection.innerHTML = `<h4 style="color:#ccc; border-bottom:1px solid #333; margin-top:20px;">Other Advances</h4>`;
+                others.forEach(adv => {
+                    const el = document.createElement('div');
+                    el.className = 'ability-node';
+                    el.style.borderLeft = '2px solid #555';
+                    el.style.padding = '5px';
+                    const desc = adv.description ? marked.parse(adv.description) : "";
+                    el.innerHTML = `<strong>${adv.name}</strong>: <span style="font-size:0.9em; color:#999;">${desc}</span>`;
+                    otherSection.appendChild(el);
+                });
+                container.appendChild(otherSection);
+            }
         }
+
+        function findNodeByName(nodes, name) {
+            if (!nodes) return null;
+            name = name.toLowerCase();
+            for (const node of nodes) {
+                if (node.name.toLowerCase() === name) return node;
+                if (node.children) {
+                    const found = findNodeByName(node.children, name);
+                    if (found) return found;
+                }
+            }
+            return null;
+        }
+
+        function renderHierarchicalNode(node, ownedNames, ownedMap) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'ability-node';
+            wrapper.style.marginLeft = '10px';
+            wrapper.style.borderLeft = '1px dashed var(--dim-text)';
+            wrapper.style.paddingLeft = '10px';
+
+            const advanceData = ownedMap[node.name.toLowerCase()];
+
+            const header = document.createElement('div');
+            const displayName = node.name;
+            header.innerHTML = `<strong style="color:var(--main-color)">${displayName}</strong>`;
+
+            const descText = (advanceData && advanceData.description) || node.description;
+            if (descText) {
+                const desc = document.createElement('div');
+                desc.style.fontSize = '0.9em';
+                desc.style.color = '#ccc';
+                // Render markdown
+                desc.innerHTML = marked.parse(descText);
+                header.appendChild(desc);
+            }
+
+            wrapper.appendChild(header);
+
+            renderedNames.add(node.name.toLowerCase());
+
+            if (node.children && node.children.length > 0) {
+                node.children.forEach(child => {
+                    if (ownedNames.has(child.name.toLowerCase())) {
+                        wrapper.appendChild(renderHierarchicalNode(child, ownedNames, ownedMap));
+                    }
+                });
+            }
+
+            return wrapper;
+        }
+
+        function renderAll() {
+            if (!characterData.name) return;
+            renderHeader(characterData);
+            renderStats(characterData.stats);
+            renderLinks(characterData.links);
+            renderMoves(characterData.advances);
+        }
+
+        function renderLinks(links) {
+            const container = document.getElementById('links-list');
+            if (!container) return;
+            container.innerHTML = '';
+
+            for (let i = 0; i < 5; i++) {
+                const link = links && links[i] ? links[i] : { target_name: '', value: 0 };
+
+                const item = document.createElement('div');
+                item.className = 'link-item';
+
+                const hex = document.createElement('div');
+                hex.className = 'link-hex';
+                hex.innerHTML = `
+                    <svg class="hex-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+                        <polygon class="hex-path" points="50 5, 93 28, 93 72, 50 95, 7 72, 7 28" />
+                        <text x="50" y="60" class="stat-value-text" style="font-size:40px;">${link.value > 0 ? '+' + link.value : link.value}</text>
+                    </svg>
+                 `;
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'link-input';
+                input.placeholder = "Link Target";
+                input.value = link.target_name;
+                // input.readOnly = true; 
+
+                item.appendChild(hex);
+                item.appendChild(input);
+                container.appendChild(item);
+            }
+        }
+
+        // ... existing renderMoves ...
 
         function toggleAdvance(key) {
             if (socket && socket.readyState === WebSocket.OPEN) {
                 socket.send(JSON.stringify({ type: 'action', action: 'toggle_advance', key: key }));
-            } else {
-                console.log("WebSocket not connected");
             }
         }
 
-        // Web Socket Logic
         function connectWebSocket() {
             socket = new WebSocket(wsUrl);
             socket.onopen = () => {
-                document.getElementById('ws-status').textContent = "CONNECTED";
-                document.getElementById('ws-status').style.color = "var(--main-color)";
+                const el = document.getElementById('ws-status');
+                if (el) { el.textContent = "CONNECTED"; el.style.color = "var(--main-color)"; }
             };
             socket.onmessage = (event) => {
                 const msg = JSON.parse(event.data);
                 if (msg.type === 'update') {
                     characterData = msg.character;
-                    renderAll(); // Re-render logic
+                    renderAll();
                 } else if (msg.type === 'info') {
                     console.log("Server Info:", msg.message);
                 }
             };
             socket.onclose = () => {
-                document.getElementById('ws-status').textContent = "OFFLINE";
-                document.getElementById('ws-status').style.color = "red";
-                // Reconect?
+                const el = document.getElementById('ws-status');
+                if (el) { el.textContent = "OFFLINE"; el.style.color = "red"; }
                 setTimeout(connectWebSocket, 3000);
             };
         }
 
-        // Voice Logic
         if ('webkitSpeechRecognition' in window) {
             recognition = new webkitSpeechRecognition();
             recognition.continuous = false;
@@ -507,11 +585,14 @@
             };
         }
 
-        document.getElementById('mic-btn').addEventListener('click', () => {
-            if (recognition) {
-                try { recognition.start(); } catch (e) { recognition.stop(); }
-            }
-        });
+        const micBtn = document.getElementById('mic-btn');
+        if (micBtn) {
+            micBtn.addEventListener('click', () => {
+                if (recognition) {
+                    try { recognition.start(); } catch (e) { recognition.stop(); }
+                }
+            });
+        }
 
         init();
     </script>

@@ -20,6 +20,7 @@ class Character(BaseModel):
     points_used: int = 0
     advances: List[Dict[str, Any]] = []
     items: List[Dict[str, Any]] = []
+    links: List[Dict[str, Any]] = []
 
 class CharacterUpdate(BaseModel):
     name: Optional[str] = None

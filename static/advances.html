@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Character Advances</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --neon-blue: #00f3ff;
@@ -18,7 +21,8 @@
         body {
             font-family: 'Roboto', sans-serif;
             background-color: var(--bg-color);
-            background-image: url('/static/cyberpunk-bg.png'); /* Use existing image */
+            background-image: url('/static/cyberpunk-bg.png');
+            /* Use existing image */
             background-size: cover;
             background-attachment: fixed;
             color: #eee;
@@ -26,7 +30,9 @@
             padding: 20px;
         }
 
-        h1, h2, h3 {
+        h1,
+        h2,
+        h3 {
             font-family: 'Orbitron', sans-serif;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -99,9 +105,10 @@
             color: #ccc;
             font-size: 0.9em;
         }
-        
-        .node.expanded > .node-details {
-            max-height: 500px; /* Arbitrary large number */
+
+        .node.expanded>.node-details {
+            max-height: 500px;
+            /* Arbitrary large number */
             margin-bottom: 10px;
         }
 
@@ -109,7 +116,7 @@
             font-weight: bold;
             color: var(--neon-blue);
         }
-        
+
         .node-cost {
             font-size: 0.8em;
             color: var(--neon-pink);
@@ -132,7 +139,7 @@
             color: #000;
             box-shadow: 0 0 10px var(--neon-green);
         }
-        
+
         .btn-add:disabled {
             border-color: grey;
             color: grey;
@@ -143,8 +150,8 @@
         .children {
             display: none;
         }
-        
-        .node.expanded > .children {
+
+        .node.expanded>.children {
             display: block;
         }
 
@@ -163,171 +170,183 @@
         }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <div class="header">
-        <h1>Advances</h1>
-        <div class="char-info">
-            <span id="charName">Loading...</span>
-            <small>Points Used: <span id="pointsUsed">0</span></small> <br>
-            <small>XP Available: <span id="xpAvailable">0</span></small>
+    <div class="container">
+        <div class="header">
+            <h1>Advances</h1>
+            <div class="char-info">
+                <span id="charName">Loading...</span>
+                <small>Points Used: <span id="pointsUsed">0</span></small> <br>
+                <small>XP Available: <span id="xpAvailable">0</span></small>
+            </div>
+        </div>
+
+        <div id="tree-root" class="tree-container">
+            <!-- Tree nodes will be injected here -->
+            Loading tree data...
         </div>
     </div>
 
-    <div id="tree-root" class="tree-container">
-        <!-- Tree nodes will be injected here -->
-        Loading tree data...
-    </div>
-</div>
+    <script>
+        const charId = window.location.pathname.split('/')[2];
+        let characterData = null;
+        let treeData = null;
 
-<script>
-    const charId = window.location.pathname.split('/')[2];
-    let characterData = null;
-    let treeData = null;
+        async function init() {
+            try {
+                // Fetch character
+                const charRes = await fetch(`/characters/${charId}`);
+                if (!charRes.ok) throw new Error("Failed to load character");
+                characterData = await charRes.json();
 
-    async function init() {
-        try {
-            // Fetch character
-            const charRes = await fetch(`/characters/${charId}`);
-            if (!charRes.ok) throw new Error("Failed to load character");
-            characterData = await charRes.json();
-            
-            updateHeader();
+                updateHeader();
 
-            // Fetch tree
-            const treeRes = await fetch('/api/tree');
-            if (!treeRes.ok) throw new Error("Failed to load tree");
-            treeData = await treeRes.json();
-            
-            renderTree();
+                // Fetch tree
+                const treeRes = await fetch('/api/tree');
+                if (!treeRes.ok) throw new Error("Failed to load tree");
+                treeData = await treeRes.json();
 
-        } catch (e) {
-            document.getElementById('tree-root').innerHTML = `<p style="color:red">Error: ${e.message}</p>`;
-        }
-    }
-    
-    function updateHeader() {
-        document.getElementById('charName').textContent = characterData.name;
-        document.getElementById('pointsUsed').textContent = characterData.points_used || 0;
-        document.getElementById('xpAvailable').textContent = characterData.experience || 0;
-    }
+                renderTree();
 
-    function isOwned(key) {
-        // Advances is a list of objects or strings (legacy)
-        return characterData.advances.some(adv => {
-            if (typeof adv === 'string') return adv === key;
-            return adv.key === key;
-        });
-    }
-
-    // Helper to see if parent is owned (for prerequisites)
-    // We need to know parent key from tree structure, but tree logic might be recursive.
-    // The simplified requirement doesn't strictly ask for prerequisite validation in UI but it's good practice.
-    // However, I'll allow adding any node for now unless strict rules are needed.
-    // But typically you can only add if parent is owned.
-    
-    function renderTree() {
-        const root = document.getElementById('tree-root');
-        root.innerHTML = '';
-        
-        // Tree data comes as a list of roots? Or a hierarchical structure?
-        // My API will return a list of root nodes with 'children' populated.
-        
-        treeData.forEach(node => {
-            root.append(createNodeElement(node));
-        });
-    }
-
-    function createNodeElement(node) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'node';
-        if (node.children && node.children.length > 0) {
-            // wrapper.classList.add('expanded'); // Optional: Expand by default? No.
+            } catch (e) {
+                document.getElementById('tree-root').innerHTML = `<p style="color:red">Error: ${e.message}</p>`;
+            }
         }
 
-        const content = document.createElement('div');
-        content.className = 'node-content';
-        const owned = isOwned(node.key);
-        if (owned) content.classList.add('owned');
-        
-        // Toggle expansion
-        content.onclick = (e) => {
-            // Prevent triggering when button clicked
-            if (e.target.tagName === 'BUTTON') return;
-            wrapper.classList.toggle('expanded');
-            const icon = content.querySelector('.toggle-icon');
-            if(icon) icon.textContent = wrapper.classList.contains('expanded') ? '▼' : '▶';
-        };
-
-        const titleSection = document.createElement('div');
-        const icon = node.children && node.children.length > 0 ? '▶' : '•';
-        titleSection.innerHTML = `<span class="toggle-icon">${icon}</span> <span class="node-title">${node.key}</span> <span class="node-cost">[${node.cost} CP]</span>`;
-        
-        const actionSection = document.createElement('div');
-        
-        if (!owned) {
-            const btn = document.createElement('button');
-            btn.className = 'btn-add';
-            btn.textContent = "+ ADD";
-            btn.onclick = () => addAdvance(node);
-            actionSection.appendChild(btn);
-        } else {
-            actionSection.innerHTML = '<span style="color:var(--neon-green)">✓ OWNED</span>';
+        function updateHeader() {
+            document.getElementById('charName').textContent = characterData.name;
+            document.getElementById('pointsUsed').textContent = characterData.points_used || 0;
+            document.getElementById('xpAvailable').textContent = characterData.experience || 0;
         }
 
-        content.appendChild(titleSection);
-        content.appendChild(actionSection);
-        
-        wrapper.appendChild(content);
-
-        // Details (Description)
-        if (node.description) {
-            const details = document.createElement('div');
-            details.className = 'node-details';
-            details.textContent = node.description;
-            wrapper.appendChild(details);
-        }
-
-        // Children
-        if (node.children && node.children.length > 0) {
-            const childrenContainer = document.createElement('div');
-            childrenContainer.className = 'children';
-            node.children.forEach(child => {
-                childrenContainer.appendChild(createNodeElement(child));
+        function isOwned(name) {
+            // Advances is a list of objects or strings (legacy)
+            return characterData.advances.some(adv => {
+                if (typeof adv === 'string') return adv === name;
+                return adv.name === name || adv.key === name; // Compat
             });
-            wrapper.appendChild(childrenContainer);
         }
-        
-        return wrapper;
-    }
 
-    async function addAdvance(node) {
-        if(!confirm(`Buy ${node.key} for ${node.cost} CP?`)) return;
-
-        try {
-            const res = await fetch(`/characters/${charId}/advances`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ key: node.key, cost: node.cost })
+        function renderTree() {
+            const root = document.getElementById('tree-root');
+            root.innerHTML = '';
+            treeData.forEach(node => {
+                root.append(createNodeElement(node));
             });
+        }
 
-            if(!res.ok) {
-                const err = await res.json();
-                throw new Error(err.detail || "Failed to add advance");
+        function createNodeElement(node) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'node';
+            if (node.children && node.children.length > 0) {
+                // wrapper.classList.add('expanded'); 
             }
 
-            const updatedChar = await res.json();
-            characterData = updatedChar;
-            updateHeader();
-            renderTree(); // Re-render to update buttons
-        } catch (e) {
-            alert("Error: " + e.message);
-        }
-    }
+            const content = document.createElement('div');
+            content.className = 'node-content';
+            const owned = isOwned(node.name);
+            if (owned) content.classList.add('owned');
 
-    init();
-</script>
+            content.onclick = (e) => {
+                if (e.target.tagName === 'BUTTON') return;
+                wrapper.classList.toggle('expanded');
+                const icon = content.querySelector('.toggle-icon');
+                if (icon) icon.textContent = wrapper.classList.contains('expanded') ? '▼' : '▶';
+            };
+
+            const titleSection = document.createElement('div');
+            const icon = node.children && node.children.length > 0 ? '▶' : '•';
+            // Display node.name
+            titleSection.innerHTML = `<span class="toggle-icon">${icon}</span> <span class="node-title">${node.name}</span> <span class="node-cost">[${node.cost} CP]</span>`;
+
+            const actionSection = document.createElement('div');
+
+            if (!owned) {
+                const btn = document.createElement('button');
+                btn.className = 'btn-add';
+                btn.textContent = "+ ADD";
+                btn.onclick = function () { addAdvance(node, this); };
+                actionSection.appendChild(btn);
+            } else {
+                actionSection.innerHTML = '<span style="color:var(--neon-green)">✓ OWNED</span>';
+            }
+
+            content.appendChild(titleSection);
+            content.appendChild(actionSection);
+
+            wrapper.appendChild(content);
+
+            if (node.description) {
+                const details = document.createElement('div');
+                details.className = 'node-details';
+                details.textContent = node.description;
+                wrapper.appendChild(details);
+            }
+
+            if (node.children && node.children.length > 0) {
+                const childrenContainer = document.createElement('div');
+                childrenContainer.className = 'children';
+                node.children.forEach(child => {
+                    childrenContainer.appendChild(createNodeElement(child));
+                });
+                wrapper.appendChild(childrenContainer);
+            }
+
+            return wrapper;
+        }
+
+        async function addAdvance(node, btnElement) {
+            const originalText = btnElement.textContent;
+            btnElement.textContent = "...";
+            btnElement.disabled = true;
+
+            try {
+                const res = await fetch(`/characters/${charId}/advances`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    // Send name instead of key
+                    body: JSON.stringify({ name: node.name, cost: node.cost })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.detail || "Failed to add advance");
+                }
+
+                const updatedChar = await res.json();
+                characterData = updatedChar;
+                updateHeader();
+
+                const contentDiv = btnElement.closest('.node-content');
+                if (contentDiv) {
+                    contentDiv.classList.add('owned');
+                    // Replace button with owned label
+                    const actionSection = btnElement.parentElement;
+                    actionSection.innerHTML = '<span style="color:var(--neon-green)">✓ OWNED</span>';
+                }
+                // Check if other buttons need enabling/updating? 
+                // If we had prerequisite logic visible, we might need to refresh neighbors/children.
+                // But since current createNodeElement triggers 'owned' check dynamically, 
+                // changing the DOM manually here is faster but less thorough.
+                // However, user specifically asked: "Don't close the hierarchy".
+                // Full renderTree() destroys DOM state (open folders).
+
+                // If we need to update other nodes (e.g. unlocking children), we might strictly need to re-render OR manually find them.
+                // For now, let's stick to simple in-place update for the clicked node. 
+                // If children unlock, they might be visible but "ADD" buttons might need Prereq checks (currently not implemented in UI blocking).
+
+            } catch (e) {
+                alert("Error: " + e.message);
+                btnElement.textContent = originalText;
+                btnElement.disabled = false;
+            }
+        }
+
+        init();
+    </script>
 
 </body>
+
 </html>
