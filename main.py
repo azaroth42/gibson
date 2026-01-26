@@ -47,14 +47,20 @@ class Clock(BaseModel):
     id: int
     name: str
     filled: int
+    x: Optional[int] = None
+    y: Optional[int] = None
 
 class ClockCreate(BaseModel):
     name: str
     filled: int = 0
+    x: Optional[int] = None
+    y: Optional[int] = None
 
 class ClockUpdate(BaseModel):
     name: Optional[str] = None
     filled: Optional[int] = None
+    x: Optional[int] = None
+    y: Optional[int] = None
 
 class GameState(BaseModel):
     map_image: Optional[str] = None
@@ -115,7 +121,9 @@ async def create_character(char: CharacterCreate):
                 records
              )
 
-        return await get_character_internal(conn, row['id'])
+        new_char = await get_character_internal(conn, row['id'])
+        await broadcast_tabletop(app, {"type": "character_update", "payload": new_char.model_dump()})
+        return new_char
 
 @app.get("/characters", response_model=List[Character])
 async def list_characters():
@@ -144,6 +152,7 @@ async def delete_character(char_id: int):
         # Delete links pointing TO this character
         await conn.execute("DELETE FROM character_links WHERE target_name = $1", row['name'])
         
+    await broadcast_tabletop(app, {"type": "character_delete", "payload": {"id": char_id}})
     return None
 
 @app.put("/characters/{char_id}", response_model=Character)
@@ -243,10 +252,51 @@ async def websocket_endpoint(websocket: WebSocket, char_id: int):
 
                         updated = True
             
+            elif message.get("type") == "command":
+                text = message.get("text", "").lower()
+                response = f"Command recognized: {text}"
+                
+                # Simple Health Parser
+                # "Take X damage"
+                damage_match = re.search(r'(take|suffer)\s+(\d+)', text)
+                heal_match = re.search(r'(heal|recover)\s+(\d+)', text)
+                set_match = re.search(r'set\s+health\s+(?:to\s+)?(\d+)', text)
+                
+                delta = 0
+                set_val = None
+                
+                if damage_match:
+                    delta = -int(damage_match.group(2))
+                    response = f"Taking {-delta} damage."
+                elif heal_match:
+                    delta = int(heal_match.group(2))
+                    response = f"Healing {delta} points."
+                elif set_match:
+                    set_val = int(set_match.group(1))
+                    response = f"Health set to {set_val}."
+                
+                if delta != 0 or set_val is not None:
+                     async with pool.acquire() as conn:
+                        # Get current
+                        curr = await conn.fetchval("SELECT health FROM characters WHERE id = $1", char_id)
+                        max_hp = await conn.fetchval("SELECT max_health FROM characters WHERE id = $1", char_id) or 25
+                        
+                        if set_val is not None:
+                            new_val = set_val
+                        else:
+                            new_val = curr + delta
+                            
+                        # Clamp?
+                        new_val = max(0, min(new_val, max_hp))
+                        
+                        await conn.execute("UPDATE characters SET health = $1 WHERE id = $2", new_val, char_id)
+                        updated = True
+
             if updated:
                 async with pool.acquire() as conn:
                     updated_character = await get_character_internal(conn, char_id)
                 await websocket.send_json({"response": response, "character": updated_character.model_dump()})
+                await broadcast_tabletop(app, {"type": "character_update", "payload": updated_character.model_dump()})
             else:
                 await websocket.send_json({"response": response})
 
@@ -506,6 +556,10 @@ async def view_tabletop(request: Request):
 async def view_select_map(request: Request):
     return templates.TemplateResponse("select-map.html", {"request": request})
 
+@app.get("/clocks", response_class=HTMLResponse)
+async def view_clocks(request: Request):
+    return templates.TemplateResponse("clocks.html", {"request": request})
+
 @app.get("/api/maps")
 async def list_maps():
     maps_dir = "static/maps"
@@ -563,6 +617,7 @@ async def delete_clock(clock_id: int):
         result = await conn.execute("DELETE FROM countdown_clocks WHERE id = $1", clock_id)
         if result == "DELETE 0":
             raise HTTPException(status_code=404, detail="Clock not found")
+    await broadcast_tabletop(app, {"type": "clock_delete", "payload": {"id": clock_id}})
     return None
 
 @app.get("/api/gamestate", response_model=GameState)

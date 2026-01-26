@@ -233,6 +233,16 @@
                     clocks.push(clock);
                 }
                 renderClocks();
+            } else if (data.type === 'character_delete') {
+                const id = data.payload.id;
+                characters = characters.filter(c => c.id !== id);
+                const token = document.getElementById(`token-char-${id}`);
+                if (token) token.remove();
+            } else if (data.type === 'clock_delete') {
+                const id = data.payload.id;
+                clocks = clocks.filter(c => c.id !== id);
+                const token = document.getElementById(`token-clock-${id}`);
+                if (token) token.remove();
             }
         }
 
@@ -245,30 +255,28 @@
                     token = document.createElement('div');
                     token.id = `token-char-${char.id}`;
                     token.className = 'token';
+                    surface.appendChild(token);
+                    makeDraggable(token);
+                }
 
-                    // Initial Layout (only for new tokens)
+                // Position
+                // If we have saved coords, use them. Else, default layout if brand new token (no style set)
+                // Actually, server sends X/Y updates too.
+                if (char.x !== null && char.y !== null) {
+                    token.style.left = char.x + 'px';
+                    token.style.top = char.y + 'px';
+                } else if (!token.style.left) {
+                    // Initial Layout default
                     const x = 50 + (index % 8) * 130;
                     const y = window.innerHeight - 150 - (Math.floor(index / 8) * 150);
                     token.style.left = x + 'px';
                     token.style.top = y + 'px';
-
-                    surface.appendChild(token);
-                    makeDraggable(token);
-                    // We'll populate content below
                 }
-
-                // Update Content (HP Wheel & Name)
-                // To avoid destroying inner drag handlers or state, strictly update children?
-                // Or just replace innerHTML is fine as long as the parent .token tracks events?
-                // makeDraggable attaches to 'el' (token). Replacing innerHTML is safe.
 
                 const current = char.health;
                 const max = char.max_health || 25;
                 const percent = max > 0 ? (current / max) * 100 : 0;
                 const color = current < (max * 0.3) ? '#ff4444' : '#4caf50';
-
-                // Check if values changed to avoid DOM thrashing? 
-                // Replacing innerHTML is cheap enough here.
 
                 token.innerHTML = `
                     <div class="hp-wheel" style="background: conic-gradient(${color} ${percent}%, #ddd 0);">
@@ -280,8 +288,7 @@
                 updateRotation(token);
             });
 
-            // Handle removed characters?
-            // Optional, but good.
+            // ... (cleanup code) ...
             const newIds = new Set(newChars.map(c => c.id));
             const existingTokens = document.querySelectorAll('.token[id^="token-char-"]');
             existingTokens.forEach(el => {
@@ -294,7 +301,6 @@
             characters = newChars;
         }
 
-        // Re-implement renderClocks to be safe for updates (Clock Polling was not explicitly asked but I'll make it safe)
         function renderClocks() {
             clocks.forEach((clock, index) => {
                 let token = document.getElementById(`token-clock-${clock.id}`);
@@ -302,21 +308,24 @@
                     token = document.createElement('div');
                     token.id = `token-clock-${clock.id}`;
                     token.className = 'clock-token';
-
-                    const x = window.innerWidth - 200;
-                    const y = 50 + (index * 180);
-                    token.style.left = x + 'px';
-                    token.style.top = y + 'px';
-
                     surface.appendChild(token);
                     makeDraggable(token);
                 }
 
+                // Position
+                if (clock.x !== null && clock.y !== null) {
+                    token.style.left = clock.x + 'px';
+                    token.style.top = clock.y + 'px';
+                } else if (!token.style.left) {
+                    const x = window.innerWidth - 200;
+                    const y = 50 + (index * 180);
+                    token.style.left = x + 'px';
+                    token.style.top = y + 'px';
+                }
+
                 // Re-create content
                 token.innerHTML = '';
-                // Pass both filled and name to infer total segments e.g. "Clock [6]"
                 const svg = createPieSVG(clock.filled, clock.name);
-
                 const name = document.createElement('div');
                 name.className = 'char-name';
                 name.textContent = clock.name;
@@ -409,22 +418,17 @@
                 offset.x = x - el.offsetLeft;
                 offset.y = y - el.offsetTop;
                 el.style.zIndex = 1000;
-                el.style.transition = 'none'; // Disable transition during drag
+                el.style.transition = 'none';
             }
 
             function onMove(x, y) {
                 if (!isDragging) return;
-
                 let newX = x - offset.x;
                 let newY = y - offset.y;
-
-                // Bounds
                 newX = Math.max(0, Math.min(window.innerWidth - el.offsetWidth, newX));
                 newY = Math.max(0, Math.min(window.innerHeight - el.offsetHeight, newY));
-
                 el.style.left = newX + 'px';
                 el.style.top = newY + 'px';
-
                 updateRotation(el);
             }
 
@@ -432,16 +436,15 @@
                 if (isDragging) {
                     isDragging = false;
                     el.style.zIndex = '';
-                    el.style.transition = 'transform 0.3s ease'; // Re-enable transition
+                    el.style.transition = 'transform 0.3s ease';
+                    // Save Position
+                    savePosition(el);
                 }
             }
 
-            // Mouse
             el.addEventListener('mousedown', e => { onStart(e.clientX, e.clientY); });
             window.addEventListener('mousemove', e => { onMove(e.clientX, e.clientY); });
             window.addEventListener('mouseup', onEnd);
-
-            // Touch
             el.addEventListener('touchstart', e => {
                 const t = e.touches[0];
                 onStart(t.clientX, t.clientY);
@@ -453,6 +456,27 @@
                 e.preventDefault();
             }, { passive: false });
             window.addEventListener('touchend', onEnd);
+        }
+
+        async function savePosition(el) {
+            const x = parseInt(el.style.left || 0);
+            const y = parseInt(el.style.top || 0);
+
+            if (el.id.startsWith('token-char-')) {
+                const id = el.id.replace('token-char-', '');
+                await fetch(`/characters/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ x: x, y: y })
+                });
+            } else if (el.id.startsWith('token-clock-')) {
+                const id = el.id.replace('token-clock-', '');
+                await fetch(`/api/clocks/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ x: x, y: y })
+                });
+            }
         }
 
         function updateRotation(el) {

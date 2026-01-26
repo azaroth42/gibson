@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Clock Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #111;
+            color: #eee;
+            font-family: 'Share Tech Mono', monospace;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #00f3ff;
+            text-shadow: 0 0 5px rgba(0, 243, 255, 0.7);
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .clock-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #222;
+            margin-bottom: 5px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .clock-info {
+            flex-grow: 1;
+        }
+
+        .clock-name {
+            font-size: 1.2em;
+            color: #fff;
+        }
+
+        .clock-segments {
+            color: #aaa;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        button {
+            background: #333;
+            color: #eee;
+            border: 1px solid #555;
+            padding: 5px 15px;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #444;
+            border-color: #777;
+        }
+
+        button.btn-inc {
+            background: #00f3ff;
+            color: #000;
+            border-color: #00f3ff;
+            font-weight: bold;
+        }
+
+        button.btn-dec {
+            background: #333;
+            color: #00f3ff;
+            border-color: #00f3ff;
+        }
+
+        button.btn-delete {
+            background: #300;
+            color: #ff4444;
+            border-color: #800;
+            margin-left: 20px;
+        }
+
+        button.btn-delete:hover {
+            background: #500;
+        }
+
+        .create-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            background: #222;
+            border: 1px solid #444;
+            color: #eee;
+            padding: 8px;
+            font-family: inherit;
+            flex-grow: 1;
+            font-size: 1.1em;
+        }
+
+        .pie-preview {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Countdown Clocks</h1>
+
+    <!-- Create New -->
+    <div class="section">
+        <h3 style="margin-top:0; color: #888;">New Clock</h3>
+        <div class="create-form">
+            <input type="text" id="new-clock-name" placeholder="Clock Name (e.g. 'Security Alert')">
+            <!-- Optional: Default Size override? The user said "set value between 0 and 6", implying 6 is standard max.
+                 I'll stick to name-based logic or just assume 6. Let's just create with 0 filled.
+                 We can add syntax help for [SIZE] if we want, but name is enough.
+            -->
+            <button onclick="createClock()" class="btn-inc">Create</button>
+        </div>
+    </div>
+
+    <!-- List -->
+    <div class="section">
+        <h3 style="margin-top:0; color: #888;">Active Clocks</h3>
+        <div id="clock-list">
+            <!-- Populated via JS -->
+            <div style="padding:20px; text-align:center; color:#555">Loading...</div>
+        </div>
+    </div>
+
+    <script>
+        const clockList = document.getElementById('clock-list');
+        const nameInput = document.getElementById('new-clock-name');
+
+        async function loadClocks() {
+            try {
+                const res = await fetch('/api/clocks');
+                if (res.ok) {
+                    const clocks = await res.json();
+                    renderClocks(clocks);
+                }
+            } catch (e) {
+                console.error(e);
+                clockList.innerHTML = '<div style="color:red">Error loading clocks</div>';
+            }
+        }
+
+        function renderClocks(clocks) {
+            clockList.innerHTML = '';
+            if (clocks.length === 0) {
+                clockList.innerHTML = '<div style="padding:20px; text-align:center; color:#555">No active clocks</div>';
+                return;
+            }
+
+            clocks.forEach(c => {
+                const item = document.createElement('div');
+                item.className = 'clock-item';
+
+                // Determine Max (default 6 or from name [N])
+                let max = 6;
+                const match = c.name.match(/\[(\d+)\]/);
+                if (match) max = parseInt(match[1]);
+
+                // SVG Preview (Mini)
+                const svg = createMiniPie(c.filled, max);
+
+                const info = document.createElement('div');
+                info.className = 'clock-info';
+                info.innerHTML = `
+                    <div class="clock-name">${c.name}</div>
+                    <div class="clock-segments">Filled: ${c.filled} / ${max}</div>
+                `;
+
+                const controls = document.createElement('div');
+                controls.className = 'controls';
+
+                // logic for buttons
+                // DEC
+                const btnDec = document.createElement('button');
+                btnDec.textContent = "-";
+                btnDec.className = 'btn-dec';
+                btnDec.disabled = c.filled <= 0;
+                btnDec.onclick = () => updateClock(c.id, c.filled - 1);
+                if (c.filled <= 0) btnDec.style.opacity = 0.5;
+
+                // INC
+                const btnInc = document.createElement('button');
+                btnInc.textContent = "+";
+                btnInc.className = 'btn-inc';
+                btnInc.disabled = c.filled >= max;
+                btnInc.onclick = () => updateClock(c.id, c.filled + 1);
+                if (c.filled >= max) btnInc.style.opacity = 0.5;
+
+                // DELETE
+                const btnDel = document.createElement('button');
+                btnDel.textContent = "DEL";
+                btnDel.className = 'btn-delete';
+                btnDel.onclick = () => deleteClock(c.id);
+
+                controls.appendChild(btnDec);
+                controls.appendChild(btnInc);
+                controls.appendChild(btnDel);
+
+                item.appendChild(svg);
+                item.appendChild(info);
+                item.appendChild(controls);
+
+                clockList.appendChild(item);
+            });
+        }
+
+        async function createClock() {
+            const name = nameInput.value.trim();
+            if (!name) return;
+
+            try {
+                const res = await fetch('/api/clocks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: name, filled: 0 })
+                });
+                if (res.ok) {
+                    nameInput.value = '';
+                    loadClocks();
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function updateClock(id, newVal) {
+            try {
+                const res = await fetch(`/api/clocks/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filled: newVal })
+                });
+                if (res.ok) {
+                    loadClocks();
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function deleteClock(id) {
+            if (!confirm("Delete this clock?")) return;
+            try {
+                const res = await fetch(`/api/clocks/${id}`, {
+                    method: 'DELETE'
+                });
+                if (res.ok) {
+                    loadClocks();
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        // Mini SVG generator (Reuse logic simplified)
+        function createMiniPie(filled, total) {
+            const size = 40;
+            const center = size / 2;
+            const radius = 18;
+            const ns = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(ns, "svg");
+            svg.setAttribute("viewBox", `0 0 ${size} ${size}`);
+            svg.setAttribute("class", "pie-preview");
+
+            const safeFilled = Math.min(filled, total);
+
+            for (let i = 0; i < total; i++) {
+                const startAngle = (i * 360) / total;
+                const endAngle = ((i + 1) * 360) / total;
+                const a1 = (startAngle - 90) * (Math.PI / 180);
+                const a2 = (endAngle - 90) * (Math.PI / 180);
+
+                const x1 = center + radius * Math.cos(a1);
+                const y1 = center + radius * Math.sin(a1);
+                const x2 = center + radius * Math.cos(a2);
+                const y2 = center + radius * Math.sin(a2);
+
+                const largeArc = (endAngle - startAngle) > 180 ? 1 : 0;
+
+                const path = document.createElementNS(ns, "path");
+                const d = `M ${center} ${center} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+                path.setAttribute("d", d);
+
+                const isFilled = i < safeFilled;
+                path.setAttribute("fill", isFilled ? "#00f3ff" : "#222");
+                path.setAttribute("stroke", "#000");
+                path.setAttribute("stroke-width", "1");
+                svg.appendChild(path);
+            }
+            return svg;
+        }
+
+        loadClocks();
+    </script>
+</body>
+
+</html>
