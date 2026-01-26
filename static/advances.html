@@ -193,6 +193,7 @@
         const charId = window.location.pathname.split('/')[2];
         let characterData = null;
         let treeData = null;
+        let expandedNodeIds = new Set();
 
         async function init() {
             try {
@@ -241,7 +242,7 @@
             const wrapper = document.createElement('div');
             wrapper.className = 'node';
             if (node.children && node.children.length > 0) {
-                // wrapper.classList.add('expanded'); 
+                if (expandedNodeIds.has(node.id)) wrapper.classList.add('expanded');
             }
 
             const content = document.createElement('div');
@@ -252,6 +253,9 @@
             content.onclick = (e) => {
                 if (e.target.tagName === 'BUTTON') return;
                 wrapper.classList.toggle('expanded');
+                if (wrapper.classList.contains('expanded')) expandedNodeIds.add(node.id);
+                else expandedNodeIds.delete(node.id);
+
                 const icon = content.querySelector('.toggle-icon');
                 if (icon) icon.textContent = wrapper.classList.contains('expanded') ? '▼' : '▶';
             };
@@ -267,6 +271,19 @@
                 const btn = document.createElement('button');
                 btn.className = 'btn-add';
                 btn.textContent = "+ ADD";
+
+                // CP Check
+                const baseCP = 6;
+                const earned = characterData.experience || 0;
+                const used = characterData.points_used || 0;
+                const available = (baseCP + earned) - used;
+
+                if (node.cost > available) {
+                    btn.disabled = true;
+                    btn.title = "Not enough CP";
+                    btn.style.opacity = "0.5";
+                }
+
                 btn.onclick = function () { addAdvance(node, this); };
                 actionSection.appendChild(btn);
             } else {
@@ -317,14 +334,7 @@
                 const updatedChar = await res.json();
                 characterData = updatedChar;
                 updateHeader();
-
-                const contentDiv = btnElement.closest('.node-content');
-                if (contentDiv) {
-                    contentDiv.classList.add('owned');
-                    // Replace button with owned label
-                    const actionSection = btnElement.parentElement;
-                    actionSection.innerHTML = '<span style="color:var(--neon-green)">✓ OWNED</span>';
-                }
+                renderTree(); // Re-render to update CP availability on other buttons
                 // Check if other buttons need enabling/updating? 
                 // If we had prerequisite logic visible, we might need to refresh neighbors/children.
                 // But since current createNodeElement triggers 'owned' check dynamically, 

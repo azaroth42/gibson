@@ -786,8 +786,10 @@
                     select.style.background = 'rgba(0,0,0,0.5)';
 
                     let html = `<option value="">Select Character...</option>`;
+                    const existingTargets = new Set((links || []).map(l => l.target_name));
+
                     allCharacters.forEach(c => {
-                        if (c.id !== characterData.id) {
+                        if (c.id !== characterData.id && !existingTargets.has(c.name)) {
                             html += `<option value="${c.name}">${c.name}</option>`;
                         }
                     });

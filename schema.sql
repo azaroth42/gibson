@@ -54,3 +54,14 @@ CREATE TABLE IF NOT EXISTS character_links (
     target_name TEXT,
     value INTEGER DEFAULT 0
 );
+
+CREATE TABLE IF NOT EXISTS countdown_clocks (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    filled INTEGER DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS game_state (
+    id SERIAL PRIMARY KEY,
+    map_image TEXT
+);

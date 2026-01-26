@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 import json
 import os
 import re
@@ -19,9 +19,17 @@ async def lifespan(app: FastAPI):
     # Startup
     await init_db()
     app.state.pool = await get_db_pool()
+    app.state.tabletop_connections = []
     yield
     # Shutdown
     await app.state.pool.close()
+
+async def broadcast_tabletop(app, message: dict):
+    for connection in app.state.tabletop_connections:
+        try:
+            await connection.send_json(message)
+        except Exception as e:
+            print(f"Error broadcasting to tabletop: {e}")
 
 app = FastAPI(lifespan=lifespan)
 
@@ -34,6 +42,25 @@ async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 from models import Character, CharacterCreate, CharacterUpdate, ItemAdd, LinkAdd
+
+class Clock(BaseModel):
+    id: int
+    name: str
+    filled: int
+
+class ClockCreate(BaseModel):
+    name: str
+    filled: int = 0
+
+class ClockUpdate(BaseModel):
+    name: Optional[str] = None
+    filled: Optional[int] = None
+
+class GameState(BaseModel):
+    map_image: Optional[str] = None
+
+class GameStateUpdate(BaseModel):
+    map_image: Optional[str] = None
 
 @app.post("/characters", response_model=Character)
 async def create_character(char: CharacterCreate):
@@ -58,11 +85,17 @@ async def create_character(char: CharacterCreate):
         target_ids = []
         
         if basic_moves_root:
-             # Get all children of Basic Moves with cost 0 (most are cost 0 usually?)
-             # Actually basic moves list was explicit. 
-             # Let's just grab all children of "Basic Moves" node.
-             bm_rows = await conn.fetch("SELECT id FROM ability_nodes WHERE parent_id = $1", basic_moves_root['id'])
-             target_ids.extend([r['id'] for r in bm_rows])
+             # Get all children of "Basic Moves" node.
+             bm_rows = await conn.fetch("SELECT id, key FROM ability_nodes WHERE parent_id = $1", basic_moves_root['id'])
+             
+             allowed_science = ['Netrunner', 'Driver', 'Tech', 'Juicer', 'Face']
+             
+             for r in bm_rows:
+                 if 'science' in r['key'].lower():
+                     if char.playbook in allowed_science:
+                         target_ids.append(r['id'])
+                 else:
+                     target_ids.append(r['id'])
 
         # Playbook Intrinsic Moves (Cost 0)
         # Find Playbook node by key (slugified name)
@@ -70,6 +103,7 @@ async def create_character(char: CharacterCreate):
         pb_node = await conn.fetchrow("SELECT id FROM ability_nodes WHERE key = $1", pb_slug)
         
         if pb_node:
+             target_ids.append(pb_node['id']) # Add the playbook node itself so items under it are unlockable
              # Find children of playbook with cost 0 (intrinsic moves)
              intrinsic_rows = await conn.fetch("SELECT id FROM ability_nodes WHERE parent_id = $1 AND cost = 0", pb_node['id'])
              target_ids.extend([r['id'] for r in intrinsic_rows])
@@ -141,7 +175,11 @@ async def update_character(char_id: int, char_update: CharacterUpdate):
         row = await conn.fetchrow(query, *values)
         if not row:
             raise HTTPException(status_code=404, detail="Character not found")
-        return await get_character_internal(conn, char_id)
+        char = await get_character_internal(conn, char_id)
+        
+    # Broadcast update
+    await broadcast_tabletop(app, {"type": "character_update", "payload": char.model_dump()})
+    return char
 
 class AdvanceAdd(BaseModel):
     # API now expects ID? Or should we keep name for convenience if unique?
@@ -444,6 +482,114 @@ async def add_character_link(char_id: int, link: LinkAdd):
         await conn.execute("INSERT INTO character_links (character_id, target_name) VALUES ($1, $2)", char_id, link.target_name)
         
         return await get_character_internal(conn, char_id)
+
+@app.websocket("/ws/tabletop")
+async def websocket_tabletop(websocket: WebSocket):
+    await websocket.accept()
+    app.state.tabletop_connections.append(websocket)
+    try:
+        while True:
+            # Just keep connection open, maybe handle pings
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        app.state.tabletop_connections.remove(websocket)
+    except Exception as e:
+        print(f"Tabletop WS Error: {e}")
+        if websocket in app.state.tabletop_connections:
+            app.state.tabletop_connections.remove(websocket)
+
+@app.get("/tabletop", response_class=HTMLResponse)
+async def view_tabletop(request: Request):
+    return templates.TemplateResponse("tabletop.html", {"request": request})
+
+@app.get("/select-map", response_class=HTMLResponse)
+async def view_select_map(request: Request):
+    return templates.TemplateResponse("select-map.html", {"request": request})
+
+@app.get("/api/maps")
+async def list_maps():
+    maps_dir = "static/maps"
+    if not os.path.exists(maps_dir):
+        return []
+    files = [f for f in os.listdir(maps_dir) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp'))]
+    return files
+
+@app.get("/api/clocks", response_model=List[Clock])
+async def list_clocks():
+    pool = app.state.pool
+    rows = await pool.fetch("SELECT * FROM countdown_clocks ORDER BY id")
+    return [dict(r) for r in rows]
+
+@app.post("/api/clocks", response_model=Clock)
+async def create_clock(clock: ClockCreate):
+    pool = app.state.pool
+    row = await pool.fetchrow(
+        "INSERT INTO countdown_clocks (name, filled) VALUES ($1, $2) RETURNING *",
+        clock.name, clock.filled
+    )
+    res = dict(row)
+    await broadcast_tabletop(app, {"type": "clock_update", "payload": res})
+    return res
+
+@app.put("/api/clocks/{clock_id}", response_model=Clock)
+async def update_clock(clock_id: int, clock: ClockUpdate):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        update_data = clock.model_dump(exclude_unset=True)
+        if not update_data:
+             row = await conn.fetchrow("SELECT * FROM countdown_clocks WHERE id = $1", clock_id)
+        else:
+             set_clauses = []
+             values = []
+             for i, (key, value) in enumerate(update_data.items(), start=1):
+                 set_clauses.append(f"{key} = ${i}")
+                 values.append(value)
+             values.append(clock_id)
+             row = await conn.fetchrow(
+                 f"UPDATE countdown_clocks SET {', '.join(set_clauses)} WHERE id = ${len(values)} RETURNING *",
+                 *values
+             )
+        
+        if not row:
+            raise HTTPException(status_code=404, detail="Clock not found")
+        res = dict(row)
+        await broadcast_tabletop(app, {"type": "clock_update", "payload": res})
+        return res
+
+@app.delete("/api/clocks/{clock_id}", status_code=204)
+async def delete_clock(clock_id: int):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        result = await conn.execute("DELETE FROM countdown_clocks WHERE id = $1", clock_id)
+        if result == "DELETE 0":
+            raise HTTPException(status_code=404, detail="Clock not found")
+    return None
+
+@app.get("/api/gamestate", response_model=GameState)
+async def get_gamestate():
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow("SELECT map_image FROM game_state ORDER BY id LIMIT 1")
+        if not row:
+            # Create default if not exists
+            await conn.execute("INSERT INTO game_state (map_image) VALUES (NULL)")
+            return {"map_image": None}
+        return dict(row)
+
+@app.put("/api/gamestate", response_model=GameState)
+async def update_gamestate(state: GameStateUpdate):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        # Ensure row exists
+        row = await conn.fetchrow("SELECT id FROM game_state ORDER BY id LIMIT 1")
+        if not row:
+             await conn.execute("INSERT INTO game_state (map_image) VALUES ($1)", state.map_image)
+        else:
+             await conn.execute("UPDATE game_state SET map_image = $1 WHERE id = $2", state.map_image, row['id'])
+        
+        res = {"map_image": state.map_image}
+        await broadcast_tabletop(app, {"type": "gamestate_update", "payload": res})
+        return res
 
 if __name__ == "__main__":
     config = Config()
