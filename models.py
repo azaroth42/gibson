@@ -50,6 +50,9 @@ class ItemAdd(BaseModel):
 class LinkAdd(BaseModel):
     target_name: str
 
+class LinkUpdate(BaseModel):
+    value: int
+
 class Clock(BaseModel):
     id: int
     name: str

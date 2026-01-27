@@ -520,6 +520,22 @@ async def add_character_link(char_id: int, link: LinkAdd):
         
         return await get_character_internal(conn, char_id)
 
+@app.put("/characters/{char_id}/links/{link_id}", response_model=Character)
+async def update_character_link(char_id: int, link_id: int, link: LinkUpdate):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        char_exists = await conn.fetchval("SELECT 1 FROM characters WHERE id = $1", char_id)
+        if not char_exists:
+             raise HTTPException(status_code=404, detail="Character not found")
+        
+        link_exists = await conn.fetchval("SELECT 1 FROM character_links WHERE id = $1 AND character_id = $2", link_id, char_id)
+        if not link_exists:
+             raise HTTPException(status_code=404, detail="Link not found for this character")
+
+        await conn.execute("UPDATE character_links SET value = $1 WHERE id = $2", link.value, link_id)
+        
+        return await get_character_internal(conn, char_id)
+
 @app.get("/tabletop", response_class=HTMLResponse)
 async def view_tabletop(request: Request):
     return templates.TemplateResponse("tabletop.html", {"request": request})
@@ -620,5 +636,5 @@ async def update_gamestate(state: GameStateUpdate):
 
 if __name__ == "__main__":
     config = Config()
-    config.bind = ["localhost:8000"]
+    config.bind = ["0.0.0.0:8000"]
     asyncio.run(serve(app, config))

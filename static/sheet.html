@@ -840,6 +840,9 @@
                 const link = links && links[i] ? links[i] : null;
                 const item = document.createElement('div');
                 item.className = 'link-item';
+                // Override grid columns for buttons
+                item.style.gridTemplateColumns = "50px 20px 20px 1fr";
+                item.style.alignItems = "center";
 
                 const hex = document.createElement('div');
                 hex.className = 'link-hex';
@@ -852,6 +855,46 @@
                 </svg>`;
 
                 item.appendChild(hex);
+
+                // Minus Button
+                const minusBtn = document.createElement('div');
+                minusBtn.textContent = "-";
+                minusBtn.className = "stat-btn";
+                minusBtn.style.cursor = "pointer";
+                minusBtn.style.fontSize = "20px";
+                minusBtn.style.textAlign = "center";
+                minusBtn.style.userSelect = "none";
+                minusBtn.style.color = "var(--dim-text)";
+                minusBtn.onmouseover = () => minusBtn.style.color = "var(--main-color)";
+                minusBtn.onmouseout = () => minusBtn.style.color = "var(--dim-text)";
+
+                if (link && link.target_name) {
+                    minusBtn.onclick = () => updateLink(link.id, val - 1);
+                } else {
+                    minusBtn.style.opacity = "0.3";
+                    minusBtn.style.cursor = "default";
+                }
+                item.appendChild(minusBtn);
+
+                // Plus Button
+                const plusBtn = document.createElement('div');
+                plusBtn.textContent = "+";
+                plusBtn.className = "stat-btn";
+                plusBtn.style.cursor = "pointer";
+                plusBtn.style.fontSize = "20px";
+                plusBtn.style.textAlign = "center";
+                plusBtn.style.userSelect = "none";
+                plusBtn.style.color = "var(--dim-text)";
+                plusBtn.onmouseover = () => plusBtn.style.color = "var(--main-color)";
+                plusBtn.onmouseout = () => plusBtn.style.color = "var(--dim-text)";
+
+                if (link && link.target_name) {
+                    plusBtn.onclick = () => updateLink(link.id, val + 1);
+                } else {
+                    plusBtn.style.opacity = "0.3";
+                    plusBtn.style.cursor = "default";
+                }
+                item.appendChild(plusBtn);
 
                 if (link && link.target_name) {
                     // Locked
@@ -896,6 +939,22 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ target_name: targetName })
+                });
+                if (res.ok) {
+                    characterData = await res.json();
+                    renderAll();
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function updateLink(linkId, newVal) {
+            if (newVal < -3 || newVal > 3) return;
+
+            try {
+                const res = await fetch(`/characters/${charId}/links/${linkId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ value: newVal })
                 });
                 if (res.ok) {
                     characterData = await res.json();
