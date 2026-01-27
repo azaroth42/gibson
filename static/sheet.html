@@ -215,12 +215,68 @@
             justify-items: center;
             /* Center hexes in their cells */
         }
+
+        /* Stat control buttons */
+        .stat-btn {
+            font-size: 20px;
+            fill: var(--dim-text);
+            cursor: pointer;
+            user-select: none;
+            transition: fill 0.2s;
+            font-family: sans-serif;
+            /* Clearer symbols */
+        }
+
+        .stat-btn:hover {
+            fill: var(--main-color);
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel-box {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            box-shadow: var(--glow-box);
+        }
+
+        .voice-active {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        .item-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .item-list li {
+            padding: 5px;
+            border-left: 2px solid #333;
+            margin-bottom: 5px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Markdown content styles */
+        .ability-node p {
+            margin: 5px 0;
+        }
+
+        .ability-node ul {
+            padding-left: 20px;
+        }
     </style>
 </head>
 
 <body>
 
     <div class="header">
+        <!-- ... header content ... -->
         <div class="char-title">
             <h1 id="char-name" class="glitch">Accessing...</h1>
             <div id="char-playbook" class="char-playbook"></div>
@@ -239,6 +295,7 @@
         </div>
     </div>
 
+    <!-- Container start -->
     <div class="container">
         <!-- Sidebar (Stats + Links) -->
         <div class="sidebar">
@@ -255,113 +312,89 @@
             </div>
         </div>
 
-        <!-- Main Content (Moves) -->
+        <!-- Main Panel (Moves) -->
         <div class="main-panel">
-            <div
-                style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--dim-text); margin-bottom:15px; padding-bottom:5px;">
-                <h3 style="margin:0">Known Moves</h3>
-                <a href="#" id="manage-advances-btn"
-                    style="color:var(--main-color); text-decoration:none; border:1px solid var(--main-color); padding:5px 10px;">+
-                    MANAGE / BUY</a>
-            </div>
-
-            <div id="moves-container">
-                <!-- Moves List -->
-            </div>
+            <h3>Moves & Advances <span style="float:right; cursor:pointer; font-size:0.6em; color:var(--accent-color)"
+                    onclick="window.location.href='/characters/'+charId+'/view-advances'">[+ ADD]</span></h3>
+            <div id="moves-container">Loading moves...</div>
         </div>
 
-        <!-- Right Column (Cyberware + Equipment) -->
-        <div class="sidebar">
-            <div class="main-panel" style="margin-bottom: 20px;">
-                <div
-                    style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #333; margin-bottom:10px; padding-bottom:5px;">
-                    <h3 style="margin:0">Cyberware</h3>
-                    <a href="#" id="add-cyber-btn"
-                        style="color:var(--accent-color); font-size:0.8em; text-decoration:none; border:1px solid var(--accent-color); padding:2px 5px;">+
-                        ADD</a>
+        <!-- Right Panel (Items & Voice) -->
+        <div class="right-panel">
+            <div class="panel-box">
+                <h3>Cyberware <span style="float:right; cursor:pointer; font-size:0.6em; color:var(--accent-color)"
+                        onclick="window.location.href='/characters/'+charId+'/view-equipment?type=cyberware'">[+
+                        ADD]</span></h3>
+                <ul id="cyberware-list" class="item-list"></ul>
+            </div>
+
+            <div class="panel-box">
+                <h3>Equipment <span style="float:right; cursor:pointer; font-size:0.6em; color:var(--accent-color)"
+                        onclick="window.location.href='/characters/'+charId+'/view-equipment?type=gear'">[+ ADD]</span>
+                </h3>
+                <ul id="equipment-list" class="item-list"></ul>
+            </div>
+
+            <div id="voice-panel" class="panel-box" style="border-top: 1px solid #333; padding-top: 10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <h3 style="margin:0">Voice Link</h3>
+                    <span id="ws-status" style="font-size:0.7em; color:var(--dim-text)">OFFLINE</span>
                 </div>
-                <ul id="cyberware-list" style="list-style: none; padding: 0;">
-                    <li>No chrome installed.</li>
-                </ul>
-            </div>
-
-            <div class="main-panel">
-                <div
-                    style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #333; margin-bottom:10px; padding-bottom:5px;">
-                    <h3 style="margin:0">Equipment</h3>
-                    <a href="#" id="add-gear-btn"
-                        style="color:var(--main-color); font-size:0.8em; text-decoration:none; border:1px solid var(--main-color); padding:2px 5px;">+
-                        ADD</a>
+                <div style="text-align:center; margin-bottom: 10px;">
+                    <button id="mic-btn"
+                        style="width:100%; padding: 15px; font-size:1.2em; border-radius: 5px; background: #222; color: #fff; border: 1px solid #444;">OFF</button>
                 </div>
-                <ul id="equipment-list" style="list-style: none; padding: 0;">
-                    <li>No equipment loaded.</li>
-                </ul>
+                <div id="last-cmd"
+                    style="font-family:monospace; color:var(--main-color); min-height:20px; font-size: 0.9em; border-top:1px dashed #333; padding-top:5px;">
+                </div>
             </div>
         </div>
-    </div>
+    </div> <!-- End Container -->
 
-    <!-- Voice Panel -->
-    <div class="voice-panel" id="voice-panel">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <strong>VOICE LINK</strong>
-            <button id="mic-btn"
-                style="background:none; border: 1px solid var(--main-color); color: var(--main-color); cursor: pointer;">OFF</button>
-        </div>
-        <div class="voice-status">STATUS: <span id="ws-status">DISCONNECTED</span></div>
-        <div style="margin-top: 10px; font-size: 0.9em; border-top: 1px solid #333; padding-top:5px;">
-            Input: <span id="last-cmd" style="color: #fff;">...</span>
-        </div>
-    </div>
-
-    <!-- Add marked for markdown rendering -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
-        const charId = new URLSearchParams(window.location.search).get('id');
-        // ... (rest of simple setup variables)
-        const wsUrl = `ws://${window.location.host}/ws/${charId}`;
-        let socket;
-        let recognition;
-        let characterData = {};
+        const urlParams = new URLSearchParams(window.location.search);
+        const charId = urlParams.get('id');
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.host}/ws/${charId}`;
 
-        // Setup Link
-        const manageBtn = document.getElementById('manage-advances-btn');
-        if (manageBtn) manageBtn.href = `/characters/${charId}/view-advances`;
-
-        const addCyberBtn = document.getElementById('add-cyber-btn');
-        if (addCyberBtn) addCyberBtn.href = `/characters/${charId}/view-equipment?type=cyberware`;
-
-        const addGearBtn = document.getElementById('add-gear-btn');
-        if (addGearBtn) addGearBtn.href = `/characters/${charId}/view-equipment?type=gear`;
-
+        let characterData = {
+            tough: 0, cool: 0, sharp: 0, style: 0, chrome: 0,
+            health: 0, max_health: 25,
+            experience: 0, points_used: 0,
+            advances: [], items: [], links: []
+        };
         let abilityTree = [];
+        let socket = null;
+        let recognition = null;
 
-        async function init() {
+        async function fetchAbilityTree() {
             try {
-                const treeRes = await fetch('/api/tree');
-                if (treeRes.ok) {
-                    abilityTree = await treeRes.json();
-                } else {
-                    console.error("Failed to load ability tree");
-                }
-            } catch (e) { console.error("Tree Load Error:", e); }
-
-            await fetchCharacter();
+                const res = await fetch('/api/tree');
+                abilityTree = await res.json();
+            } catch (e) { console.error("Failed to load tree", e); }
         }
 
         async function fetchCharacter() {
+            if (!charId) return;
             try {
                 const res = await fetch(`/characters/${charId}`);
-                if (!res.ok) {
-                    document.body.innerHTML = "<h1>Character not found</h1>";
-                    return;
+                if (res.ok) {
+                    characterData = await res.json();
+                    renderAll();
                 }
-                characterData = await res.json();
-                await loadAllCharacters();
-                renderAll();
-                connectWebSocket();
-            } catch (e) {
-                console.error("Char Load Error:", e);
+            } catch (e) { console.error(e); }
+        }
+
+        async function init() {
+            if (!charId) {
+                document.body.innerHTML = "<div style='color:red; text-align:center; margin-top:50px;'><h1>ERROR</h1><p>No Character ID Provided in URL.</p></div>";
+                return;
             }
+            await loadAllCharacters();
+            await fetchAbilityTree();
+            await fetchCharacter();
+            connectWebSocket();
         }
 
         let allCharacters = [];
@@ -372,22 +405,16 @@
             } catch (e) { }
         }
 
-        // ... (renderAll, renderHeader, renderStats)
-
-
         function renderHeader(char) {
             document.getElementById('char-name').textContent = char.name;
             document.getElementById('char-playbook').textContent = char.playbook;
 
-            // Health
             const health = char.health;
             const maxHealth = char.max_health || 25;
             document.getElementById('health-val').textContent = health;
             document.getElementById('max-health-val').textContent = maxHealth;
             document.getElementById('health-bar').style.width = Math.min((health / maxHealth) * 100, 100) + '%';
 
-            // XP
-            // CP
             const baseCP = 6;
             const earnedCP = char.experience || 0;
             const spentCP = char.points_used || 0;
@@ -405,10 +432,50 @@
 
             const cpBar = document.getElementById('cp-bar');
             if (cpBar) {
-                // Bar represents Available / Total
                 const percent = totalCP > 0 ? Math.min((availableCP / totalCP) * 100, 100) : 0;
                 cpBar.style.width = percent + '%';
             }
+        }
+
+        async function handleStatChange(statKey, delta) {
+            const dbKey = statKey.toLowerCase();
+            const currentVal = characterData[dbKey] || 0;
+            const newVal = currentVal + delta;
+
+            if (newVal < -1 || newVal > 2) return;
+
+            const tempStats = {
+                tough: characterData.tough,
+                cool: characterData.cool,
+                sharp: characterData.sharp,
+                style: characterData.style,
+                chrome: characterData.chrome
+            };
+            tempStats[dbKey] = newVal;
+
+            const values = Object.values(tempStats).sort((a, b) => b - a);
+            const limit = [2, 1, 1, 0, -1];
+
+            for (let i = 0; i < 5; i++) {
+                if (values[i] > limit[i]) {
+                    alert("Stat distribution cannot exceed standard array (2, 1, 1, 0, -1) and max value is 2.");
+                    return;
+                }
+            }
+
+            try {
+                const body = {};
+                body[dbKey] = newVal;
+                const res = await fetch(`/characters/${charId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                if (res.ok) {
+                    await fetchCharacter();
+                }
+            } catch (e) { console.error(e); }
         }
 
         function renderStats(stats) {
@@ -423,19 +490,32 @@
                 "Chrome": characterData.chrome || 0
             };
 
+            const canEdit = (characterData.points_used || 0) === 0;
+
             for (const [key, value] of Object.entries(currentStats)) {
                 const hex = document.createElement('div');
                 hex.className = 'stat-hex';
+
+                let controls = '';
+                if (canEdit) {
+                    controls = `
+                <text x="20" y="55" class="stat-btn" onclick="handleStatChange('${key}', -1)">-</text>
+                <text x="80" y="55" class="stat-btn" onclick="handleStatChange('${key}', 1)">+</text>
+                `;
+                }
+
                 hex.innerHTML = `
-                    <svg class="hex-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-                        <polygon class="hex-path" points="50 5, 93 28, 93 72, 50 95, 7 72, 7 28" />
-                        <text x="50" y="50" class="stat-value-text">${value}</text>
-                        <text x="50" y="78" class="stat-label-text">${key}</text>
-                    </svg>
+                <svg class="hex-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+                    <polygon class="hex-path" points="50 5, 93 28, 93 72, 50 95, 7 72, 7 28" />
+                    <text x="50" y="50" class="stat-value-text">${value}</text>
+                    <text x="50" y="78" class="stat-label-text">${key}</text>
+                    ${controls}
+                </svg>
                 `;
                 container.appendChild(hex);
             }
         }
+
 
         // Global Set for tracking rendered IDs
         const renderedIds = new Set();
@@ -473,7 +553,8 @@
 
             if (playbookRoot) {
                 const section = document.createElement('div');
-                section.innerHTML = `<h4 style="color:var(--accent-color); border-bottom:1px solid #333; margin-top:0;">${characterData.playbook} Moves</h4>`;
+                section.innerHTML = `<h4 style="color:var(--accent-color); border-bottom:1px solid #333; margin-top:0;">
+                    ${characterData.playbook} Moves</h4>`;
                 const nodeEl = renderHierarchicalNode(playbookRoot, ownedIds, ownedMap);
                 if (nodeEl) {
                     container.appendChild(section);
@@ -488,7 +569,9 @@
 
             if (basicRoot) {
                 const basicSection = document.createElement('div');
-                basicSection.innerHTML = `<h4 style="color:var(--main-color); border-bottom:1px solid #333; margin-top:20px;">Basic Moves</h4>`;
+                basicSection.innerHTML = `<h4
+                    style="color:var(--main-color); border-bottom:1px solid #333; margin-top:20px;">
+                    Basic Moves</h4>`;
 
                 // If we have an ID-based tree, we just check which children of BasicMoves are owned
                 let hasBasic = false;
@@ -522,12 +605,12 @@
 
             // 3. Others (Fallback for IDs not found in tree or under headers?)
             // If ID is valid but not encountered in tree traversal?
+            // 3. Others (Fallback for IDs not found in tree or under headers?)
             // Since we traverse relevant roots (Playbooks and Basic), others might be orphan nodes or from other playbooks?
             // Let's just list anything owned not in renderedIds.
 
             const others = [];
             advances.forEach(adv => {
-                // If adv has ID, check if rendered
                 const key = adv.id !== undefined ? adv.id : adv.name.toLowerCase();
                 if (!renderedIds.has(key)) {
                     others.push(adv);
@@ -566,6 +649,7 @@
                             const content = document.createElement('div');
                             content.innerHTML = marked.parse(adv.description);
                             content.style.display = "none";
+                            content.style.marginTop = "5px";
 
                             toggle.onclick = () => {
                                 if (content.style.display === "none") {
@@ -754,19 +838,18 @@
 
             for (let i = 0; i < 5; i++) {
                 const link = links && links[i] ? links[i] : null;
-
                 const item = document.createElement('div');
                 item.className = 'link-item';
 
                 const hex = document.createElement('div');
                 hex.className = 'link-hex';
                 const val = link ? link.value : 0;
+
                 hex.innerHTML = `
-                    <svg class="hex-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-                        <polygon class="hex-path" points="50 5, 93 28, 93 72, 50 95, 7 72, 7 28" />
-                        <text x="50" y="60" class="stat-value-text" style="font-size:40px;">${val > 0 ? '+' + val : val}</text>
-                    </svg>
-                 `;
+                <svg class="hex-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+                    <polygon class="hex-path" points="50 5, 93 28, 93 72, 50 95, 7 72, 7 28" />
+                    <text x="50" y="60" class="stat-value-text" style="font-size:40px;">${val > 0 ? '+' + val : val}</text>
+                </svg>`;
 
                 item.appendChild(hex);
 

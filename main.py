@@ -72,9 +72,8 @@ class GameStateUpdate(BaseModel):
 async def create_character(char: CharacterCreate):
     pool = app.state.pool
     import random
-    stats_vals = [2, 1, 1, 0, -1]
-    random.shuffle(stats_vals)
-    tough, cool, sharp, style, chrome = stats_vals
+    # Start all stats at -1 per user request
+    tough = cool = sharp = style = chrome = -1
     
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
