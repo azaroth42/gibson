@@ -1,4 +1,5 @@
 from fastapi import FastAPI, WebSocket, Request, HTTPException, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -32,6 +33,15 @@ async def broadcast_tabletop(app, message: dict):
             print(f"Error broadcasting to tabletop: {e}")
 
 app = FastAPI(lifespan=lifespan)
+
+# Add CORS middleware to allow WebSocket connections from any origin
+# Note: allow_credentials cannot be True when allow_origins is ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -198,6 +208,22 @@ class AdvanceAdd(BaseModel):
     node_id: int
 
 # ... 
+
+# IMPORTANT: /ws/tabletop must be defined BEFORE /ws/{char_id} to ensure proper route matching
+@app.websocket("/ws/tabletop")
+async def websocket_tabletop(websocket: WebSocket):
+    await websocket.accept()
+    app.state.tabletop_connections.append(websocket)
+    try:
+        while True:
+            # Just keep connection open, maybe handle pings
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        app.state.tabletop_connections.remove(websocket)
+    except Exception as e:
+        print(f"Tabletop WS Error: {e}")
+        if websocket in app.state.tabletop_connections:
+            app.state.tabletop_connections.remove(websocket)
 
 @app.websocket("/ws/{char_id}")
 async def websocket_endpoint(websocket: WebSocket, char_id: int):
@@ -531,21 +557,6 @@ async def add_character_link(char_id: int, link: LinkAdd):
         await conn.execute("INSERT INTO character_links (character_id, target_name) VALUES ($1, $2)", char_id, link.target_name)
         
         return await get_character_internal(conn, char_id)
-
-@app.websocket("/ws/tabletop")
-async def websocket_tabletop(websocket: WebSocket):
-    await websocket.accept()
-    app.state.tabletop_connections.append(websocket)
-    try:
-        while True:
-            # Just keep connection open, maybe handle pings
-            await websocket.receive_text()
-    except WebSocketDisconnect:
-        app.state.tabletop_connections.remove(websocket)
-    except Exception as e:
-        print(f"Tabletop WS Error: {e}")
-        if websocket in app.state.tabletop_connections:
-            app.state.tabletop_connections.remove(websocket)
 
 @app.get("/tabletop", response_class=HTMLResponse)
 async def view_tabletop(request: Request):
