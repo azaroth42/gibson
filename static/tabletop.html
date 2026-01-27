@@ -246,6 +246,15 @@
             }
         }
 
+        function ensureInBounds(x, y, w, h) {
+            const maxX = window.innerWidth - w;
+            const maxY = window.innerHeight - h;
+            return {
+                x: Math.max(0, Math.min(x, maxX)),
+                y: Math.max(0, Math.min(y, maxY))
+            };
+        }
+
         function updateTokens(newChars) {
             newChars.forEach((char, index) => {
                 let token = document.getElementById(`token-char-${char.id}`);
@@ -260,18 +269,22 @@
                 }
 
                 // Position
-                // If we have saved coords, use them. Else, default layout if brand new token (no style set)
-                // Actually, server sends X/Y updates too.
+                let x, y;
                 if (char.x !== null && char.y !== null) {
-                    token.style.left = char.x + 'px';
-                    token.style.top = char.y + 'px';
+                    x = char.x;
+                    y = char.y;
                 } else if (!token.style.left) {
                     // Initial Layout default
-                    const x = 50 + (index % 8) * 130;
-                    const y = window.innerHeight - 150 - (Math.floor(index / 8) * 150);
-                    token.style.left = x + 'px';
-                    token.style.top = y + 'px';
+                    x = 50 + (index % 8) * 130;
+                    y = window.innerHeight - 150 - (Math.floor(index / 8) * 150);
+                } else {
+                    x = parseInt(token.style.left);
+                    y = parseInt(token.style.top);
                 }
+
+                const bounds = ensureInBounds(x, y, 120, 140);
+                token.style.left = bounds.x + 'px';
+                token.style.top = bounds.y + 'px';
 
                 const current = char.health;
                 const max = char.max_health || 25;
@@ -313,15 +326,21 @@
                 }
 
                 // Position
+                let x, y;
                 if (clock.x !== null && clock.y !== null) {
-                    token.style.left = clock.x + 'px';
-                    token.style.top = clock.y + 'px';
+                    x = clock.x;
+                    y = clock.y;
                 } else if (!token.style.left) {
-                    const x = window.innerWidth - 200;
-                    const y = 50 + (index * 180);
-                    token.style.left = x + 'px';
-                    token.style.top = y + 'px';
+                    x = window.innerWidth - 200;
+                    y = 50 + (index * 180);
+                } else {
+                    x = parseInt(token.style.left);
+                    y = parseInt(token.style.top);
                 }
+
+                const bounds = ensureInBounds(x, y, 140, 160);
+                token.style.left = bounds.x + 'px';
+                token.style.top = bounds.y + 'px';
 
                 // Re-create content
                 token.innerHTML = '';
