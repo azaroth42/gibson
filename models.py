@@ -49,3 +49,34 @@ class ItemAdd(BaseModel):
 
 class LinkAdd(BaseModel):
     target_name: str
+
+class Clock(BaseModel):
+    id: int
+    name: str
+    filled: int
+    x: Optional[int] = None
+    y: Optional[int] = None
+
+class ClockCreate(BaseModel):
+    name: str
+    filled: int = 0
+    x: Optional[int] = None
+    y: Optional[int] = None
+
+class ClockUpdate(BaseModel):
+    name: Optional[str] = None
+    filled: Optional[int] = None
+    x: Optional[int] = None
+    y: Optional[int] = None
+
+class GameState(BaseModel):
+    map_image: Optional[str] = None
+
+class GameStateUpdate(BaseModel):
+    map_image: Optional[str] = None
+
+class AdvanceAdd(BaseModel):
+    node_id: int
+
+class MoveUpdate(BaseModel):
+    description: str

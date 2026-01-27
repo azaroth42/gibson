@@ -3,9 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel
 from typing import List, Optional
-import json
 import os
 import re
 from contextlib import asynccontextmanager
@@ -51,32 +49,8 @@ templates = Jinja2Templates(directory="static")
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-from models import Character, CharacterCreate, CharacterUpdate, ItemAdd, LinkAdd
+from models import *
 
-class Clock(BaseModel):
-    id: int
-    name: str
-    filled: int
-    x: Optional[int] = None
-    y: Optional[int] = None
-
-class ClockCreate(BaseModel):
-    name: str
-    filled: int = 0
-    x: Optional[int] = None
-    y: Optional[int] = None
-
-class ClockUpdate(BaseModel):
-    name: Optional[str] = None
-    filled: Optional[int] = None
-    x: Optional[int] = None
-    y: Optional[int] = None
-
-class GameState(BaseModel):
-    map_image: Optional[str] = None
-
-class GameStateUpdate(BaseModel):
-    map_image: Optional[str] = None
 
 @app.post("/characters", response_model=Character)
 async def create_character(char: CharacterCreate):
@@ -199,15 +173,6 @@ async def update_character(char_id: int, char_update: CharacterUpdate):
     await broadcast_tabletop(app, {"type": "character_update", "payload": char.model_dump()})
     return char
 
-class AdvanceAdd(BaseModel):
-    # API now expects ID? Or should we keep name for convenience if unique?
-    # User asked for "Identifiers separately".
-    # Best is to use ID (int) from tree.
-    # But for backward compat with my frontend changes, I might need to update frontend FIRST?
-    # No, I should update backend to accept ID.
-    node_id: int
-
-# ... 
 
 # IMPORTANT: /ws/tabletop must be defined BEFORE /ws/{char_id} to ensure proper route matching
 @app.websocket("/ws/tabletop")
@@ -365,6 +330,7 @@ async def get_tree_api():
                 parent['children'].append(node)
                 
     return roots
+    
 @app.post("/characters/{char_id}/advances", response_model=Character)
 async def add_character_advance(char_id: int, advance: AdvanceAdd):
     pool = app.state.pool
@@ -481,8 +447,6 @@ async def get_character_internal(conn, char_id: int) -> Character:
     
     return Character(**char_data)
 
-class MoveUpdate(BaseModel):
-    description: str
 
 @app.put("/api/moves/{move_id}")
 async def update_move(move_id: int, move: MoveUpdate):
@@ -505,8 +469,6 @@ async def delete_move(move_id: int):
         if result == "DELETE 0":
              raise HTTPException(status_code=404, detail="Move not found")
     return {"status": "ok", "deleted": move_id}
-
-
 
 @app.get("/api/items")
 async def list_items():
