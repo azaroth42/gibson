@@ -107,6 +107,14 @@
         .vitals {
             text-align: right;
             display: flex;
+            flex-direction: row;
+            gap: 20px;
+            width: auto;
+            align-items: flex-end;
+        }
+
+        .vital-block {
+            display: flex;
             flex-direction: column;
             gap: 5px;
             width: 250px;
@@ -282,15 +290,24 @@
             <div id="char-playbook" class="char-playbook"></div>
         </div>
         <div class="vitals">
-            <div>HEALTH <span id="health-val">0</span> / <span id="max-health-val">0</span></div>
-            <div class="bar-container">
-                <div id="health-bar" class="bar-fill" style="width: 50%;"></div>
+            <!-- CP Block (Left) -->
+            <div class="vital-block">
+                <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                    <div style="font-size:0.7em; color:var(--dim-text); margin-bottom: 2px;">SPENT: <span
+                            id="cp-spent">0</span> / TOTAL: <span id="cp-total">0</span></div>
+                    <div>CP <span id="cp-val">0</span></div>
+                </div>
+                <div class="bar-container">
+                    <div id="cp-bar" class="bar-fill" style="width: 0%; background: var(--main-color);"></div>
+                </div>
             </div>
-            <div style="margin-top: 10px;">CP <span id="cp-val">0</span></div>
-            <div style="font-size:0.7em; color:var(--dim-text); margin-bottom: 2px;">SPENT: <span id="cp-spent">0</span>
-                / TOTAL: <span id="cp-total">0</span></div>
-            <div class="bar-container">
-                <div id="cp-bar" class="bar-fill" style="width: 0%; background: var(--main-color);"></div>
+
+            <!-- Health Block (Right) -->
+            <div class="vital-block">
+                <div id="health-header">HEALTH <span id="health-val">0</span> / <span id="max-health-val">0</span></div>
+                <div class="bar-container">
+                    <div id="health-bar" class="bar-fill" style="width: 50%;"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -419,14 +436,10 @@
                 <span class="stat-btn" style="color:var(--text-color); margin:0 5px;" onclick="updateHealth(1)">+</span>
                 / <span id="max-health-val">${maxHealth}</span>`;
 
-            // Check if wrapper exists to avoid re-rendering entire HTML structure if valid
-            // But here we are replacing textContent usually. 
-            // The existing HTML is: <div>HEALTH <span id="health-val">0</span> / <span id="max-health-val">0</span></div>
-            // Let's find that div. It is the first child of .vitals
-            const vitalsDiv = document.querySelector('.vitals');
-            if (vitalsDiv) {
-                const healthLine = vitalsDiv.firstElementChild;
-                healthLine.innerHTML = healthHtml;
+            // Update health header via ID
+            const healthHeader = document.getElementById('health-header');
+            if (healthHeader) {
+                healthHeader.innerHTML = healthHtml;
             }
 
             document.getElementById('health-bar').style.width = Math.min((health / maxHealth) * 100, 100) + '%';
