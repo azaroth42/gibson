@@ -161,7 +161,7 @@
         // Let's assume Jinja2 injection works.
         const charId = "{{ char_id }}";
 
-        document.getElementById('back-btn').href = `/characters/${charId}`;
+        document.getElementById('back-btn').href = `/static/sheet.html?id=${charId}`;
 
         let allItems = [];
         let ownedItemIds = new Set();

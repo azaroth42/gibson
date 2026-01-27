@@ -1,0 +1,55 @@
+1,SynthSenses,"Cybernetic eyes and/or ears. When your enhanced senses would help you, you can roll +Chrome for Assess.
+With Tactical AI, allows independent targeting of multiple hand-held weapons.
+When you acquire SynthSenses, you start with 2 tags:
+Sensorium allows you to also capture other senses and sensations, such as smell, touch (including pain), and taste.","{thermographic,amplification,magnification,telescopic,microscopic,dampening,recording,encrypted,HUD,lights,sensorium}",cyberware,t
+2,Comms,"When you have Comms installed, you can communicate electronically without moving or making an audible sound.
+With SynthSenses, you can project communications into your field of view.
+When you acquire Comms, you start with one tag:
+Comms without +encrypted can be intercepted. Any comms makes you susceptible to being quickhacked, +iced increases the time needed for a netrunner to break through. +recording lets you record communications to internal storage, while +broadcast lets you broadcast what you’re seeing.","{encrypted,jamming,recording,broadcast,'"inaccessible partition'",iced}",cyberware,t
+3,Implanted Weaponry,"You have a weapon implanted in your body. It can be retracted, and is automatically +linked. It can be a blade, pistol, monofilament whip or other similarly small weapon.",{},cyberware,t
+4,Overclocked Reflexes,"You react much faster than others. Roll with Advantage on any Act Under Pressure roll where reaction speed is critical. You automatically go first in combat. If none of your enemies have overclocked nerves, then you also roll with Advantage for Mix It Up.",{},cyberware,t
+5,Neural Interface,"Allows direct neural control of an appropriately configured external device such as a vehicle, weapon, recording device, or hacked electronic system.
+With Comms, allows the Driver to remotely pilot vehicles and drones, and the Netrunner to do wireless hacking / quick hack.
+With either Tactical AI or +HUD on SynthSenses, allows you to roll with Advantage on Mix It Up for +linked weapons and deal an extra +d6 damage.
+With Overclocked Reflexes you can also precisely define who gets hit with automatic weapons.",{},cyberware,t
+6,Skill Shards,"You may slot chips to grant certain skills. When your slotted shard is appropriate to a move you are making, take +1 ongoing if your relevant stat is +1 or less. If it is +2 or higher, you roll with Advantage. You can slot two shards at once. When you acquire the cyberware, it comes with one shard.
+If you also have Tactical AI, you can slot a third shard.",{},cyberware,t
+7,Tactical AI,"An expert system enhances the user’s understanding of and operation within a tactical environment. When you assess in a tactical situation, hold +1, even on a miss. When Acting Under Pressure in a tactical situation, you can roll +Chrome instead of +Cool. The GM will take into account on a miss or 7-9 that you were giving up control to an onboard AI.",{},cyberware,t
+8,Dermal Plating,"You have carbon plates in your skin that provide +2 armor, stacking with other armor.",{},cyberware,f
+9,Bone Hardening,"You have bones that are much harder than normal, providing +5 HP.",{},cyberware,f
+10,Muscle Grafts,"You have cybernetic enhancements to your muscles that, when you are fighting unarmed or with a melee weapon, allow you to roll +Chrome instead of +Tough for Mix It Up and add +d6 damage.",{},cyberware,f
+11,ChemSkin,"A subdermal layer that changes the color of your skin. You can program it in advance with complex patterns, or instantly shift to simple tones. With Tactical AI, (and translucent or scanty clothing), you roll with Advantage for Act Under Pressure for stealth as the AI blends you in with the background. With Synthsenses you can also change how your eyes look at will.",{},cyberware,f
+12,Compartment,A compartment built into a real or cybernetic part of your body which can contain a small item. It is well hidden but not interactive in any way. Describe where it is and how you get to it.,{},cyberware,f
+13,Health Monitor,Built in monitor for your physical condition. Optionally includes a dedicated tracer and alert warning to a virtual destination of your choice (typically to summon a Trauma Team to patch you up). With Comms you can send the details to anyone in real time.,{},cyberware,f
+14,Autoinjecter,"Inject a dose of a drug if your Health Monitor detects a pre-determined trigger condition. You can manually cause the inject to trigger – describe how it is triggered. With a neural interface, you can trigger it by thought.",{},cyberware,f
+15,Small Weapon,+2,{},gear,f
+16,Large Weapon,+d6,{},gear,f
+17,Two Handed Weapon,+d6+2,{},gear,f
+18,Pistol,+d6,{},gear,f
+19,Heavy Pistol,+d6+2,{},gear,f
+20,SMG,"+d6+2, +target or +reroll",{},gear,f
+21,Assault Rifle,"+2d6+2, +target or +reroll",{},gear,f
+22,Shotgun,"+2d6, +slow",{},gear,f
+23,Sniper Rifle,"+3d6, +reroll, +slow",{},gear,f
+24,Assault Cannon,"+4d6, +reroll, +target, +clumsy",{},gear,f
+25,Flechette Pistol,"+d6, +reroll, +quiet, armor is doubled",{},gear,f
+26,Flechette SMG,"+d6+2, +reroll, +quiet, armor is doubled",{},gear,f
+27,Flechette Assault Rifle,"+2d6+2, +reroll, +quiet, armor is doubled",{},gear,f
+28,Clothing,0,{},gear,f
+29,Heavy Clothing,1,{},gear,f
+30,Armored Jacket/Trenchcoat,2,{},gear,f
+31,Body Armor,4,{},gear,f
+32,Tactical Gear,6,{},gear,f
+33,Military Hardsuit,10,{},gear,f
+34,Powered Rollerblades (1 person),"",{},gear,f
+35,Sports Bike (1 person),"",{},gear,f
+36,Chopper (1 person),"",{},gear,f
+37,Car (2-4 people),"",{},gear,f
+38,Sports Car,(2 people),{},gear,f
+39,Van (4-6 people),"",{},gear,f
+40,Ambulance (4-6 people),"",{},gear,f
+41,Armored Personnel Carrier (6-10 people),"",{},gear,f
+42,Tank (2-4 people),"",{},gear,f
+43,Attack Helicopter (4-6 people),"",{},gear,f
+44,VTOL Fighter (1-2 people),"",{},gear,f
+45,Jetboat (2-4 people),"",{},gear,f

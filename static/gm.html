@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Gibson - GM Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #050505;
+            color: #e0e0e0;
+            font-family: 'Share Tech Mono', monospace;
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #00f3ff;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.7);
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            font-size: 2.5em;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .menu-link {
+            display: block;
+            background: #111;
+            border: 1px solid #333;
+            color: #00f3ff;
+            text-decoration: none;
+            padding: 20px;
+            font-size: 1.5em;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .menu-link:hover {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: #00f3ff;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>GM Control Panel</h1>
+
+    <div class="menu">
+        <a href="/select-map" class="menu-link">Select Map</a>
+        <a href="/clocks" class="menu-link">Countdown Clocks</a>
+        <a href="/static/edit-moves.html" class="menu-link">Edit Moves</a>
+        <a href="/tabletop" class="menu-link">Open Tabletop</a>
+        <a href="/" class="menu-link" style="color: #666; border-color: #444; margin-top: 20px;">&lt; Back to Index</a>
+    </div>
+
+</body>
+
+</html>

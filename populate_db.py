@@ -299,10 +299,52 @@ async def populate_db(conn, table_nodes="ability_nodes", table_advances="charact
             
     print("Database population complete.")
 
+
+async def ensure_schema(conn):
+    # Check if necessary tables exist
+    # query information_schema or try a select
+    try:
+        # Check for 'ability_nodes' and 'items'
+        # We can just check one of them or check pg_tables
+        exists = await conn.fetchval("""
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE  table_schema = 'public'
+                AND    table_name   = 'ability_nodes'
+            );
+        """)
+        
+        if not exists:
+            print("Tables not found. Creating schema from schema.sql...")
+            if not os.path.exists('schema.sql'):
+                print("Error: schema.sql not found.")
+                return False
+                
+            with open('schema.sql', 'r') as f:
+                schema_sql = f.read()
+                
+            await conn.execute(schema_sql)
+            print("Schema created.")
+        else:
+            print("Schema check passed: Tables exist.")
+            
+    except Exception as e:
+        print(f"Error checking/creating schema: {e}")
+        return False
+        
+    return True
+
 async def main():
     conn = await asyncpg.connect(DATABASE_URL)
-    await populate_db(conn)
+    
+    # Ensure tables exist
+    if await ensure_schema(conn):
+        await populate_db(conn)
+    else:
+        print("Skipping population due to schema error.")
+        
     await conn.close()
+
 
 if __name__ == "__main__":
     asyncio.run(main())

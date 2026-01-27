@@ -16,6 +16,7 @@
             --bg-color: #0a0a0a;
             --panel-bg: rgba(20, 20, 20, 0.9);
             --border-color: #333;
+            --dim-text: #666;
         }
 
         body {
@@ -177,6 +178,9 @@
         <div class="header">
             <h1>Advances</h1>
             <div class="char-info">
+                <a href="#" id="back-link"
+                    style="color:var(--dim-text); text-decoration:none; border:1px solid var(--dim-text); padding:5px 10px; margin-right:20px; font-size:0.8em;">&lt;
+                    BACK</a>
                 <span id="charName">Loading...</span>
                 <small>Points Used: <span id="pointsUsed">0</span></small> <br>
                 <small>XP Available: <span id="xpAvailable">0</span></small>
@@ -214,6 +218,8 @@
             } catch (e) {
                 document.getElementById('tree-root').innerHTML = `<p style="color:red">Error: ${e.message}</p>`;
             }
+
+            document.getElementById('back-link').href = `/static/sheet.html?id=${charId}`;
         }
 
         function updateHeader() {
