@@ -1,4 +1,4 @@
-from fastapi import FastAPI, WebSocket, Request, HTTPException, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, Request, HTTPException, WebSocketDisconnect, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -10,6 +10,9 @@ from contextlib import asynccontextmanager
 from hypercorn.asyncio import serve
 from hypercorn.config import Config
 import asyncio
+import tempfile
+from parakeet_mlx import from_pretrained
+import soundfile as sf
 
 from db import init_db, get_db_pool
 
@@ -19,6 +22,12 @@ async def lifespan(app: FastAPI):
     await init_db()
     app.state.pool = await get_db_pool()
     app.state.tabletop_connections = []
+    
+    # Load parakeet-mlx ASR model
+    print("Loading parakeet-mlx ASR model...")
+    app.state.asr_model = from_pretrained('mlx-community/parakeet-tdt-0.6b-v2')
+    print("ASR model loaded successfully")
+    
     yield
     # Shutdown
     await app.state.pool.close()
@@ -670,6 +679,35 @@ async def update_gamestate(state: GameStateUpdate):
         res = {"map_image": state.map_image}
         await broadcast_tabletop(app, {"type": "gamestate_update", "payload": res})
         return res
+
+@app.post("/api/transcribe")
+async def transcribe_audio(audio: UploadFile = File(...)):
+    """
+    Accepts an audio file (WAV format) and returns the transcribed text using parakeet-mlx.
+    """
+    # Create a temporary file to store the uploaded audio
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
+        content = await audio.read()
+        temp_audio.write(content)
+        temp_path = temp_audio.name
+        print(temp_path)
+
+        # Transcribe using parakeet-mlx
+        model = app.state.asr_model
+        result = model.transcribe(temp_path)
+        
+        # Extract text from result
+        text = result.text.strip()
+        
+    return {"text": text.strip()}
+    
+    #except Exception as e:
+    #    raise HTTPException(status_code=500, detail=f"Transcription failed: {str(e)}")
+    
+ #   #finally:
+        # Clean up temp file
+ #       if os.path.exists(temp_path):
+ #           os.unlink(temp_path)
 
 if __name__ == "__main__":
     config = Config()

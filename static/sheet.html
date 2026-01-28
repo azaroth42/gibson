@@ -435,7 +435,6 @@
         };
         let abilityTree = [];
         let socket = null;
-        let recognition = null;
 
         function openContactModal() {
             document.getElementById('contact-modal').style.display = 'flex';
@@ -1183,38 +1182,179 @@
             };
         }
 
-        if ('webkitSpeechRecognition' in window) {
-            recognition = new webkitSpeechRecognition();
-            recognition.continuous = false;
-            recognition.lang = 'en-US';
+        // Audio Recording for Server-Side ASR
+        const SAMPLE_RATE = 44100;
+        const BIT_DEPTH = 16;
+        const CHANNELS = 2;
 
-            recognition.onstart = () => {
+        let mediaRecorder;
+        let audioContext;
+        let scriptProcessor;
+        let chunks = [];
+        let isRecording = false;
+        let stream;
+
+        async function startRecording() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 const btn = document.getElementById('mic-btn');
-                btn.textContent = "ON";
+                btn.textContent = "RECORDING";
+                btn.style.backgroundColor = "#ff5555";
                 document.getElementById('voice-panel').classList.add('voice-active');
-            };
+                document.getElementById('last-cmd').textContent = "Recording...";
 
-            recognition.onend = () => {
-                const btn = document.getElementById('mic-btn');
-                btn.textContent = "OFF";
-                document.getElementById('voice-panel').classList.remove('voice-active');
-            };
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                await audioContext.resume();
 
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                document.getElementById('last-cmd').textContent = transcript;
+                scriptProcessor = audioContext.createScriptProcessor(4096, CHANNELS, CHANNELS);
+                const source = audioContext.createMediaStreamSource(stream);
+                source.connect(scriptProcessor);
+                scriptProcessor.connect(audioContext.destination);
 
-                if (socket && socket.readyState === WebSocket.OPEN) {
-                    socket.send(JSON.stringify({ type: 'command', text: transcript }));
+                scriptProcessor.onaudioprocess = (e) => {
+                    const inputData = e.inputBuffer.getChannelData(0);
+                    const rightData = e.inputBuffer.getChannelData(1);
+
+                    const leftInt16 = convertFloatToInt16(inputData);
+                    const rightInt16 = convertFloatToInt16(rightData);
+
+                    // Properly interleave stereo: L,R,L,R,L,R...
+                    const interleaved = new Int16Array(inputData.length * 2);
+                    for (let i = 0; i < inputData.length; i++) {
+                        interleaved[i * 2] = leftInt16[i];     // Left
+                        interleaved[i * 2 + 1] = rightInt16[i]; // Right
+                    }
+
+                    chunks.push(interleaved);
+                };
+
+                isRecording = true;
+            } catch (err) {
+                console.error("Error accessing microphone:", err);
+                document.getElementById('last-cmd').textContent = "Mic Error: " + err.message;
+            }
+        }
+
+        async function stopRecording() {
+            if (!stream) return;
+
+            stream.getTracks().forEach((track) => track.stop());
+            if (scriptProcessor) scriptProcessor.disconnect();
+            if (audioContext) audioContext.close();
+
+            const btn = document.getElementById('mic-btn');
+            btn.textContent = "PROCESSING";
+            btn.disabled = true;
+            btn.style.backgroundColor = "#888";
+            document.getElementById('voice-panel').classList.remove('voice-active');
+            document.getElementById('last-cmd').textContent = "Transcribing...";
+
+            // Combine chunks
+            const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+            const buffer = new Int16Array(totalLength);
+            let offset = 0;
+            for (const chunk of chunks) {
+                buffer.set(chunk, offset);
+                offset += chunk.length;
+            }
+
+            // Create WAV
+            const wavBlob = createWavBlob(buffer, SAMPLE_RATE);
+
+            // Upload to server
+            await uploadAndTranscribe(wavBlob);
+
+            // Reset
+            isRecording = false;
+            chunks = [];
+            btn.textContent = "OFF";
+            btn.disabled = false;
+            btn.style.backgroundColor = "#222";
+        }
+
+        function convertFloatToInt16(float32Array) {
+            const l = float32Array.length;
+            const int16Array = new Int16Array(l);
+            for (let i = 0; i < l; i++) {
+                const s = Math.max(-1, Math.min(1, float32Array[i]));
+                int16Array[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+            }
+            return int16Array;
+        }
+
+        function createWavBlob(buffer, sampleRate) {
+            const numChannels = CHANNELS;
+            const byteRate = sampleRate * numChannels * (BIT_DEPTH / 8);
+            const blockAlign = numChannels * (BIT_DEPTH / 8);
+
+            const header = new ArrayBuffer(44);
+            const view = new DataView(header);
+
+            writeString(view, 0, "RIFF");
+            view.setUint32(4, 36 + buffer.byteLength, true); // Use byteLength, not length
+            writeString(view, 8, "WAVE");
+            writeString(view, 12, "fmt ");
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, numChannels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, byteRate, true);
+            view.setUint16(32, blockAlign, true);
+            view.setUint16(34, BIT_DEPTH, true);
+            writeString(view, 36, "data");
+            view.setUint32(40, buffer.byteLength, true); // Use byteLength, not length
+
+            const wavData = new Uint8Array(header);
+            const finalBuffer = new Uint8Array(header.byteLength + buffer.byteLength);
+            finalBuffer.set(wavData, 0);
+            finalBuffer.set(new Uint8Array(buffer.buffer), wavData.byteLength);
+
+            return new Blob([finalBuffer], { type: "audio/wav" });
+        }
+
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        }
+
+        async function uploadAndTranscribe(blob) {
+            const formData = new FormData();
+            formData.append("audio", blob, "recording.wav");
+
+            try {
+                const response = await fetch("/api/transcribe", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const transcript = data.text || "";
+
+                    document.getElementById('last-cmd').textContent = transcript || "(no speech detected)";
+
+                    if (transcript && socket && socket.readyState === WebSocket.OPEN) {
+                        socket.send(JSON.stringify({ type: 'command', text: transcript }));
+                    }
+                } else {
+                    const error = await response.text();
+                    document.getElementById('last-cmd').textContent = "Transcription failed";
+                    console.error("Transcription error:", error);
                 }
-            };
+            } catch (error) {
+                document.getElementById('last-cmd').textContent = "Upload error";
+                console.error("Upload error:", error);
+            }
         }
 
         const micBtn = document.getElementById('mic-btn');
         if (micBtn) {
-            micBtn.addEventListener('click', () => {
-                if (recognition) {
-                    try { recognition.start(); } catch (e) { recognition.stop(); }
+            micBtn.addEventListener('click', async () => {
+                if (!isRecording) {
+                    await startRecording();
+                } else {
+                    await stopRecording();
                 }
             });
         }
