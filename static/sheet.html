@@ -1182,36 +1182,96 @@
             };
         }
 
-        // Audio Recording for Server-Side ASR
+        // Continuous Audio Streaming for Wake Word Detection
         const SAMPLE_RATE = 44100;
         const BIT_DEPTH = 16;
         const CHANNELS = 2;
+        const LISTENING_CHUNK_MS = 2000;  // 2 seconds for wake word detection
+        const COMMAND_CHUNK_MS = 6000;     // 6 seconds for command capture
 
-        let mediaRecorder;
         let audioContext;
         let scriptProcessor;
-        let chunks = [];
-        let isRecording = false;
-        let stream;
+        let audioChunks = [];
+        let isStreamingAudio = false;
+        let audioStream;
+        let audioSocket = null;
+        let chunkInterval = null;
+        let currentChunkDuration = LISTENING_CHUNK_MS;  // Start with listening duration
 
-        async function startRecording() {
+        async function startContinuousListening() {
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 const btn = document.getElementById('mic-btn');
-                btn.textContent = "RECORDING";
-                btn.style.backgroundColor = "#ff5555";
+                btn.textContent = "LISTENING";
+                btn.style.backgroundColor = "#00f3ff";
                 document.getElementById('voice-panel').classList.add('voice-active');
-                document.getElementById('last-cmd').textContent = "Recording...";
+                document.getElementById('last-cmd').textContent = "Initializing...";
+
+                // Create WebSocket connection for audio streaming
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const audioWsUrl = `${protocol}//${window.location.host}/ws/audio/${charId}`;
+                audioSocket = new WebSocket(audioWsUrl);
+
+                audioSocket.onopen = () => {
+                    console.log("Audio WebSocket connected");
+                    document.getElementById('last-cmd').textContent = "Listening for 'Gibson'...";
+                };
+
+                audioSocket.onmessage = (event) => {
+                    const msg = JSON.parse(event.data);
+
+                    if (msg.type === 'state') {
+                        document.getElementById('last-cmd').textContent = msg.message;
+
+                        if (msg.state === 'wake_word_detected') {
+                            const btn = document.getElementById('mic-btn');
+                            btn.style.backgroundColor = "#ff0055";
+                            btn.textContent = "COMMAND";
+
+                            // Switch to longer chunk duration for command capture
+                            currentChunkDuration = COMMAND_CHUNK_MS;
+                            restartChunkInterval();
+                        } else if (msg.state === 'listening') {
+                            const btn = document.getElementById('mic-btn');
+                            btn.style.backgroundColor = "#00f3ff";
+                            btn.textContent = "LISTENING";
+
+                            // Switch back to shorter chunk duration for wake word
+                            currentChunkDuration = LISTENING_CHUNK_MS;
+                            restartChunkInterval();
+                        }
+                    } else if (msg.type === 'command_received') {
+                        document.getElementById('last-cmd').textContent = `Command: "${msg.text}"`;
+                    } else if (msg.type === 'command_processed') {
+                        console.log("Command processed:", msg.response);
+                    } else if (msg.type === 'error') {
+                        console.error("Audio stream error:", msg.message);
+                    }
+                };
+
+                audioSocket.onerror = (error) => {
+                    console.error("Audio WebSocket error:", error);
+                    document.getElementById('last-cmd').textContent = "Connection error";
+                };
+
+                audioSocket.onclose = () => {
+                    console.log("Audio WebSocket closed");
+                    if (isStreamingAudio) {
+                        document.getElementById('last-cmd').textContent = "Connection lost";
+                    }
+                };
 
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 await audioContext.resume();
 
                 scriptProcessor = audioContext.createScriptProcessor(4096, CHANNELS, CHANNELS);
-                const source = audioContext.createMediaStreamSource(stream);
+                const source = audioContext.createMediaStreamSource(audioStream);
                 source.connect(scriptProcessor);
                 scriptProcessor.connect(audioContext.destination);
 
                 scriptProcessor.onaudioprocess = (e) => {
+                    if (!isStreamingAudio) return;
+
                     const inputData = e.inputBuffer.getChannelData(0);
                     const rightData = e.inputBuffer.getChannelData(1);
 
@@ -1221,55 +1281,89 @@
                     // Properly interleave stereo: L,R,L,R,L,R...
                     const interleaved = new Int16Array(inputData.length * 2);
                     for (let i = 0; i < inputData.length; i++) {
-                        interleaved[i * 2] = leftInt16[i];     // Left
-                        interleaved[i * 2 + 1] = rightInt16[i]; // Right
+                        interleaved[i * 2] = leftInt16[i];
+                        interleaved[i * 2 + 1] = rightInt16[i];
                     }
 
-                    chunks.push(interleaved);
+                    audioChunks.push(interleaved);
                 };
 
-                isRecording = true;
+                isStreamingAudio = true;
+
+                // Send audio chunks - starts with listening duration
+                startChunkInterval();
+
             } catch (err) {
-                console.error("Error accessing microphone:", err);
+                console.error("Error starting continuous listening:", err);
                 document.getElementById('last-cmd').textContent = "Mic Error: " + err.message;
             }
         }
 
-        async function stopRecording() {
-            if (!stream) return;
+        function startChunkInterval() {
+            chunkInterval = setInterval(() => {
+                if (audioChunks.length > 0 && audioSocket && audioSocket.readyState === WebSocket.OPEN) {
+                    // Combine chunks
+                    const totalLength = audioChunks.reduce((acc, chunk) => acc + chunk.length, 0);
+                    const buffer = new Int16Array(totalLength);
+                    let offset = 0;
+                    for (const chunk of audioChunks) {
+                        buffer.set(chunk, offset);
+                        offset += chunk.length;
+                    }
 
-            stream.getTracks().forEach((track) => track.stop());
-            if (scriptProcessor) scriptProcessor.disconnect();
-            if (audioContext) audioContext.close();
+                    // Create WAV
+                    const wavBlob = createWavBlob(buffer, SAMPLE_RATE);
 
-            const btn = document.getElementById('mic-btn');
-            btn.textContent = "PROCESSING";
-            btn.disabled = true;
-            btn.style.backgroundColor = "#888";
-            document.getElementById('voice-panel').classList.remove('voice-active');
-            document.getElementById('last-cmd').textContent = "Transcribing...";
+                    // Send via WebSocket as binary
+                    wavBlob.arrayBuffer().then(arrayBuffer => {
+                        audioSocket.send(arrayBuffer);
+                    });
 
-            // Combine chunks
-            const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
-            const buffer = new Int16Array(totalLength);
-            let offset = 0;
-            for (const chunk of chunks) {
-                buffer.set(chunk, offset);
-                offset += chunk.length;
+                    // Clear chunks
+                    audioChunks = [];
+                }
+            }, currentChunkDuration);
+        }
+
+        function restartChunkInterval() {
+            if (chunkInterval) {
+                clearInterval(chunkInterval);
+                chunkInterval = null;
+            }
+            startChunkInterval();
+        }
+
+        async function stopContinuousListening() {
+            isStreamingAudio = false;
+
+            if (chunkInterval) {
+                clearInterval(chunkInterval);
             }
 
-            // Create WAV
-            const wavBlob = createWavBlob(buffer, SAMPLE_RATE);
+            if (audioStream) {
+                audioStream.getTracks().forEach((track) => track.stop());
+            }
 
-            // Upload to server
-            await uploadAndTranscribe(wavBlob);
+            if (scriptProcessor) {
+                scriptProcessor.disconnect();
+            }
 
-            // Reset
-            isRecording = false;
-            chunks = [];
+            if (audioContext) {
+                await audioContext.close();
+            }
+
+            if (audioSocket) {
+                audioSocket.close();
+                audioSocket = null;
+            }
+
+            const btn = document.getElementById('mic-btn');
             btn.textContent = "OFF";
-            btn.disabled = false;
             btn.style.backgroundColor = "#222";
+            document.getElementById('voice-panel').classList.remove('voice-active');
+            document.getElementById('last-cmd').textContent = "";
+
+            audioChunks = [];
         }
 
         function convertFloatToInt16(float32Array) {
@@ -1351,10 +1445,10 @@
         const micBtn = document.getElementById('mic-btn');
         if (micBtn) {
             micBtn.addEventListener('click', async () => {
-                if (!isRecording) {
-                    await startRecording();
+                if (!isStreamingAudio) {
+                    await startContinuousListening();
                 } else {
-                    await stopRecording();
+                    await stopContinuousListening();
                 }
             });
         }

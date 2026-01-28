@@ -201,7 +201,7 @@ async def update_character(char_id: int, char_update: CharacterUpdate):
     return char
 
 
-# IMPORTANT: /ws/tabletop must be defined BEFORE /ws/{char_id} to ensure proper route matching
+# IMPORTANT: Define specific routes before generic ones
 @app.websocket("/ws/tabletop")
 async def websocket_tabletop(websocket: WebSocket):
     await websocket.accept()
@@ -216,6 +216,132 @@ async def websocket_tabletop(websocket: WebSocket):
         print(f"Tabletop WS Error: {e}")
         if websocket in app.state.tabletop_connections:
             app.state.tabletop_connections.remove(websocket)
+
+@app.websocket("/ws/audio/{char_id}")
+async def websocket_audio_stream(websocket: WebSocket, char_id: int):
+    """
+    WebSocket endpoint for continuous audio streaming with wake word detection.
+    State machine: LISTENING -> WAKE_WORD_DETECTED -> COMMAND_MODE -> LISTENING
+    """
+    await websocket.accept()
+    pool = app.state.pool
+    
+    # State: "listening" or "command"
+    state = "listening"
+    
+    try:
+        await websocket.send_json({"type": "state", "state": "listening", "message": "Listening for 'Gibson'..."})
+        
+        while True:
+            # Receive binary audio data
+            data = await websocket.receive_bytes()
+            
+            # Save to temp file
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
+                temp_audio.write(data)
+                temp_path = temp_audio.name
+            
+            try:
+                # Transcribe audio chunk
+                model = app.state.asr_model
+                result = model.transcribe(temp_path)
+                text = result.text.strip().lower()
+                
+                print(f"[Audio Stream {char_id}] State: {state}, Transcribed: '{text}'")
+                
+                if state == "listening":
+                    # Check for wake word
+                    if "gibson" in text:
+                        state = "command"
+                        await websocket.send_json({
+                            "type": "state", 
+                            "state": "wake_word_detected",
+                            "message": "Wake word detected! Speak your command..."
+                        })
+                        print(f"[Audio Stream {char_id}] Wake word detected!")
+                    
+                elif state == "command":
+                    # Process command
+                    if text:  # Non-empty transcription
+                        await websocket.send_json({
+                            "type": "command_received",
+                            "text": text
+                        })
+                        
+                        # Execute command using existing logic
+                        response = ""
+                        updated = False
+                        
+                        # Health command parsing (copied from existing WS logic)
+                        damage_match = re.search(r'(take|suffer)\s+(\d+)', text)
+                        heal_match = re.search(r'(heal|recover)\s+(\d+)', text)
+                        set_match = re.search(r'set\s+health\s+(?:to\s+)?(\d+)', text)
+                        
+                        delta = 0
+                        set_val = None
+                        
+                        if damage_match:
+                            delta = -int(damage_match.group(2))
+                            response = f"Taking {-delta} damage."
+                        elif heal_match:
+                            delta = int(heal_match.group(2))
+                            response = f"Healing {delta} points."
+                        elif set_match:
+                            set_val = int(set_match.group(1))
+                            response = f"Health set to {set_val}."
+                        
+                        if delta != 0 or set_val is not None:
+                            async with pool.acquire() as conn:
+                                curr = await conn.fetchval("SELECT health FROM characters WHERE id = $1", char_id)
+                                max_hp = await conn.fetchval("SELECT max_health FROM characters WHERE id = $1", char_id) or 25
+                                
+                                if set_val is not None:
+                                    new_val = set_val
+                                else:
+                                    new_val = curr + delta
+                                
+                                new_val = max(0, min(new_val, max_hp))
+                                await conn.execute("UPDATE characters SET health = $1 WHERE id = $2", new_val, char_id)
+                                updated = True
+                        
+                        if updated:
+                            async with pool.acquire() as conn:
+                                updated_character = await get_character_internal(conn, char_id)
+                            await broadcast_tabletop(app, {"type": "character_update", "payload": updated_character.model_dump()})
+                        
+                        await websocket.send_json({
+                            "type": "command_processed",
+                            "response": response or "Command received",
+                            "updated": updated
+                        })
+                        
+                    # Return to listening state
+                    state = "listening"
+                    await websocket.send_json({
+                        "type": "state",
+                        "state": "listening",
+                        "message": "Listening for 'Gibson'..."
+                    })
+                    
+            except Exception as e:
+                print(f"[Audio Stream {char_id}] Transcription error: {e}")
+                await websocket.send_json({
+                    "type": "error",
+                    "message": f"Transcription failed: {str(e)}"
+                })
+            finally:
+                # Clean up temp file
+                if os.path.exists(temp_path):
+                    os.unlink(temp_path)
+                    
+    except WebSocketDisconnect:
+        print(f"[Audio Stream {char_id}] Client disconnected")
+    except Exception as e:
+        print(f"[Audio Stream {char_id}] Error: {e}")
+        try:
+            await websocket.send_json({"type": "error", "message": str(e)})
+        except:
+            pass
 
 @app.websocket("/ws/{char_id}")
 async def websocket_endpoint(websocket: WebSocket, char_id: int):
@@ -272,7 +398,6 @@ async def websocket_endpoint(websocket: WebSocket, char_id: int):
             elif message.get("type") == "command":
                 text = message.get("text", "").lower()
                 response = f"Command recognized: {text}"
-                
                 # Simple Health Parser
                 # "Take X damage"
                 damage_match = re.search(r'(take|suffer)\s+(\d+)', text)
