@@ -57,6 +57,14 @@ CREATE TABLE IF NOT EXISTS character_links (
     value INTEGER DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS contacts (
+    id SERIAL PRIMARY KEY,
+    character_id INTEGER REFERENCES characters(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    description TEXT,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS countdown_clocks (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,

@@ -138,6 +138,24 @@ async def delete_character(char_id: int):
     await broadcast_tabletop(app, {"type": "character_delete", "payload": {"id": char_id}})
     return None
 
+    return None
+
+@app.post("/characters/{char_id}/contacts", response_model=Character)
+async def add_character_contact(char_id: int, contact: ContactAdd):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        char_exists = await conn.fetchval("SELECT 1 FROM characters WHERE id = $1", char_id)
+        if not char_exists:
+             raise HTTPException(status_code=404, detail="Character not found")
+        
+        await conn.execute(
+            "INSERT INTO contacts (character_id, name, description) VALUES ($1, $2, $3)", 
+            char_id, contact.name, contact.description
+        )
+        
+        updated_char = await get_character_internal(conn, char_id)
+        return updated_char
+
 @app.put("/characters/{char_id}", response_model=Character)
 async def update_character(char_id: int, char_update: CharacterUpdate):
     pool = app.state.pool
@@ -445,6 +463,25 @@ async def get_character_internal(conn, char_id: int) -> Character:
     
     char_data['links'] = [dict(r) for r in link_rows]
     
+    char_data['links'] = [dict(r) for r in link_rows]
+    
+    # Fetch contacts
+    contact_rows = await conn.fetch("""
+        SELECT id, name, description, added_at
+        FROM contacts
+        WHERE character_id = $1
+        ORDER BY added_at ASC
+    """, char_id)
+    
+    char_data['contacts'] = []
+    for r in contact_rows:
+        char_data['contacts'].append({
+            "id": r['id'],
+            "name": r['name'],
+            "description": r['description'],
+            "timestamp": int(r['added_at'].timestamp())
+        })
+
     return Character(**char_data)
 
 

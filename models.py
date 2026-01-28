@@ -23,6 +23,7 @@ class Character(BaseModel):
     advances: List[Dict[str, Any]] = []
     items: List[Dict[str, Any]] = []
     links: List[Dict[str, Any]] = []
+    contacts: List[Dict[str, Any]] = []
 
 class CharacterUpdate(BaseModel):
     name: Optional[str] = None
@@ -83,3 +84,7 @@ class AdvanceAdd(BaseModel):
 
 class MoveUpdate(BaseModel):
     description: str
+
+class ContactAdd(BaseModel):
+    name: str
+    description: Optional[str] = None

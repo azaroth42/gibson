@@ -64,8 +64,8 @@
             max-width: 1400px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 360px 1fr 300px;
-            /* Wider left sidebar */
+            grid-template-columns: 300px 1fr 400px;
+            /* Narrower left, Wider right */
             grid-gap: 20px;
         }
 
@@ -352,6 +352,12 @@
                 <ul id="equipment-list" class="item-list"></ul>
             </div>
 
+            <div class="panel-box">
+                <h3>Contacts <span style="float:right; cursor:pointer; font-size:0.6em; color:var(--accent-color)"
+                        onclick="openContactModal()">[+ ADD]</span></h3>
+                <ul id="contacts-list" class="item-list"></ul>
+            </div>
+
             <div id="voice-panel" class="panel-box" style="border-top: 1px solid #333; padding-top: 10px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                     <h3 style="margin:0">Voice Link</h3>
@@ -368,6 +374,32 @@
         </div>
     </div> <!-- End Container -->
 
+    <!-- Contact Modal -->
+    <div id="contact-modal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; align-items:center; justify-content:center;">
+        <div
+            style="background:#111; border:1px solid var(--main-color); padding:20px; width:300px; box-shadow:0 0 20px rgba(0,243,255,0.2);">
+            <h3 style="margin-top:0; border-bottom:1px solid #333; padding-bottom:10px;">Add Contact</h3>
+            <div style="margin-bottom:10px;">
+                <label style="display:block; color:var(--dim-text); font-size:0.8em; margin-bottom:5px;">Name</label>
+                <input type="text" id="contact-name"
+                    style="width:100%; background:#222; border:1px solid #444; color:#fff; padding:5px; box-sizing:border-box;">
+            </div>
+            <div style="margin-bottom:15px;">
+                <label
+                    style="display:block; color:var(--dim-text); font-size:0.8em; margin-bottom:5px;">Description</label>
+                <textarea id="contact-desc" rows="3"
+                    style="width:100%; background:#222; border:1px solid #444; color:#fff; padding:5px; box-sizing:border-box;"></textarea>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button onclick="closeContactModal()"
+                    style="background:transparent; border:1px solid #444; color:#fff; padding:5px 10px; cursor:pointer;">Cancel</button>
+                <button onclick="submitContact()"
+                    style="background:var(--main-color); border:none; color:#000; padding:5px 15px; cursor:pointer; font-weight:bold;">Add</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
@@ -379,11 +411,51 @@
             tough: 0, cool: 0, sharp: 0, style: 0, chrome: 0,
             health: 0, max_health: 25,
             experience: 0, points_used: 0,
-            advances: [], items: [], links: []
+            advances: [], items: [], links: [], contacts: []
         };
         let abilityTree = [];
         let socket = null;
         let recognition = null;
+
+        function openContactModal() {
+            document.getElementById('contact-modal').style.display = 'flex';
+            document.getElementById('contact-name').focus();
+        }
+
+        function closeContactModal() {
+            document.getElementById('contact-modal').style.display = 'none';
+            document.getElementById('contact-name').value = '';
+            document.getElementById('contact-desc').value = '';
+        }
+
+        async function submitContact() {
+            const name = document.getElementById('contact-name').value;
+            const desc = document.getElementById('contact-desc').value;
+
+            if (!name) {
+                alert("Name is required");
+                return;
+            }
+
+            try {
+                const res = await fetch(`/characters/${charId}/contacts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: name, description: desc })
+                });
+                if (res.ok) {
+                    characterData = await res.json();
+                    renderAll();
+                    closeContactModal();
+                } else {
+                    alert("Failed to create contact");
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Error connecting to server");
+            }
+        }
+
 
         async function fetchAbilityTree() {
             try {
@@ -925,7 +997,47 @@
             renderLinks(characterData.links);
             renderItems(characterData.items || []);
             renderMoves(characterData.advances);
+            renderContacts(characterData.contacts);
         }
+
+        function renderContacts(contacts) {
+            const container = document.getElementById('contacts-list');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (!contacts || contacts.length === 0) {
+                container.innerHTML = '<li style="color:var(--dim-text); list-style:none;">No contacts</li>';
+                return;
+            }
+
+            contacts.forEach(contact => {
+                const li = document.createElement('li');
+
+                const header = document.createElement('div');
+                header.style.display = 'flex';
+                header.style.justifyContent = 'space-between';
+                header.style.cursor = 'pointer';
+                header.innerHTML = `<strong>${contact.name}</strong> <span style="font-size:0.8em; color:var(--dim-text)">▼</span>`;
+
+                const desc = document.createElement('div');
+                desc.style.display = 'none';
+                desc.style.marginTop = '5px';
+                desc.style.color = '#aaa';
+                desc.style.fontSize = '0.9em';
+                desc.textContent = contact.description || "No description.";
+
+                header.onclick = () => {
+                    const isHidden = desc.style.display === 'none';
+                    desc.style.display = isHidden ? 'block' : 'none';
+                    header.querySelector('span').textContent = isHidden ? '▲' : '▼';
+                };
+
+                li.appendChild(header);
+                li.appendChild(desc);
+                container.appendChild(li);
+            });
+        }
+
 
         function renderItems(items) {
             const cyberList = document.getElementById('cyberware-list');
