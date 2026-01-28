@@ -77,6 +77,8 @@
             padding-bottom: 10px;
             margin-bottom: 20px;
             margin-right: 25px;
+            padding-right: 240px;
+            /* Space for Voice Link */
         }
 
         .char-title {
@@ -278,17 +280,35 @@
         .ability-node ul {
             padding-left: 20px;
         }
+
+        /* Voice Panel Fixed Style */
+        #voice-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            left: auto;
+            width: 200px;
+            padding: 8px;
+            background: rgba(10, 10, 10, 0.95);
+            border: 1px solid var(--accent-color);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+            border-radius: 6px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
     </style>
 </head>
 
 <body>
 
     <div class="header">
-        <!-- ... header content ... -->
         <div class="char-title">
             <h1 id="char-name" class="glitch">Accessing...</h1>
             <div id="char-playbook" class="char-playbook"></div>
         </div>
+
         <div class="vitals">
             <!-- CP Block (Left) -->
             <div class="vital-block">
@@ -309,6 +329,19 @@
                     <div id="health-bar" class="bar-fill" style="width: 50%;"></div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Voice Panel (Fixed) -->
+    <div id="voice-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; font-size:14px; color:var(--text-color);">VOICE LINK</h3>
+            <span id="ws-status" style="font-size:0.6em; color:var(--dim-text)">OFFLINE</span>
+        </div>
+        <button id="mic-btn"
+            style="width:100%; padding: 5px; font-size:12px; border-radius: 3px; background: #222; color: #fff; border: 1px solid #444; cursor:pointer;">OFF</button>
+        <div id="last-cmd"
+            style="font-family:monospace; color:var(--main-color); min-height:12px; font-size: 0.8em; margin-top:2px; text-align:center;">
         </div>
     </div>
 
@@ -357,21 +390,8 @@
                         onclick="openContactModal()">[+ ADD]</span></h3>
                 <ul id="contacts-list" class="item-list"></ul>
             </div>
-
-            <div id="voice-panel" class="panel-box" style="border-top: 1px solid #333; padding-top: 10px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <h3 style="margin:0">Voice Link</h3>
-                    <span id="ws-status" style="font-size:0.7em; color:var(--dim-text)">OFFLINE</span>
-                </div>
-                <div style="text-align:center; margin-bottom: 10px;">
-                    <button id="mic-btn"
-                        style="width:100%; padding: 15px; font-size:1.2em; border-radius: 5px; background: #222; color: #fff; border: 1px solid #444;">OFF</button>
-                </div>
-                <div id="last-cmd"
-                    style="font-family:monospace; color:var(--main-color); min-height:20px; font-size: 0.9em; border-top:1px dashed #333; padding-top:5px;">
-                </div>
-            </div>
         </div>
+    </div>
     </div> <!-- End Container -->
 
     <!-- Contact Modal -->
