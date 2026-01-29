@@ -1,0 +1,291 @@
+:root {
+    --bg-color: #050505;
+    --panel-bg: #0a0a0a;
+    --main-color: #00f3ff;
+    /* Cyan */
+    --accent-color: #ff0055;
+    /* Pink */
+    --text-color: #e0e0e0;
+    --dim-text: #666;
+    --border-color: #333;
+    --glow-text: 0 0 5px rgba(0, 243, 255, 0.7);
+    --glow-box: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
+body {
+    background-color: var(--bg-color);
+    background-image: url('/static/cyberpunk-bg.png');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+    /* Cyberpunkish font */
+    margin: 0;
+    padding: 20px;
+    overflow-x: hidden;
+}
+
+/* Scanline effect */
+body::before {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 1000;
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+}
+
+h1,
+h2,
+h3 {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--main-color);
+    text-shadow: var(--glow-text);
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 300px 1fr 400px;
+    /* Narrower left, Wider right */
+    grid-gap: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    margin-right: 25px;
+    padding-right: 240px;
+    /* Space for Voice Link */
+}
+
+.char-title {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+#char-name {
+    font-size: 48px;
+    margin: 0;
+    padding-left: 25px;
+    color: var(--text-color);
+    text-shadow: none;
+    letter-spacing: 1px;
+}
+
+#char-playbook {
+    font-size: 25px;
+    padding-left: 25px;
+    font-weight: bold;
+    color: var(--main-color);
+    text-transform: uppercase;
+    text-shadow: var(--glow-text);
+    line-height: 1;
+}
+
+.vitals {
+    text-align: right;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    width: auto;
+    align-items: flex-end;
+}
+
+.vital-block {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 250px;
+}
+
+.bar-container {
+    width: 100%;
+    height: 8px;
+    background: #222;
+    border: 1px solid #444;
+}
+
+.bar-fill {
+    height: 100%;
+    background: var(--accent-color);
+    box-shadow: 0 0 5px var(--accent-color);
+    transition: width 0.3s ease;
+}
+
+/* Links Hexes */
+.links-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.link-item {
+    display: grid;
+    grid-template-columns: 50px 1fr;
+    gap: 10px;
+    align-items: center;
+}
+
+.stat-hex {
+    width: 140px;
+    /* Force smaller width to fit 2 per row */
+    height: auto;
+}
+
+/* Update move usability via panel bg */
+.main-panel {
+    background-color: rgba(10, 10, 10, 0.95);
+    /* More opaque */
+    border: 1px solid var(--border-color);
+    padding: 20px;
+    box-shadow: var(--glow-box);
+}
+
+.hex-path {
+    fill: rgba(30, 30, 30, 0.9);
+    stroke: var(--main-color);
+    stroke-width: 2px;
+    vector-effect: non-scaling-stroke;
+}
+
+.stat-label-text {
+    font-size: 13px;
+    fill: var(--main-color);
+    text-anchor: middle;
+    dominant-baseline: middle;
+    font-family: 'Share Tech Mono', monospace;
+    text-transform: uppercase;
+    text-shadow: 0 0 2px var(--main-color);
+    letter-spacing: 1px;
+}
+
+.stat-label {
+    font-size: 0.3em;
+    color: var(--dim-text);
+    text-transform: uppercase;
+}
+
+.stat-value-text {
+    font-size: 44px;
+    /* Slightly larger relative to smaller hex? Or keeping scale */
+    fill: #fff;
+    /* Force white text */
+    text-anchor: middle;
+    dominant-baseline: central;
+    font-family: 'Share Tech Mono', monospace;
+    text-shadow: 0 0 5px var(--main-color);
+}
+
+.link-hex {
+    width: 50px;
+    height: 50px;
+    position: relative;
+}
+
+.link-input {
+    background: rgba(0, 0, 0, 0.5);
+    /* More opaque input */
+    border: 1px solid var(--dim-text);
+    color: var(--text-color);
+    padding: 5px;
+    font-family: inherit;
+    width: 100%;
+}
+
+/* Stat Row Grid Correction */
+.stat-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    justify-items: center;
+    /* Center hexes in their cells */
+}
+
+/* Stat control buttons */
+.stat-btn {
+    font-size: 20px;
+    fill: var(--dim-text);
+    cursor: pointer;
+    user-select: none;
+    transition: fill 0.2s;
+    font-family: sans-serif;
+    /* Clearer symbols */
+}
+
+.stat-btn:hover {
+    fill: var(--main-color);
+}
+
+.right-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.panel-box {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    box-shadow: var(--glow-box);
+}
+
+.voice-active {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 10px var(--accent-color);
+}
+
+.item-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.item-list li {
+    padding: 5px;
+    border-left: 2px solid #333;
+    margin-bottom: 5px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Markdown content styles */
+.ability-node p {
+    margin: 5px 0;
+}
+
+.ability-node ul {
+    padding-left: 20px;
+}
+
+/* Voice Panel Fixed Style */
+#voice-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    left: auto;
+    width: 200px;
+    padding: 8px;
+    background: rgba(10, 10, 10, 0.95);
+    border: 1px solid var(--accent-color);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+    border-radius: 6px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
