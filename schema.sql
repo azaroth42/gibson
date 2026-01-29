@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS character_items (
     character_id INTEGER REFERENCES characters(id) ON DELETE CASCADE,
     item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
     name TEXT,
+    description TEXT,
     tags TEXT[],
     added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

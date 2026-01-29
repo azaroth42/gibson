@@ -565,24 +565,31 @@ async def get_character_internal(conn, char_id: int) -> Character:
 
     # Fetch items
     item_rows = await conn.fetch("""
-        SELECT ci.id, ci.item_id, ci.name as custom_name, ci.tags as custom_tags,
-               i.name as base_name, i.description, i.tags as base_tags,
+        SELECT ci.id, ci.item_id, ci.name as custom_name, ci.tags as custom_tags, ci.description as custom_description,
+               i.name as base_name, i.description as base_description, i.tags as base_tags,
                i.type, i.stress
         FROM character_items ci
         JOIN items i ON ci.item_id = i.id
         WHERE ci.character_id = $1
+        ORDER BY i.name
     """, char_id)
     
     char_data['items'] = []
     for r in item_rows:
         name = r['custom_name'] if r['custom_name'] else r['base_name']
-        tags = (r['base_tags'] or []) + (r['custom_tags'] or [])
+        description = r['custom_description'] if r['custom_description'] is not None else r['base_description']
+        base_tags = r['base_tags'] or []
+        custom_tags = r['custom_tags'] or []
+        
+        # Tags for display are merged, but we keep them separate for the UI logic
         char_data['items'].append({
             "id": r['id'], 
             "item_id": r['item_id'],
             "name": name,
-            "description": r['description'],
-            "tags": tags,
+            "description": description,
+            "tags": base_tags + custom_tags,
+            "base_tags": base_tags,
+            "custom_tags": custom_tags,
             "type": r['type'],
             "stress": r['stress']
         })
@@ -594,8 +601,6 @@ async def get_character_internal(conn, char_id: int) -> Character:
         WHERE character_id = $1
         ORDER BY id
     """, char_id)
-    
-    char_data['links'] = [dict(r) for r in link_rows]
     
     char_data['links'] = [dict(r) for r in link_rows]
     
@@ -617,6 +622,30 @@ async def get_character_internal(conn, char_id: int) -> Character:
         })
 
     return Character(**char_data)
+
+@app.put("/characters/{char_id}/items/{item_id}")
+async def update_character_item(char_id: int, item_id: int, update: CharacterItemUpdate):
+    """
+    Updates the custom tags and description for a specific character item.
+    """
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        # Check ownership
+        row = await conn.fetchrow("SELECT id FROM character_items WHERE id = $1 AND character_id = $2", item_id, char_id)
+        if not row:
+            raise HTTPException(status_code=404, detail="Item not found")
+        
+        if update.tags is not None:
+            await conn.execute("UPDATE character_items SET tags = $1 WHERE id = $2", update.tags, item_id)
+            
+        if update.description is not None:
+            await conn.execute("UPDATE character_items SET description = $1 WHERE id = $2", update.description, item_id)
+        
+        # Return updated character
+        updated_character = await get_character_internal(conn, char_id)
+        
+    await broadcast_tabletop(app, {"type": "character_update", "payload": updated_character.model_dump()})
+    return updated_character
 
 
 @app.put("/api/moves/{move_id}")

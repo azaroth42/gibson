@@ -1058,6 +1058,199 @@
         }
 
 
+        async function toggleItem(id) {
+            const el = document.getElementById(`item-details-${id}`);
+            const arrow = document.getElementById(`item-arrow-${id}`);
+            if (el.style.display === 'none') {
+                el.style.display = 'block';
+                arrow.innerHTML = '▼';
+            } else {
+                el.style.display = 'none';
+                arrow.innerHTML = '▶';
+            }
+        }
+
+        async function saveItemUpdate(itemId, updateData) {
+            try {
+                const res = await fetch(`/characters/${charId}/items/${itemId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updateData)
+                });
+                if (res.ok) {
+                    characterData = await res.json();
+                    renderAll();
+                    // Keep details open if we just updated
+                    setTimeout(() => {
+                        const el = document.getElementById(`item-details-${itemId}`);
+                        const arrow = document.getElementById(`item-arrow-${itemId}`);
+                        if (el) {
+                            el.style.display = 'block';
+                            arrow.innerHTML = '▼';
+                        }
+                    }, 50);
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function addTag(itemId) {
+            const input = document.getElementById(`item-tags-input-${itemId}`);
+            const val = input.value.trim();
+            if (!val) return;
+
+            // Get current custom tags from data
+            const item = characterData.items.find(i => i.id === itemId);
+            if (!item) return;
+
+            const newTags = [...(item.custom_tags || [])];
+            if (!newTags.includes(val)) {
+                newTags.push(val);
+                saveItemUpdate(itemId, { tags: newTags });
+            }
+            input.value = '';
+        }
+
+        function removeTag(itemId, tagToRemove) {
+            const item = characterData.items.find(i => i.id === itemId);
+            if (!item) return;
+
+            const newTags = (item.custom_tags || []).filter(t => t !== tagToRemove);
+            saveItemUpdate(itemId, { tags: newTags });
+        }
+
+        function updateDescription(itemId) {
+            const textarea = document.getElementById(`item-desc-${itemId}`);
+            const newDesc = textarea.value;
+            saveItemUpdate(itemId, { description: newDesc });
+        }
+
+        function renderItemRow(item, container, isCyberware) {
+            const div = document.createElement('div');
+            div.style.marginBottom = '5px';
+            div.style.borderLeft = item.stress ? '2px solid var(--accent-color)' : `2px solid ${isCyberware ? 'var(--main-color)' : '#444'}`;
+            div.style.backgroundColor = 'rgba(0,0,0,0.3)';
+
+            // Header
+            const header = document.createElement('div');
+            header.style.padding = '5px';
+            header.style.display = 'flex';
+            header.style.justifyContent = 'space-between';
+            header.style.alignItems = 'center';
+            header.style.cursor = 'pointer';
+            header.onclick = (e) => {
+                // Prevent toggling if clicking directly on a tag or button in header (if any)
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
+                toggleItem(item.id);
+            };
+
+            let html = `<div style="display:flex; align-items:center; gap:5px;">
+                <span id="item-arrow-${item.id}" style="font-size:0.8em; color:var(--dim-text)">▶</span>
+                <strong>${item.name}</strong>`;
+
+            if (item.stress) {
+                html += ` <span style="color:var(--accent-color); font-size:0.8em;">(STRESS)</span>`;
+            }
+
+            // Summary tags (all tags)
+            if (item.tags && item.tags.length > 0) {
+                html += ` <span style="font-size:0.8em; color:var(--dim-text)">[${item.tags.join(', ')}]</span>`;
+            }
+            html += `</div>`;
+            header.innerHTML = html;
+            div.appendChild(header);
+
+            // Details (Hidden by default)
+            const details = document.createElement('div');
+            details.id = `item-details-${item.id}`;
+            details.style.display = 'none';
+            details.style.padding = '10px';
+            details.style.background = 'rgba(255,255,255,0.05)';
+            details.style.borderTop = '1px solid #333';
+
+            // Description Editor
+            const descLabel = document.createElement('div');
+            descLabel.textContent = "Description:";
+            descLabel.style.fontSize = "0.8em";
+            descLabel.style.color = "var(--dim-text)";
+            descLabel.style.marginBottom = "3px";
+            details.appendChild(descLabel);
+
+            const textarea = document.createElement('textarea');
+            textarea.id = `item-desc-${item.id}`;
+            textarea.value = item.description || "";
+            textarea.style.width = "100%";
+            textarea.style.minHeight = "60px";
+            textarea.style.background = "#222";
+            textarea.style.border = "1px solid #444";
+            textarea.style.color = "#ccc";
+            textarea.style.fontSize = "0.9em";
+            textarea.style.marginBottom = "5px";
+            // Auto-save on blur
+            textarea.onblur = () => {
+                if (textarea.value !== (item.description || "")) {
+                    updateDescription(item.id);
+                }
+            };
+            details.appendChild(textarea);
+
+
+            // Tag Editor
+            const tagEditor = document.createElement('div');
+            tagEditor.style.marginTop = '10px';
+            tagEditor.innerHTML = `<div style="font-size:0.8em; color:var(--dim-text); margin-bottom:5px;">Tags:</div>`;
+
+            const tagContainer = document.createElement('div');
+            tagContainer.id = `item-tags-container-${item.id}`;
+            tagContainer.style.display = 'flex';
+            tagContainer.style.flexWrap = 'wrap';
+            tagContainer.style.gap = '5px';
+            tagContainer.style.marginBottom = '5px';
+
+            // Base Tags (Read-only)
+            (item.base_tags || []).forEach(tag => {
+                tagContainer.innerHTML += `<span class="tag-chip base" style="background:#333; color:#888; padding:2px 6px; border-radius:3px; font-size:0.8em; border:1px solid #444; cursor:default;" title="Base Tag (Read-only)">${tag}</span>`;
+            });
+
+            // Custom Tags (Editable)
+            (item.custom_tags || []).forEach(tag => {
+                const chip = document.createElement('span');
+                chip.className = 'tag-chip custom';
+                chip.dataset.tag = tag;
+                chip.style.cssText = "background:var(--main-color); color:#000; padding:2px 6px; border-radius:3px; font-size:0.8em; cursor:pointer;";
+                chip.innerHTML = `${tag} <span style="font-weight:bold; margin-left:3px;">×</span>`;
+                chip.onclick = (e) => { e.stopPropagation(); removeTag(item.id, tag); };
+                tagContainer.appendChild(chip);
+            });
+
+            tagEditor.appendChild(tagContainer);
+
+            // Input for new tags
+            const inputContainer = document.createElement('div');
+            inputContainer.style.display = 'flex';
+            inputContainer.style.gap = '5px';
+
+            const input = document.createElement('input');
+            input.id = `item-tags-input-${item.id}`;
+            input.type = 'text';
+            input.placeholder = "Add tag...";
+            input.style.cssText = "background:#222; border:1px solid #444; color:#fff; padding:3px; font-size:0.8em; width:100px;";
+            input.onkeydown = (e) => { if (e.key === 'Enter') addTag(item.id); };
+
+            const addBtn = document.createElement('button');
+            addBtn.textContent = "+";
+            addBtn.style.cssText = "background:#333; border:1px solid #444; color:#fff; cursor:pointer; padding:0 5px;";
+            addBtn.onclick = () => addTag(item.id);
+
+            inputContainer.appendChild(input);
+            inputContainer.appendChild(addBtn);
+            tagEditor.appendChild(inputContainer);
+
+            details.appendChild(tagEditor);
+            div.appendChild(details);
+
+            container.appendChild(div);
+        }
+
         function renderItems(items) {
             const cyberList = document.getElementById('cyberware-list');
             const gearList = document.getElementById('equipment-list');
@@ -1077,46 +1270,13 @@
             // Render Cyber
             if (cyberItems.length === 0 && cyberList) cyberList.innerHTML = '<li>No chrome installed.</li>';
             else if (cyberList) {
-                cyberItems.forEach(item => {
-                    const li = document.createElement('li');
-                    li.style.marginBottom = '5px';
-                    li.style.borderLeft = item.stress ? '2px solid var(--accent-color)' : '2px solid var(--main-color)';
-                    li.style.paddingLeft = '5px';
-
-                    let html = `<strong>${item.name}</strong>`;
-                    if (item.tags && item.tags.length > 0) {
-                        html += ` <span style="font-size:0.8em; color:var(--dim-text)">[${item.tags.join(', ')}]</span>`;
-                    }
-                    if (item.stress) {
-                        html += ` <span style="color:var(--accent-color); font-size:0.8em;">(STRESS)</span>`;
-                    }
-                    li.innerHTML = html;
-                    cyberList.appendChild(li);
-                });
+                cyberItems.forEach(item => renderItemRow(item, cyberList, true));
             }
 
             // Render Gear
             if (gearItems.length === 0 && gearList) gearList.innerHTML = '<li>No equipment loaded.</li>';
             else if (gearList) {
-                gearItems.forEach(item => {
-                    const li = document.createElement('li');
-                    li.style.marginBottom = '5px';
-                    li.style.borderLeft = '2px solid #444';
-                    li.style.paddingLeft = '5px';
-
-                    let html = `<strong>${item.name}</strong>`;
-                    if (item.tags && item.tags.length > 0) {
-                        html += ` <span style="font-size:0.8em; color:var(--dim-text)">[${item.tags.join(', ')}]</span>`;
-                    }
-                    if (item.description && item.description.length < 50) {
-                        html += ` <span style="font-size:0.8em; color:#888">- ${item.description}</span>`;
-                    } else if (item.description) {
-                        // Long description truncated or tooltip?
-                        html += ` <span title="${item.description.replace(/"/g, '&quot;')}" style="font-size:0.8em; color:#888; cursor:help;">[...]</span>`;
-                    }
-                    li.innerHTML = html;
-                    gearList.appendChild(li);
-                });
+                gearItems.forEach(item => renderItemRow(item, gearList, false));
             }
         }
 
