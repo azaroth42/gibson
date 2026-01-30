@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Gibson - GM Character Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/sheet.css">
+    <style>
+        body {
+            text-align: center;
+        }
+
+        .manager-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: left;
+            background: rgba(10, 10, 10, 0.9);
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--glow-box);
+        }
+
+        .char-select-area {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        select {
+            background: #111;
+            color: var(--main-color);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            font-size: 1.2em;
+            font-family: inherit;
+            width: 300px;
+        }
+
+        .edit-form {
+            display: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-section {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border: 1px solid #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            color: var(--dim-text);
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        input[type="number"] {
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 8px;
+            width: 100%;
+            font-family: inherit;
+            font-size: 1.1em;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .save-btn {
+            background: var(--main-color);
+            color: #000;
+            border: none;
+            padding: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            grid-column: span 2;
+            margin-top: 20px;
+            font-family: inherit;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .save-btn:hover {
+            box-shadow: 0 0 15px var(--main-color);
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 30px;
+            color: #666;
+            text-decoration: none;
+        }
+
+        #status-msg {
+            grid-column: span 2;
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+            height: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Character Manager</h1>
+
+    <div class="manager-container">
+        <div class="char-select-area">
+            <label>Select Character:</label>
+            <select id="char-select" onchange="loadCharacter()">
+                <option value="">-- Choose --</option>
+            </select>
+        </div>
+
+        <div id="edit-area" class="edit-form" style="display:none;">
+            <div class="form-section">
+                <h3 style="margin-top:0; color:var(--accent-color)">Vitals</h3>
+                <div class="form-group">
+                    <label>Current Health</label>
+                    <input type="number" id="health">
+                </div>
+                <div class="form-group">
+                    <label>Max Health</label>
+                    <input type="number" id="max_health">
+                </div>
+                <div class="form-group">
+                    <label>Total Experience (XP)</label>
+                    <input type="number" id="experience">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 style="margin-top:0; color:var(--main-color)">Stats</h3>
+                <div class="stat-grid">
+                    <div class="form-group">
+                        <label>Tough</label>
+                        <input type="number" id="tough" min="-3" max="3">
+                    </div>
+                    <div class="form-group">
+                        <label>Cool</label>
+                        <input type="number" id="cool" min="-3" max="3">
+                    </div>
+                    <div class="form-group">
+                        <label>Sharp</label>
+                        <input type="number" id="sharp" min="-3" max="3">
+                    </div>
+                    <div class="form-group">
+                        <label>Style</label>
+                        <input type="number" id="style" min="-3" max="3">
+                    </div>
+                    <div class="form-group">
+                        <label>Chrome</label>
+                        <input type="number" id="chrome" min="-3" max="3">
+                    </div>
+                </div>
+            </div>
+
+            <button class="save-btn" onclick="saveChanges()">SAVE CHANGES</button>
+            <div id="status-msg"></div>
+        </div>
+    </div>
+
+    <a href="/static/gm.html" class="back-link">&lt; Back to GM Panel</a>
+
+    <script>
+        let currentCharacter = null;
+
+        async function init() {
+            try {
+                const res = await fetch('/characters');
+                const chars = await res.json();
+                const select = document.getElementById('char-select');
+                chars.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = `${c.name} (${c.playbook})`;
+                    select.appendChild(opt);
+                });
+            } catch (e) {
+                console.error("Failed to load characters", e);
+            }
+        }
+
+        async function loadCharacter() {
+            const id = document.getElementById('char-select').value;
+            const container = document.getElementById('edit-area');
+
+            if (!id) {
+                container.style.display = 'none';
+                return;
+            }
+
+            try {
+                const res = await fetch(`/characters/${id}`);
+                const char = await res.json();
+                currentCharacter = char;
+
+                // Populate fields
+                document.getElementById('health').value = char.health;
+                document.getElementById('max_health').value = char.max_health || 25;
+                document.getElementById('experience').value = char.experience || 0;
+
+                document.getElementById('tough').value = char.tough || 0;
+                document.getElementById('cool').value = char.cool || 0;
+                document.getElementById('sharp').value = char.sharp || 0;
+                document.getElementById('style').value = char.style || 0;
+                document.getElementById('chrome').value = char.chrome || 0;
+
+                container.style.display = 'grid';
+
+            } catch (e) {
+                console.error(e);
+                alert("Failed to load character details.");
+            }
+        }
+
+        async function saveChanges() {
+            if (!currentCharacter) return;
+
+            const updates = {
+                health: parseInt(document.getElementById('health').value),
+                max_health: parseInt(document.getElementById('max_health').value),
+                experience: parseInt(document.getElementById('experience').value),
+                tough: parseInt(document.getElementById('tough').value),
+                cool: parseInt(document.getElementById('cool').value),
+                sharp: parseInt(document.getElementById('sharp').value),
+                style: parseInt(document.getElementById('style').value),
+                chrome: parseInt(document.getElementById('chrome').value)
+            };
+
+            const status = document.getElementById('status-msg');
+            status.textContent = "Saving...";
+            status.style.color = "#aaa";
+
+            try {
+                const res = await fetch(`/characters/${currentCharacter.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updates)
+                });
+
+                if (res.ok) {
+                    status.textContent = "UPDATED SUCCESSFULLY";
+                    status.style.color = "var(--main-color)";
+                    // Refresh data just in case
+                    loadCharacter();
+                } else {
+                    status.textContent = "ERROR SAVING";
+                    status.style.color = "red";
+                }
+            } catch (e) {
+                console.error(e);
+                status.textContent = "CONNECTION ERROR";
+                status.style.color = "red";
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
