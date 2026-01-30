@@ -647,6 +647,26 @@ async def update_character_item(char_id: int, item_id: int, update: CharacterIte
     await broadcast_tabletop(app, {"type": "character_update", "payload": updated_character.model_dump()})
     return updated_character
 
+@app.delete("/characters/{char_id}/items/{item_id}")
+async def delete_character_item(char_id: int, item_id: int):
+    """
+    Removes an item from the character.
+    """
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        # Check ownership
+        row = await conn.fetchrow("SELECT id FROM character_items WHERE id = $1 AND character_id = $2", item_id, char_id)
+        if not row:
+            raise HTTPException(status_code=404, detail="Item not found")
+        
+        await conn.execute("DELETE FROM character_items WHERE id = $1", item_id)
+        
+        # Return updated character
+        updated_character = await get_character_internal(conn, char_id)
+        
+    await broadcast_tabletop(app, {"type": "character_update", "payload": updated_character.model_dump()})
+    return updated_character
+
 
 @app.put("/api/moves/{move_id}")
 async def update_move(move_id: int, move: MoveUpdate):

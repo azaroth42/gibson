@@ -200,3 +200,22 @@ function toggleAdvance(key) {
         socket.send(JSON.stringify({ type: 'action', action: 'toggle_advance', key: key }));
     }
 }
+
+async function deleteItem(itemId) {
+    if (!confirm("Are you sure you want to delete this item?")) return;
+
+    try {
+        const res = await fetch(`/characters/${charId}/items/${itemId}`, {
+            method: 'DELETE'
+        });
+        if (res.ok) {
+            characterData = await res.json();
+            renderAll();
+        } else {
+            alert("Failed to delete item");
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Error deleting item");
+    }
+}

@@ -796,6 +796,15 @@
             tagEditor.appendChild(inputContainer);
 
             details.appendChild(tagEditor);
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = "DELETE ITEM";
+            deleteBtn.style.cssText = "background:#700; color:#ddd; border:1px solid #900; padding:5px; margin-top:15px; cursor:pointer; width:100%; font-size:0.7em; letter-spacing:1px;";
+            deleteBtn.onmouseover = () => deleteBtn.style.background = "#f00";
+            deleteBtn.onmouseout = () => deleteBtn.style.background = "#700";
+            deleteBtn.onclick = () => deleteItem(item.id);
+            details.appendChild(deleteBtn);
+
             div.appendChild(details);
 
             container.appendChild(div);
