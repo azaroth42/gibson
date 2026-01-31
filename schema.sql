@@ -115,6 +115,15 @@ CREATE TABLE IF NOT EXISTS dw_items (
     qty INTEGER DEFAULT 1
 );
 
+CREATE TABLE IF NOT EXISTS dw_reference_items (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    tags TEXT[],
+    weight INTEGER DEFAULT 0,
+    class TEXT, -- Nullable if global
+    description TEXT
+);
+
 CREATE TABLE IF NOT EXISTS dw_character_moves (
     id SERIAL PRIMARY KEY,
     character_id INTEGER REFERENCES dw_characters(id) ON DELETE CASCADE,
@@ -126,7 +135,17 @@ CREATE TABLE IF NOT EXISTS dw_character_moves (
 CREATE TABLE IF NOT EXISTS dw_reference_moves (
     id SERIAL PRIMARY KEY,
     class TEXT, -- NULL for Basic Moves
+    min_level INTEGER DEFAULT 1,
+    requires TEXT, -- Name of move required
+    replaces TEXT, -- Name of move replaced
+    type TEXT DEFAULT 'basic' -- basic, starting, advanced
+);
+
+CREATE TABLE IF NOT EXISTS dw_character_options (
+    id SERIAL PRIMARY KEY,
+    class TEXT NOT NULL,
+    type TEXT NOT NULL, -- 'alignment' or 'race'
     name TEXT NOT NULL,
     description TEXT NOT NULL,
-    type TEXT DEFAULT 'basic' -- basic, starting, advanced
+    UNIQUE(class, type, name)
 );

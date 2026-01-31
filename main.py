@@ -140,6 +140,32 @@ async def list_reference_moves(
         rows = await conn.fetch(query, *args)
         return [DWReferenceMove(**dict(r)) for r in rows]
 
+@app.get("/dw/options")
+async def list_character_options(
+    hero_class: Optional[str] = None,
+    type: Optional[str] = None
+):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        query = "SELECT * FROM dw_character_options WHERE 1=1"
+        args = []
+        i = 1
+        if hero_class:
+             # Match "Bard" against "The Bard" or "Bard"
+             # i.e. class ends with hero_class (case insensitive)
+             query += f" AND lower(class) LIKE '%' || lower(${i})"
+             args.append(hero_class)
+             i += 1
+        if type:
+             query += f" AND type = ${i}"
+             args.append(type)
+             i += 1
+             
+        query += " ORDER BY type, name"
+        rows = await conn.fetch(query, *args)
+        # Return simple list of dicts
+        return [dict(r) for r in rows]
+
 @app.post("/dw/reference-moves", response_model=DWReferenceMove)
 async def create_reference_move(move: DWReferenceMoveCreate):
     pool = app.state.pool
@@ -199,7 +225,7 @@ async def create_dw_character(char: DWCharacterCreate):
         # Create character
         row = await conn.fetchrow("""
             INSERT INTO dw_characters (name, hero_class, level, xp, str, dex, con, "int", wis, cha, current_hp, max_hp)
-            VALUES ($1, $2, 1, 0, 10, 10, 10, 10, 10, 10, 20, 20)
+            VALUES ($1, $2, 1, 0, 8, 8, 8, 8, 8, 8, 20, 20)
             RETURNING *
         """, char.name, char.hero_class)
         
