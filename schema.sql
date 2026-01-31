@@ -134,6 +134,8 @@ CREATE TABLE IF NOT EXISTS dw_character_moves (
 
 CREATE TABLE IF NOT EXISTS dw_reference_moves (
     id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
     class TEXT, -- NULL for Basic Moves
     min_level INTEGER DEFAULT 1,
     requires TEXT, -- Name of move required
