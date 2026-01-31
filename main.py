@@ -12,8 +12,6 @@ from hypercorn.config import Config
 import asyncio
 import tempfile
 from parakeet_mlx import from_pretrained
-import soundfile as sf
-
 from db import init_db, get_db_pool
 
 @asynccontextmanager
@@ -116,6 +114,248 @@ async def create_character(char: CharacterCreate):
         new_char = await get_character_internal(conn, row['id'])
         await broadcast_tabletop(app, {"type": "character_update", "payload": new_char.model_dump()})
         return new_char
+
+# Dungeon World Endpoints
+
+@app.get("/dw/reference-moves", response_model=List[DWReferenceMove])
+async def list_reference_moves(
+    hero_class: Optional[str] = None, 
+    type: Optional[str] = None
+):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        query = "SELECT * FROM dw_reference_moves WHERE 1=1"
+        args = []
+        i = 1
+        if hero_class:
+            query += f" AND lower(class) = lower(${i})"
+            args.append(hero_class)
+            i += 1
+        if type:
+            query += f" AND type = ${i}"
+            args.append(type)
+            i += 1
+            
+        query += " ORDER BY class, type, name"
+        rows = await conn.fetch(query, *args)
+        return [DWReferenceMove(**dict(r)) for r in rows]
+
+@app.get("/dw/options")
+async def list_character_options(
+    hero_class: Optional[str] = None,
+    type: Optional[str] = None
+):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        query = "SELECT * FROM dw_character_options WHERE 1=1"
+        args = []
+        i = 1
+        if hero_class:
+             # Match "Bard" against "The Bard" or "Bard"
+             # i.e. class ends with hero_class (case insensitive)
+             query += f" AND lower(class) LIKE '%' || lower(${i})"
+             args.append(hero_class)
+             i += 1
+        if type:
+             query += f" AND type = ${i}"
+             args.append(type)
+             i += 1
+             
+        query += " ORDER BY type, name"
+        rows = await conn.fetch(query, *args)
+        # Return simple list of dicts
+        return [dict(r) for r in rows]
+
+@app.post("/dw/reference-moves", response_model=DWReferenceMove)
+async def create_reference_move(move: DWReferenceMoveCreate):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow("""
+            INSERT INTO dw_reference_moves (name, description, class, type)
+            VALUES ($1, $2, $3, $4)
+            RETURNING *
+        """, move.name, move.description, move.class_name, move.type)
+        return DWReferenceMove(**dict(row))
+
+@app.put("/dw/reference-moves/{move_id}", response_model=DWReferenceMove)
+async def update_reference_move(move_id: int, update: DWReferenceMoveUpdate):
+    pool = app.state.pool
+    update_data = update.model_dump(exclude_unset=True)
+    
+    if not update_data:
+        async with pool.acquire() as conn:
+            row = await conn.fetchrow("SELECT * FROM dw_reference_moves WHERE id = $1", move_id)
+            if not row: raise HTTPException(status_code=404, detail="Move not found")
+            return DWReferenceMove(**dict(row))
+
+    set_clauses = []
+    values = []
+    
+    if 'class_name' in update_data:
+        update_data['class'] = update_data.pop('class_name')
+        
+    for i, (key, value) in enumerate(update_data.items(), start=1):
+        set_clauses.append(f"{key} = ${i}")
+        values.append(value)
+        
+    values.append(move_id)
+    query = f"UPDATE dw_reference_moves SET {', '.join(set_clauses)} WHERE id = ${len(values)} RETURNING *"
+    
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(query, *values)
+        if not row:
+             raise HTTPException(status_code=404, detail="Move not found")
+        return DWReferenceMove(**dict(row))
+
+@app.delete("/dw/reference-moves/{move_id}", status_code=204)
+async def delete_reference_move(move_id: int):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        result = await conn.execute("DELETE FROM dw_reference_moves WHERE id = $1", move_id)
+        if result == "DELETE 0":
+            raise HTTPException(status_code=404, detail="Move not found")
+    return None
+
+
+
+@app.post("/dw/characters", response_model=DWCharacter)
+async def create_dw_character(char: DWCharacterCreate):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        # Create character
+        row = await conn.fetchrow("""
+            INSERT INTO dw_characters (name, hero_class, level, xp, str, dex, con, "int", wis, cha, current_hp, max_hp)
+            VALUES ($1, $2, 1, 0, 8, 8, 8, 8, 8, 8, 20, 20)
+            RETURNING *
+        """, char.name, char.hero_class)
+        
+        char_id = row['id']
+        
+        # Populate Starting Moves
+        # 1. Fetch relevant reference moves
+        target_moves = await conn.fetch("""
+            SELECT id FROM dw_reference_moves 
+            WHERE 
+                (lower(class) = lower($1) AND type = 'starting')
+                OR 
+                (type = 'basic')
+                OR 
+                (type = 'special')
+        """, char.hero_class)
+        
+        # 2. Insert into join table
+        if target_moves:
+             records = [(char_id, m['id']) for m in target_moves]
+             await conn.executemany(
+                 "INSERT INTO dw_character_moves (character_id, move_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+                 records
+             )
+            
+        return await get_dw_character_internal(conn, char_id)
+
+@app.delete("/dw/characters/{char_id}", status_code=204)
+async def delete_dw_character(char_id: int):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        result = await conn.execute("DELETE FROM dw_characters WHERE id = $1", char_id)
+        if result == "DELETE 0":
+            raise HTTPException(status_code=404, detail="Character not found")
+    return None
+
+@app.get("/dw/characters", response_model=List[DWCharacter])
+async def list_dw_characters():
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        rows = await conn.fetch('SELECT *, "int" as int_stat FROM dw_characters ORDER BY id')
+        result = []
+        for row in rows:
+            data = dict(row)
+            result.append(DWCharacter(**data))
+        return result
+
+@app.get("/dw/characters/{char_id}", response_model=DWCharacter)
+async def get_dw_character(char_id: int):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        return await get_dw_character_internal(conn, char_id)
+
+@app.put("/dw/characters/{char_id}", response_model=DWCharacter)
+async def update_dw_character(char_id: int, update: DWCharacterUpdate):
+    pool = app.state.pool
+    update_data = update.model_dump(exclude_unset=True)
+    
+    if not update_data:
+        return await get_dw_character(char_id)
+
+    set_clauses = []
+    values = []
+    
+    # Handle 'int_stat' -> 'int' mapping
+    if 'int_stat' in update_data:
+        update_data['int'] = update_data.pop('int_stat')
+        
+    # Handle 'strength' -> 'str' mapping
+    if 'strength' in update_data:
+        update_data['str'] = update_data.pop('strength')
+        
+    for i, (key, value) in enumerate(update_data.items(), start=1):
+        # Quote "int" column
+        col = f'"{key}"' if key == 'int' else key
+        set_clauses.append(f"{col} = ${i}")
+        values.append(value)
+        
+    values.append(char_id)
+    
+    query = f"UPDATE dw_characters SET {', '.join(set_clauses)} WHERE id = ${len(values)}"
+    
+    async with pool.acquire() as conn:
+        await conn.execute(query, *values)
+        return await get_dw_character_internal(conn, char_id)
+
+@app.delete("/dw/characters/{char_id}/items/{item_id}")
+async def delete_dw_item(char_id: int, item_id: int):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        await conn.execute("DELETE FROM dw_items WHERE id = $1 AND character_id = $2", item_id, char_id)
+        return await get_dw_character_internal(conn, char_id)
+
+@app.post("/dw/characters/{char_id}/items")
+async def add_dw_item(char_id: int, item: DWItemAdd):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        await conn.execute("""
+            INSERT INTO dw_items (character_id, name, description, tags, weight, qty)
+            VALUES ($1, $2, $3, $4, $5, $6)
+        """, char_id, item.name, item.description, item.tags, item.weight, item.qty)
+        return await get_dw_character_internal(conn, char_id)
+
+async def get_dw_character_internal(conn, char_id: int) -> DWCharacter:
+    row = await conn.fetchrow("""
+        SELECT *, "int" as int_stat FROM dw_characters WHERE id = $1
+    """, char_id)
+    
+    if not row:
+        raise HTTPException(status_code=404, detail="Character not found")
+        
+    data = dict(row)
+    
+    # Items
+    items = await conn.fetch("SELECT * FROM dw_items WHERE character_id = $1", char_id)
+    data['items'] = [dict(i) for i in items]
+    
+    # Moves (Joined)
+    moves = await conn.fetch("""
+        SELECT rm.id, rm.name, rm.description, rm.type, rm.class
+        FROM dw_character_moves cm
+        JOIN dw_reference_moves rm ON cm.move_id = rm.id
+        WHERE cm.character_id = $1
+        ORDER BY 
+            CASE WHEN rm.type = 'basic' THEN 1 ELSE 2 END, 
+            rm.name
+    """, char_id)
+    data['moves'] = [dict(m) for m in moves]
+    
+    return DWCharacter(**data)
 
 @app.get("/characters", response_model=List[Character])
 async def list_characters():

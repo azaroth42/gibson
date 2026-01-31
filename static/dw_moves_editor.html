@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>DW Moves Editor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Merriweather&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/dw_sheet.css">
+    <style>
+        .editor-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4e4bc;
+            font-family: 'Cinzel', serif;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .actions {
+            white-space: nowrap;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 3px double #855;
+            width: 600px;
+            border-radius: 5px;
+            font-family: 'Merriweather', serif;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            /* Overriding default input style from sheet css */
+            border-radius: 4px;
+            font-family: inherit;
+            background: white;
+            text-align: left;
+        }
+
+        textarea {
+            height: 150px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1 style="text-align:center;">Dungeon World Moves Editor</h1>
+
+    <div class="editor-container">
+        <div style="display:flex; gap:10px; margin-bottom:20px;">
+            <select id="filter-class" onchange="loadMoves()">
+                <option value="">All Classes</option>
+                <option value="Basic">Basic Moves</option>
+                <option value="The Bard">The Bard</option>
+                <option value="The Cleric">The Cleric</option>
+                <option value="The Druid">The Druid</option>
+                <option value="The Fighter">The Fighter</option>
+                <option value="The Paladin">The Paladin</option>
+                <option value="The Ranger">The Ranger</option>
+                <option value="The Thief">The Thief</option>
+                <option value="The Wizard">The Wizard</option>
+            </select>
+            <select id="filter-type" onchange="loadMoves()">
+                <option value="">All Types</option>
+                <option value="basic">Basic</option>
+                <option value="starting">Starting</option>
+                <option value="advanced">Advanced</option>
+                <option value="special">Special</option>
+            </select>
+            <button class="btn" onclick="openModal()">Add Move</button>
+            <a href="/" class="btn" style="text-decoration:none; margin-left:auto;">Back to Home</a>
+        </div>
+
+        <table id="moves-table">
+            <thead>
+                <tr>
+                    <th>Class</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Description Preview</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="moveCheckModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Add Move</h2>
+            <div class="form-group">
+                <label>Class</label>
+                <input type="text" id="edit-class" placeholder="e.g. The Bard (Leave empty for Basic/Special)">
+            </div>
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="edit-name">
+            </div>
+            <div class="form-group">
+                <label>Type</label>
+                <select id="edit-type">
+                    <option value="basic">Basic</option>
+                    <option value="starting">Starting</option>
+                    <option value="advanced">Advanced</option>
+                    <option value="special">Special</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="edit-desc"></textarea>
+            </div>
+            <div style="text-align:right;">
+                <button class="btn" onclick="closeModal()" style="background:#ccc; color:#333;">Cancel</button>
+                <button class="btn" onclick="saveMove()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMoveId = null;
+
+        async function loadMoves() {
+            const cls = document.getElementById('filter-class').value;
+            const type = document.getElementById('filter-type').value;
+
+            let url = '/dw/reference-moves?';
+            if (cls === 'Basic') {
+                // Special handling if user picks Basic, API expects null for class basic moves?
+                // Wait, logic in main.py:
+                // if hero_class: query += " AND lower(class) = lower($i)"
+                // Basic moves have class NULL.
+                // So filter-class "Basic" needs to map to some logic, or I assume API handles it?
+                // main.py doesn't have an explicit 'class is null' filter param besides omitting class.
+                // But omitting class returns ALL.
+                // I might need to update API to allow explicit 'null' or just handle client side.
+                // Let's simpler: If "Basic" selected, we want rows where class is null.
+                // Revisiting API: 
+                // list_reference_moves(hero_class: Optional[str] = None ...
+                // If I pass nothing, I get all.
+                // If I pass "Basic", it searches for class="Basic". My seed data uses "Basic" or NULL?
+                // Schema says: class TEXT, -- NULL for Basic Moves
+                // Seed script: m['class'] is None for Basic.
+                // So I can't filter for NULL via the current API unless I add a param like `is_basic=true`.
+                // Or I fetch all and filter in JS. Given 200 moves, fetching all is fine.
+            }
+
+            const res = await fetch(url);
+            let moves = await res.json();
+
+            // Client side filtering for better control
+            const filterClass = document.getElementById('filter-class').value;
+            if (filterClass === 'Basic') {
+                moves = moves.filter(m => !m.class);
+            } else if (filterClass) {
+                moves = moves.filter(m => m.class && m.class.toLowerCase() === filterClass.toLowerCase());
+            }
+
+            if (type) {
+                moves = moves.filter(m => m.type === type);
+            }
+
+            const tbody = document.querySelector('#moves-table tbody');
+            tbody.innerHTML = '';
+
+            moves.forEach(m => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${m.class || 'Basic'}</td>
+                    <td>${m.name}</td>
+                    <td>${m.type}</td>
+                    <td>${m.description.substring(0, 50)}...</td>
+                    <td class="actions">
+                        <button class="btn" onclick="editMove(${m.id})">Edit</button>
+                        <button class="btn" onclick="deleteMove(${m.id})" style="background:#a33;">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function saveMove() {
+            const data = {
+                class: document.getElementById('edit-class').value || null,
+                name: document.getElementById('edit-name').value,
+                type: document.getElementById('edit-type').value,
+                description: document.getElementById('edit-desc').value
+            };
+
+            const method = currentMoveId ? 'PUT' : 'POST';
+            const url = currentMoveId ? `/dw/reference-moves/${currentMoveId}` : '/dw/reference-moves';
+
+            const res = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                closeModal();
+                loadMoves();
+            } else {
+                alert("Error saving move");
+            }
+        }
+
+        async function deleteMove(id) {
+            if (!confirm("Are you sure? This will not remove the move from existing characters.")) return;
+
+            const res = await fetch(`/dw/reference-moves/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                loadMoves();
+            } else {
+                alert("Error deleting move");
+            }
+        }
+
+        async function editMove(id) {
+            currentMoveId = id;
+            document.getElementById('modal-title').innerText = "Edit Move";
+
+            // Fetch latest details (or use local if I stored it)
+            // Just assume listing has fields? No listing truncated desc.
+            // But I returned full objects in list_reference_moves.
+            // I'll define moves globally or fetch single.
+            // Let's fetch single to be safe? Or simple filter.
+            // I'll fetch list again? No, I'll fetch single if I had an endpoint but I do:
+            // But endpoints in main.py:
+            // update_reference_move returns updated.
+            // list returns list.
+            // I don't have GET single reference move?
+            // Actually I implemented update and delete. I didn't verify GET single.
+            // Oh, I didn't implement GET /dw/reference-moves/{id} in main.py!
+            // I only have PUT and DELETE.
+            // Checking plan... Plan said "PUT ... Update".
+            // I'll just use the data from the row if I save it on the element or fetch list.
+            // I'll just store the last fetched list in a global var.
+
+            const moves = await (await fetch('/dw/reference-moves')).json();
+            const move = moves.find(m => m.id === id);
+
+            document.getElementById('edit-class').value = move.class || "";
+            document.getElementById('edit-name').value = move.name;
+            document.getElementById('edit-type').value = move.type;
+            document.getElementById('edit-desc').value = move.description;
+
+            document.getElementById('moveCheckModal').style.display = 'block';
+        }
+
+        function openModal() {
+            currentMoveId = null;
+            document.getElementById('modal-title').innerText = "Add Move";
+            document.getElementById('edit-class').value = "";
+            document.getElementById('edit-name').value = "";
+            document.getElementById('edit-type').value = "starting";
+            document.getElementById('edit-desc').value = "";
+            document.getElementById('moveCheckModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('moveCheckModal').style.display = 'none';
+        }
+
+        // Initial load
+        loadMoves();
+    </script>
+</body>
+
+</html>

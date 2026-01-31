@@ -78,3 +78,76 @@ CREATE TABLE IF NOT EXISTS game_state (
     id SERIAL PRIMARY KEY,
     map_image TEXT
 );
+
+CREATE TABLE IF NOT EXISTS dw_characters (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    hero_class TEXT NOT NULL,
+    level INTEGER DEFAULT 1,
+    xp INTEGER DEFAULT 0,
+    -- Stats
+    str INTEGER DEFAULT 10,
+    dex INTEGER DEFAULT 10,
+    con INTEGER DEFAULT 10,
+    "int" INTEGER DEFAULT 10,
+    wis INTEGER DEFAULT 10,
+    cha INTEGER DEFAULT 10,
+    -- Vitals
+    current_hp INTEGER DEFAULT 10,
+    max_hp INTEGER DEFAULT 10,
+    armor INTEGER DEFAULT 0,
+    damage_die TEXT DEFAULT 'd6',
+    -- RP
+    alignment TEXT,
+    look TEXT,
+    race TEXT,
+    coin INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS dw_items (
+    id SERIAL PRIMARY KEY,
+    character_id INTEGER REFERENCES dw_characters(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    description TEXT,
+    tags TEXT[],
+    weight INTEGER DEFAULT 0,
+    qty INTEGER DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS dw_reference_items (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    tags TEXT[],
+    weight INTEGER DEFAULT 0,
+    class TEXT, -- Nullable if global
+    description TEXT
+);
+
+CREATE TABLE IF NOT EXISTS dw_character_moves (
+    id SERIAL PRIMARY KEY,
+    character_id INTEGER REFERENCES dw_characters(id) ON DELETE CASCADE,
+    move_id INTEGER REFERENCES dw_reference_moves(id) ON DELETE CASCADE,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(character_id, move_id)
+);
+
+CREATE TABLE IF NOT EXISTS dw_reference_moves (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    class TEXT, -- NULL for Basic Moves
+    min_level INTEGER DEFAULT 1,
+    requires TEXT, -- Name of move required
+    replaces TEXT, -- Name of move replaced
+    type TEXT DEFAULT 'basic' -- basic, starting, advanced
+);
+
+CREATE TABLE IF NOT EXISTS dw_character_options (
+    id SERIAL PRIMARY KEY,
+    class TEXT NOT NULL,
+    type TEXT NOT NULL, -- 'alignment' or 'race'
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    UNIQUE(class, type, name)
+);
