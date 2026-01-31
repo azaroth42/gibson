@@ -62,7 +62,8 @@
     </div>
 
     <script>
-        const charId = window.location.pathname.split('/').pop();
+        const urlParams = new URLSearchParams(window.location.search);
+        const charId = urlParams.get('id');
         let charData = null;
 
         const STATS = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
@@ -93,19 +94,8 @@
             statsDiv.innerHTML = '';
             STATS.forEach(key => {
                 // Determine actual key from data (int_stat vs int)
-                const val = (key === 'int') ? charData.int_stat : charData[key];
+                const val = charData[key];
                 const mod = Math.floor((val - 10) / 2) || 0; // Handle 0? DW stat range 3-18 usually.
-                // 1-3:-3, 4-5:-2, 6-8:-1, 9-12:0, 13-15:+1, 16-17:+2, 18:+3
-                // Standard formula (val-10)/2 floor is roughly correct?
-                // 18-10=8/2=4 (Incorrect, max +3).
-                // DW lookup:
-                // 18 => +3
-                // 16-17 => +2
-                // 13-15 => +1
-                // 9-12 => 0
-                // 6-8 => -1
-                // 4-5 => -2
-                // <=3 => -3
 
                 let actualMod = 0;
                 if (val >= 18) actualMod = 3;
@@ -131,20 +121,27 @@
             // Moves
             const movesDiv = document.getElementById('moves-container');
             movesDiv.innerHTML = '';
-            charData.moves.forEach(m => {
-                const card = document.createElement('div');
-                card.className = 'move-card';
-                card.innerHTML = `
-                    <div class="move-header" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display==='none'?'block':'none'">
-                        <span>${m.name}</span>
-                        <span style="font-size:0.8em; color:#888;">${m.type}</span>
-                    </div>
-                    <div class="move-desc" style="display:block;">
-                        ${marked.parse(m.description || "")}
-                    </div>
-                `;
-                movesDiv.appendChild(card);
-            });
+
+            const classMoves = charData.moves.filter(m => m.type !== 'basic' && m.type !== 'special');
+            const basicMoves = charData.moves.filter(m => m.type === 'basic');
+            const specialMoves = charData.moves.filter(m => m.type === 'special');
+
+            // 1. Class Moves (Always visible)
+            if (classMoves.length > 0) {
+                const header = document.createElement('h3');
+                header.textContent = 'Class Moves';
+                movesDiv.appendChild(header);
+
+                classMoves.forEach(m => {
+                    movesDiv.appendChild(createMoveCard(m, true));
+                });
+            }
+
+            // 2. Basic Moves (Collapsible Section)
+            renderMoveSection(movesDiv, 'Basic Moves', basicMoves, false);
+
+            // 3. Special Moves (Collapsible Section)
+            renderMoveSection(movesDiv, 'Special Moves', specialMoves, false);
 
             // Gear
             const gearDiv = document.getElementById('gear-container');
@@ -161,6 +158,52 @@
                 gearDiv.appendChild(row);
             });
             document.getElementById('load').textContent = totalLoad;
+        }
+
+        function renderMoveSection(container, title, moves, startExpanded) {
+            if (moves.length === 0) return;
+
+            const wrapper = document.createElement('div');
+            wrapper.style.marginBottom = '20px';
+
+            const header = document.createElement('div');
+            header.className = 'section-header';
+            header.style.cssText = "cursor:pointer; font-family:'Cinzel',serif; color:#522; font-size:1.2em; font-weight:bold; border-bottom:1px solid #522; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;";
+            header.innerHTML = `<span>${title} (${moves.length})</span> <span style="font-size:0.8em;">${startExpanded ? '▼' : '▶'}</span>`;
+
+            const content = document.createElement('div');
+            content.style.display = startExpanded ? 'block' : 'none';
+
+            header.onclick = () => {
+                const isHidden = content.style.display === 'none';
+                content.style.display = isHidden ? 'block' : 'none';
+                header.lastElementChild.textContent = isHidden ? '▼' : '▶';
+            };
+
+            moves.forEach(m => {
+                content.appendChild(createMoveCard(m, false));
+            });
+
+            wrapper.appendChild(header);
+            wrapper.appendChild(content);
+            container.appendChild(wrapper);
+        }
+
+        function createMoveCard(m, defaultDescVisible = false) {
+            const card = document.createElement('div');
+            card.className = 'move-card';
+            const displayStyle = defaultDescVisible ? 'block' : 'none';
+
+            card.innerHTML = `
+                <div class="move-header" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display==='none'?'block':'none'">
+                    <span>${m.name}</span>
+                    <span style="font-size:0.8em; color:#888;">${m.type}</span>
+                </div>
+                <div class="move-desc" style="display:${displayStyle};">
+                    ${marked.parse(m.description || "")}
+                </div>
+             `;
+            return card;
         }
 
         fetchChar();

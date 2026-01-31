@@ -115,8 +115,15 @@ CREATE TABLE IF NOT EXISTS dw_items (
     qty INTEGER DEFAULT 1
 );
 
-DROP TABLE IF EXISTS dw_reference_moves;
-CREATE TABLE dw_reference_moves (
+CREATE TABLE IF NOT EXISTS dw_character_moves (
+    id SERIAL PRIMARY KEY,
+    character_id INTEGER REFERENCES dw_characters(id) ON DELETE CASCADE,
+    move_id INTEGER REFERENCES dw_reference_moves(id) ON DELETE CASCADE,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(character_id, move_id)
+);
+
+CREATE TABLE IF NOT EXISTS dw_reference_moves (
     id SERIAL PRIMARY KEY,
     class TEXT, -- NULL for Basic Moves
     name TEXT NOT NULL,
