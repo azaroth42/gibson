@@ -2,7 +2,7 @@ import asyncio
 import re
 from db import init_db, get_db_pool
 
-RULES_FILE = 'DungeonWorld_Rules.md'
+RULES_FILE = 'rules/DungeonWorld_Rules.md'
 
 async def seed_moves():
     print("Initializing database...")
