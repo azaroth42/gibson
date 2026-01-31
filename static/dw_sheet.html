@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Dungeon World Sheet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Merriweather&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/dw_sheet.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"></script>
+</head>
+
+<body>
+
+    <h1 id="char-name">Character Name</h1>
+    <h3 id="char-class" style="color:#644; margin-top:-20px;">Class Level 1</h3>
+
+    <div class="sheet-container">
+        <div class="sidebar">
+            <h3 style="text-align:center;">Stats</h3>
+            <div id="stats-container">
+                <!-- Stat Boxes -->
+            </div>
+
+            <h3 style="text-align:center; margin-top:30px;">Vitals</h3>
+            <div class="vitals-grid">
+                <div class="vital-box">
+                    <div style="font-size:0.8em;">HP</div>
+                    <span id="current-hp" class="stat-val">20</span> / <span id="max-hp">20</span>
+                </div>
+                <div class="vital-box">
+                    <div style="font-size:0.8em;">Armor</div>
+                    <span id="armor" class="stat-val">0</span>
+                </div>
+            </div>
+
+            <div class="vital-box" style="margin-top:10px;">
+                <div style="font-size:0.8em;">XP</div>
+                <span id="xp" class="stat-val">0</span>
+            </div>
+
+            <div class="vital-box" style="margin-top:10px;">
+                <div style="font-size:0.8em; color:#a80;">Coin</div>
+                <span id="coin" class="stat-val">0</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div style="margin-bottom:20px; font-style:italic; color:#555;">
+                <span id="look">Look...</span> | <span id="alignment">Alignment...</span>
+            </div>
+
+            <h2>Moves</h2>
+            <div id="moves-container">
+                <!-- Moves -->
+            </div>
+
+            <h2>Gear <span style="font-size:0.6em; float:right;">Load: <span id="load">0</span>/10</span></h2>
+            <div id="gear-container">
+                <!-- Items -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const charId = window.location.pathname.split('/').pop();
+        let charData = null;
+
+        const STATS = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
+        const NAMES = {
+            'str': 'Strength', 'dex': 'Dexterity', 'con': 'Constitution',
+            'int': 'Intelligence', 'wis': 'Wisdom', 'cha': 'Charisma'
+        };
+
+        async function fetchChar() {
+            const res = await fetch(`/dw/characters/${charId}`);
+            charData = await res.json();
+            render();
+        }
+
+        function render() {
+            document.getElementById('char-name').textContent = charData.name;
+            document.getElementById('char-class').textContent = `${charData.hero_class} Level ${charData.level}`;
+            document.getElementById('current-hp').textContent = charData.current_hp;
+            document.getElementById('max-hp').textContent = charData.max_hp;
+            document.getElementById('armor').textContent = charData.armor;
+            document.getElementById('xp').textContent = charData.xp;
+            document.getElementById('coin').textContent = charData.coin;
+            document.getElementById('look').textContent = charData.look || "No look set";
+            document.getElementById('alignment').textContent = charData.alignment || "Neutral";
+
+            // Stats
+            const statsDiv = document.getElementById('stats-container');
+            statsDiv.innerHTML = '';
+            STATS.forEach(key => {
+                // Determine actual key from data (int_stat vs int)
+                const val = (key === 'int') ? charData.int_stat : charData[key];
+                const mod = Math.floor((val - 10) / 2) || 0; // Handle 0? DW stat range 3-18 usually.
+                // 1-3:-3, 4-5:-2, 6-8:-1, 9-12:0, 13-15:+1, 16-17:+2, 18:+3
+                // Standard formula (val-10)/2 floor is roughly correct?
+                // 18-10=8/2=4 (Incorrect, max +3).
+                // DW lookup:
+                // 18 => +3
+                // 16-17 => +2
+                // 13-15 => +1
+                // 9-12 => 0
+                // 6-8 => -1
+                // 4-5 => -2
+                // <=3 => -3
+
+                let actualMod = 0;
+                if (val >= 18) actualMod = 3;
+                else if (val >= 16) actualMod = 2;
+                else if (val >= 13) actualMod = 1;
+                else if (val >= 9) actualMod = 0;
+                else if (val >= 6) actualMod = -1;
+                else if (val >= 4) actualMod = -2;
+                else actualMod = -3;
+
+                const sign = actualMod >= 0 ? '+' : '';
+
+                const box = document.createElement('div');
+                box.className = 'stat-box';
+                box.innerHTML = `
+                    <div style="font-size:0.9em; text-transform:uppercase;">${NAMES[key]}</div>
+                    <div class="stat-val">${val}</div>
+                    <div class="stat-mod">${sign}${actualMod}</div>
+                `;
+                statsDiv.appendChild(box);
+            });
+
+            // Moves
+            const movesDiv = document.getElementById('moves-container');
+            movesDiv.innerHTML = '';
+            charData.moves.forEach(m => {
+                const card = document.createElement('div');
+                card.className = 'move-card';
+                card.innerHTML = `
+                    <div class="move-header" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display==='none'?'block':'none'">
+                        <span>${m.name}</span>
+                        <span style="font-size:0.8em; color:#888;">${m.type}</span>
+                    </div>
+                    <div class="move-desc" style="display:block;">
+                        ${marked.parse(m.description || "")}
+                    </div>
+                `;
+                movesDiv.appendChild(card);
+            });
+
+            // Gear
+            const gearDiv = document.getElementById('gear-container');
+            gearDiv.innerHTML = '';
+            let totalLoad = 0;
+            charData.items.forEach(i => {
+                totalLoad += (i.weight * i.qty);
+                const row = document.createElement('div');
+                row.className = 'item-row';
+                row.innerHTML = `
+                    <span>${i.name} (x${i.qty})</span>
+                    <span style="color:#777;">${i.weight} wt</span>
+                `;
+                gearDiv.appendChild(row);
+            });
+            document.getElementById('load').textContent = totalLoad;
+        }
+
+        fetchChar();
+    </script>
+</body>
+
+</html>

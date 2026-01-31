@@ -92,3 +92,65 @@ class MoveUpdate(BaseModel):
 class ContactAdd(BaseModel):
     name: str
     description: Optional[str] = None
+
+from pydantic import Field
+
+class DWCharacterCreate(BaseModel):
+    name: str
+    hero_class: str
+
+class DWCharacter(BaseModel):
+    id: int
+    name: str
+    hero_class: str
+    level: int = 1
+    xp: int = 0
+    strength: int = Field(default=10, alias="str")
+    dex: int = 10
+    con: int = 10
+    int_stat: int = Field(default=10, alias="int")
+    wis: int = 10
+    cha: int = 10
+    current_hp: int = 10
+    max_hp: int = 10
+    armor: int = 0
+    damage_die: str = "d6"
+    alignment: Optional[str] = None
+    look: Optional[str] = None
+    race: Optional[str] = None
+    coin: int = 0
+    items: List[Dict[str, Any]] = []
+    moves: List[Dict[str, Any]] = []
+
+class DWCharacterUpdate(BaseModel):
+    name: Optional[str] = None
+    hero_class: Optional[str] = None
+    level: Optional[int] = None
+    xp: Optional[int] = None
+    strength: Optional[int] = Field(default=None, alias="str")
+    dex: Optional[int] = None
+    con: Optional[int] = None
+    int_stat: Optional[int] = Field(default=None, alias="int")
+    wis: Optional[int] = None
+    cha: Optional[int] = None
+    current_hp: Optional[int] = None
+    max_hp: Optional[int] = None
+    armor: Optional[int] = None
+    damage_die: Optional[str] = None
+    alignment: Optional[str] = None
+    look: Optional[str] = None
+    race: Optional[str] = None
+    coin: Optional[int] = None
+
+class DWItemAdd(BaseModel):
+    name: str
+    description: Optional[str] = None
+    tags: List[str] = []
+    weight: int = 0
+    qty: int = 1
+
+class DWMoveAdd(BaseModel):
+    name: str
+    description: Optional[str] = None
+    type: str = 'starting'
+

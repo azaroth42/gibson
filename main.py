@@ -117,6 +117,149 @@ async def create_character(char: CharacterCreate):
         await broadcast_tabletop(app, {"type": "character_update", "payload": new_char.model_dump()})
         return new_char
 
+# Dungeon World Endpoints
+
+@app.post("/dw/characters", response_model=DWCharacter)
+async def create_dw_character(char: DWCharacterCreate):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        # Create character
+        row = await conn.fetchrow("""
+            INSERT INTO dw_characters (name, hero_class, level, xp, str, dex, con, "int", wis, cha, current_hp, max_hp)
+            VALUES ($1, $2, 1, 0, 10, 10, 10, 10, 10, 10, 20, 20)
+            RETURNING *
+        """, char.name, char.hero_class)
+        
+        char_id = row['id']
+        
+        # Populate Starting Moves
+        # Fetch from dw_reference_moves where class_name matches OR (class_name is NULL for basic moves?)
+        # User might want Basic Moves on every sheet? Yes.
+        # Note: Reference moves has class_name='The Bard'. Input should match.
+        
+        # 1. Starting Class Moves
+        class_moves = await conn.fetch("""
+            SELECT name, description FROM dw_reference_moves 
+            WHERE lower(class_name) = lower($1) AND min_level = 1
+        """, char.hero_class)
+        
+        # 2. Basic Moves (class_name is NULL)
+        basic_moves = await conn.fetch("""
+            SELECT name, description FROM dw_reference_moves 
+            WHERE class_name IS NULL
+        """)
+        
+        for m in class_moves + basic_moves:
+            m_type = 'starting' if m in class_moves else 'basic'
+            await conn.execute("""
+                INSERT INTO dw_moves (character_id, name, description, type)
+                VALUES ($1, $2, $3, $4)
+            """, char_id, m['name'], m['description'], m_type)
+            
+        return await get_dw_character_internal(conn, char_id)
+
+@app.delete("/dw/characters/{char_id}", status_code=204)
+async def delete_dw_character(char_id: int):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        result = await conn.execute("DELETE FROM dw_characters WHERE id = $1", char_id)
+        if result == "DELETE 0":
+            raise HTTPException(status_code=404, detail="Character not found")
+    return None
+
+@app.get("/dw/characters", response_model=List[DWCharacter])
+async def list_dw_characters():
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        rows = await conn.fetch('SELECT *, "int" as int_stat FROM dw_characters ORDER BY id')
+        result = []
+        for row in rows:
+            data = dict(row)
+            # Fetch minimal data or empty items/moves for list view to be faster, 
+            # OR just fetch all. Let's fetch all to match response model compliant.
+            # Actually, fetching all for a list might be heavy if many moves. 
+            # But correct Pydantic validation requires fields.
+            # I'll default items/moves to empty for strict list view if model allows, 
+            # but model has default [], so valid.
+            result.append(DWCharacter(**data))
+        return result
+
+@app.get("/dw/characters/{char_id}", response_model=DWCharacter)
+async def get_dw_character(char_id: int):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        return await get_dw_character_internal(conn, char_id)
+
+@app.put("/dw/characters/{char_id}", response_model=DWCharacter)
+async def update_dw_character(char_id: int, update: DWCharacterUpdate):
+    pool = app.state.pool
+    update_data = update.model_dump(exclude_unset=True)
+    
+    if not update_data:
+        return await get_dw_character(char_id)
+
+    set_clauses = []
+    values = []
+    
+    # Handle 'int_stat' -> 'int' mapping
+    if 'int_stat' in update_data:
+        update_data['int'] = update_data.pop('int_stat')
+        
+    # Handle 'strength' -> 'str' mapping
+    if 'strength' in update_data:
+        update_data['str'] = update_data.pop('strength')
+        
+    for i, (key, value) in enumerate(update_data.items(), start=1):
+        # Quote "int" column
+        col = f'"{key}"' if key == 'int' else key
+        set_clauses.append(f"{col} = ${i}")
+        values.append(value)
+        
+    values.append(char_id)
+    
+    query = f"UPDATE dw_characters SET {', '.join(set_clauses)} WHERE id = ${len(values)}"
+    
+    async with pool.acquire() as conn:
+        await conn.execute(query, *values)
+        return await get_dw_character_internal(conn, char_id)
+
+@app.delete("/dw/characters/{char_id}/items/{item_id}")
+async def delete_dw_item(char_id: int, item_id: int):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        await conn.execute("DELETE FROM dw_items WHERE id = $1 AND character_id = $2", item_id, char_id)
+        return await get_dw_character_internal(conn, char_id)
+
+@app.post("/dw/characters/{char_id}/items")
+async def add_dw_item(char_id: int, item: DWItemAdd):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        await conn.execute("""
+            INSERT INTO dw_items (character_id, name, description, tags, weight, qty)
+            VALUES ($1, $2, $3, $4, $5, $6)
+        """, char_id, item.name, item.description, item.tags, item.weight, item.qty)
+        return await get_dw_character_internal(conn, char_id)
+
+async def get_dw_character_internal(conn, char_id: int) -> DWCharacter:
+    row = await conn.fetchrow("""
+        SELECT *, "int" as int_stat FROM dw_characters WHERE id = $1
+    """, char_id)
+    
+    if not row:
+        raise HTTPException(status_code=404, detail="Character not found")
+        
+    data = dict(row)
+    
+    # Items
+    items = await conn.fetch("SELECT * FROM dw_items WHERE character_id = $1", char_id)
+    data['items'] = [dict(i) for i in items]
+    
+    # Moves
+    moves = await conn.fetch("SELECT * FROM dw_moves WHERE character_id = $1 ORDER BY type, name", char_id)
+    data['moves'] = [dict(m) for m in moves]
+    
+    return DWCharacter(**data)
+
 @app.get("/characters", response_model=List[Character])
 async def list_characters():
     pool = app.state.pool
