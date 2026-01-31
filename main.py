@@ -263,15 +263,35 @@ async def websocket_audio_stream(websocket: WebSocket, char_id: int):
                 elif state == "command":
                     # Process command
                     if text:  # Non-empty transcription
-                        await websocket.send_json({
-                            "type": "command_received",
-                            "text": text
-                        })
-                        
+
                         # Execute command using existing logic
                         response = ""
                         updated = False
                         
+                        # Normalize the text
+                        text = text.lower().strip()
+                        
+                        # Fix kiwi accint
+                        text = text.replace("tin", "ten")
+                        text = text.replace("sit", "set")
+
+                        # replace words with numbers
+                        text = text.replace("one", "1")
+                        text = text.replace("two", "2")
+                        text = text.replace("three", "3")
+                        text = text.replace("four", "4")
+                        text = text.replace("five", "5")
+                        text = text.replace("six", "6")
+                        text = text.replace("seven", "7")
+                        text = text.replace("eight", "8")
+                        text = text.replace("nine", "9")
+                        text = text.replace("ten", "10")
+
+                        await websocket.send_json({
+                            "type": "command_received",
+                            "text": text
+                        })
+
                         # Health command parsing (copied from existing WS logic)
                         damage_match = re.search(r'(take|suffer)\s+(\d+)', text)
                         heal_match = re.search(r'(heal|recover)\s+(\d+)', text)
