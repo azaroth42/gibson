@@ -1,6 +1,6 @@
 from fastapi import FastAPI, WebSocket, Request, HTTPException, WebSocketDisconnect, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from typing import List, Optional
@@ -1065,15 +1065,23 @@ async def update_character_link(char_id: int, link_id: int, link: LinkUpdate):
 
 @app.get("/tabletop", response_class=HTMLResponse)
 async def view_tabletop(request: Request):
-    return templates.TemplateResponse("tabletop.html", {"request": request})
+    return FileResponse("static/sprawl/tabletop.html")
+
+@app.get("/dw/tabletop", response_class=HTMLResponse)
+async def view_dw_tabletop(request: Request):
+    return FileResponse("static/dw/dw_tabletop.html")
 
 @app.get("/select-map", response_class=HTMLResponse)
 async def view_select_map(request: Request):
-    return templates.TemplateResponse("select-map.html", {"request": request})
+    return FileResponse("static/sprawl/select-map.html")
+
+@app.get("/dw/select-map", response_class=HTMLResponse)
+async def view_dw_select_map(request: Request):
+    return FileResponse("static/dw/dw_select_map.html")
 
 @app.get("/clocks", response_class=HTMLResponse)
 async def view_clocks(request: Request):
-    return templates.TemplateResponse("clocks.html", {"request": request})
+    return FileResponse("static/sprawl/clocks.html")
 
 @app.get("/api/maps")
 async def list_maps():

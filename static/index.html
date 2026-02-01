@@ -93,8 +93,16 @@
     <h1>Gibson Dashboard</h1>
 
     <div style="text-align:center; margin-bottom:20px;">
-        <a href="/tabletop" style="margin:0 10px;">Tabletop View</a> |
-        <a href="/static/gm.html" style="margin:0 10px;">GM Panel</a>
+        <span style="color:#00f3ff; font-weight:bold;">SPRAWL:</span>
+        <a href="/tabletop" style="margin:0 10px;">Tabletop</a> |
+        <a href="/static/sprawl/gm.html" style="margin:0 10px;">GM Panel</a>
+    </div>
+
+    <div style="text-align:center; margin-bottom:20px;">
+        <span style="color:#d4af37; font-weight:bold;">DUNGEON WORLD:</span>
+        <a href="/dw/tabletop" style="margin:0 10px;">Tabletop</a> |
+        <a href="/dw/select-map" style="margin:0 10px;">Select Map</a> |
+        <a href="/static/dw/dw_clocks.html" style="margin:0 10px;">Clocks</a>
     </div>
 
     <div class="dashboard-grid">
@@ -154,7 +162,7 @@
                 chars.forEach(char => {
                     const li = document.createElement('li');
                     li.innerHTML = `
-                        <a href="/static/sheet.html?id=${char.id}">${char.name} <span style="font-size:0.8em; color:#666">(${char.playbook})</span></a> 
+                        <a href="/static/sprawl/sheet.html?id=${char.id}">${char.name} <span style="font-size:0.8em; color:#666">(${char.playbook})</span></a> 
                         <span class="delete-btn" onclick="deleteSprawl(${char.id})">DELETE</span>`;
                     list.appendChild(li);
                 });
@@ -170,7 +178,7 @@
                 chars.forEach(char => {
                     const li = document.createElement('li');
                     li.innerHTML = `
-                        <a href="/static/dw_sheet.html?id=${char.id}" style="color:#d4af37">${char.name} <span style="font-size:0.8em; color:#888">(${char.hero_class})</span></a> 
+                        <a href="/static/dw/dw_sheet.html?id=${char.id}" style="color:#d4af37">${char.name} <span style="font-size:0.8em; color:#888">(${char.hero_class})</span></a> 
                         <span class="delete-btn" onclick="deleteDW(${char.id})">DELETE</span>`;
                     list.appendChild(li);
                 });
