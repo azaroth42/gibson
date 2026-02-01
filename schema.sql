@@ -79,6 +79,19 @@ CREATE TABLE IF NOT EXISTS game_state (
     map_image TEXT
 );
 
+CREATE TABLE IF NOT EXISTS dw_game_state (
+    id SERIAL PRIMARY KEY,
+    map_image TEXT
+);
+
+CREATE TABLE IF NOT EXISTS dw_countdown_clocks (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    filled INTEGER DEFAULT 0,
+    x INTEGER DEFAULT NULL,
+    y INTEGER DEFAULT NULL
+);
+
 CREATE TABLE IF NOT EXISTS dw_characters (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
@@ -102,6 +115,8 @@ CREATE TABLE IF NOT EXISTS dw_characters (
     look TEXT,
     race TEXT,
     coin INTEGER DEFAULT 0,
+    x INTEGER DEFAULT NULL,
+    y INTEGER DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

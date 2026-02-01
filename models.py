@@ -119,6 +119,8 @@ class DWCharacter(BaseModel):
     look: Optional[str] = None
     race: Optional[str] = None
     coin: int = 0
+    x: Optional[int] = None
+    y: Optional[int] = None
     items: List[Dict[str, Any]] = []
     moves: List[Dict[str, Any]] = []
 
@@ -140,7 +142,10 @@ class DWCharacterUpdate(BaseModel):
     alignment: Optional[str] = None
     look: Optional[str] = None
     race: Optional[str] = None
+    race: Optional[str] = None
     coin: Optional[int] = None
+    x: Optional[int] = None
+    y: Optional[int] = None
 
 class DWItemAdd(BaseModel):
     name: str

@@ -62,8 +62,23 @@
 
 <body>
 
-    <h1 id="char-name">Character Name</h1>
-    <h3 id="char-class" style="color:#644; margin-top:-20px;">Class Level 1</h3>
+    <div class="sheet-header">
+        <div class="header-left">
+            <h1 id="char-name">Character Name</h1>
+            <h3 id="char-class">Class Level 1</h3>
+        </div>
+        <div class="header-right">
+            <div class="hp-label">Hit Points</div>
+            <div class="hp-bar-container">
+                <div id="hp-bar-fill" class="hp-bar-fill"></div>
+                <div class="hp-text-overlay">
+                    <span style="margin-right:10px; cursor:pointer;" onclick="updateVital('current_hp', -1)">[-]</span>
+                    <span id="current-hp">20</span> / <span id="max-hp">20</span>
+                    <span style="margin-left:10px; cursor:pointer;" onclick="updateVital('current_hp', 1)">[+]</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="sheet-container">
         <div class="sidebar">
@@ -93,18 +108,6 @@
             <div class="vitals-grid">
                 <!-- Row 1 -->
                 <div class="vital-box">
-                    <div style="font-size:0.8em; color:#a00;">HP</div>
-                    <div style="display:flex; align-items:center; justify-content:center; gap:5px;">
-                        <span id="current-hp" class="stat-val">20</span> / <span id="max-hp">20</span>
-                    </div>
-                    <div style="margin-top:5px;">
-                        <button class="btn" style="padding:0 5px; font-size:0.8em;"
-                            onclick="updateVital('current_hp', -1)">-</button>
-                        <button class="btn" style="padding:0 5px; font-size:0.8em;"
-                            onclick="updateVital('current_hp', 1)">+</button>
-                    </div>
-                </div>
-                <div class="vital-box">
                     <div style="font-size:0.8em;">Armor</div>
                     <span id="armor" class="stat-val">0</span>
                     <div style="margin-top:5px;">
@@ -130,11 +133,10 @@
                     <div style="font-size:0.8em; color:#a80;">Coin</div>
                     <span id="coin" class="stat-val">0</span>
                 </div>
-            </div>
-
-            <div class="vital-box" style="margin-top:15px;">
-                <div style="font-size:0.8em; color:#800;">Damage Die</div>
-                <span id="damage-die" class="stat-val" style="font-family:'Cinzel', serif;">-</span>
+                <div class="vital-box">
+                    <div style="font-size:0.8em; color:#800;">Damage Die</div>
+                    <span id="damage-die" class="stat-val" style="font-family:'Cinzel', serif;">-</span>
+                </div>
             </div>
 
             <div class="option-group" style="margin-top:20px;">
@@ -212,8 +214,14 @@
             document.getElementById('damage-die').textContent = damageOpt ? damageOpt.description : "d6";
 
             // Vitals
-            document.getElementById('current-hp').textContent = charData.current_hp;
-            document.getElementById('max-hp').textContent = charData.max_hp;
+            const curHp = charData.current_hp;
+            const maxHp = charData.max_hp || 20; // fallback
+            const hpPercent = Math.min((curHp / maxHp) * 100, 100);
+
+            document.getElementById('current-hp').textContent = curHp;
+            document.getElementById('max-hp').textContent = maxHp;
+            document.getElementById('hp-bar-fill').style.width = `${hpPercent}%`;
+
             document.getElementById('armor').textContent = charData.armor;
             document.getElementById('xp').textContent = charData.xp;
 

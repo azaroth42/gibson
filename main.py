@@ -20,6 +20,7 @@ async def lifespan(app: FastAPI):
     await init_db()
     app.state.pool = await get_db_pool()
     app.state.tabletop_connections = []
+    app.state.dw_tabletop_connections = []
     
     # Load parakeet-mlx ASR model
     print("Loading parakeet-mlx ASR model...")
@@ -36,6 +37,13 @@ async def broadcast_tabletop(app, message: dict):
             await connection.send_json(message)
         except Exception as e:
             print(f"Error broadcasting to tabletop: {e}")
+
+async def broadcast_dw_tabletop(app, message: dict):
+    for connection in app.state.dw_tabletop_connections:
+        try:
+            await connection.send_json(message)
+        except Exception as e:
+            print(f"Error broadcasting to DW tabletop: {e}")
 
 app = FastAPI(lifespan=lifespan)
 
@@ -260,6 +268,8 @@ async def delete_dw_character(char_id: int):
         result = await conn.execute("DELETE FROM dw_characters WHERE id = $1", char_id)
         if result == "DELETE 0":
             raise HTTPException(status_code=404, detail="Character not found")
+    
+    await broadcast_dw_tabletop(app, {"type": "character_delete", "payload": {"id": char_id}})
     return None
 
 @app.get("/dw/characters", response_model=List[DWCharacter])
@@ -310,14 +320,18 @@ async def update_dw_character(char_id: int, update: DWCharacterUpdate):
     
     async with pool.acquire() as conn:
         await conn.execute(query, *values)
-        return await get_dw_character_internal(conn, char_id)
+        updated_char = await get_dw_character_internal(conn, char_id)
+        await broadcast_dw_tabletop(app, {"type": "character_update", "payload": updated_char.model_dump()})
+        return updated_char
 
 @app.delete("/dw/characters/{char_id}/items/{item_id}")
 async def delete_dw_item(char_id: int, item_id: int):
     pool = app.state.pool
     async with pool.acquire() as conn:
         await conn.execute("DELETE FROM dw_items WHERE id = $1 AND character_id = $2", item_id, char_id)
-        return await get_dw_character_internal(conn, char_id)
+        updated_char = await get_dw_character_internal(conn, char_id)
+        await broadcast_dw_tabletop(app, {"type": "character_update", "payload": updated_char.model_dump()})
+        return updated_char
 
 @app.post("/dw/characters/{char_id}/items")
 async def add_dw_item(char_id: int, item: DWItemAdd):
@@ -327,7 +341,9 @@ async def add_dw_item(char_id: int, item: DWItemAdd):
             INSERT INTO dw_items (character_id, name, description, tags, weight, qty)
             VALUES ($1, $2, $3, $4, $5, $6)
         """, char_id, item.name, item.description, item.tags, item.weight, item.qty)
-        return await get_dw_character_internal(conn, char_id)
+        updated_char = await get_dw_character_internal(conn, char_id)
+        await broadcast_dw_tabletop(app, {"type": "character_update", "payload": updated_char.model_dump()})
+        return updated_char
 
 async def get_dw_character_internal(conn, char_id: int) -> DWCharacter:
     row = await conn.fetchrow("""
@@ -456,6 +472,37 @@ async def websocket_tabletop(websocket: WebSocket):
         print(f"Tabletop WS Error: {e}")
         if websocket in app.state.tabletop_connections:
             app.state.tabletop_connections.remove(websocket)
+
+@app.websocket("/ws/dw/tabletop")
+async def websocket_dw_tabletop(websocket: WebSocket):
+    await websocket.accept()
+    app.state.dw_tabletop_connections.append(websocket)
+    try:
+        while True:
+            # Just keep connection open
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        app.state.dw_tabletop_connections.remove(websocket)
+    except Exception as e:
+        print(f"DW Tabletop WS Error: {e}")
+        if websocket in app.state.dw_tabletop_connections:
+            app.state.dw_tabletop_connections.remove(websocket)
+
+            app.state.tabletop_connections.remove(websocket)
+
+@app.websocket("/ws/dw/tabletop")
+async def websocket_dw_tabletop(websocket: WebSocket):
+    await websocket.accept()
+    app.state.dw_tabletop_connections.append(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        app.state.dw_tabletop_connections.remove(websocket)
+    except Exception as e:
+        print(f"DW Tabletop WS Error: {e}")
+        if websocket in app.state.dw_tabletop_connections:
+            app.state.dw_tabletop_connections.remove(websocket)
 
 @app.websocket("/ws/audio/{char_id}")
 async def websocket_audio_stream(websocket: WebSocket, char_id: int):
@@ -1113,6 +1160,82 @@ async def update_gamestate(state: GameStateUpdate):
         res = {"map_image": state.map_image}
         await broadcast_tabletop(app, {"type": "gamestate_update", "payload": res})
         return res
+
+@app.get("/api/dw/gamestate", response_model=GameState)
+async def get_dw_gamestate():
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow("SELECT map_image FROM dw_game_state ORDER BY id LIMIT 1")
+        if not row:
+            # Create default if not exists
+            await conn.execute("INSERT INTO dw_game_state (map_image) VALUES (NULL)")
+            return {"map_image": None}
+        return dict(row)
+
+@app.put("/api/dw/gamestate", response_model=GameState)
+async def update_dw_gamestate(state: GameStateUpdate):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        # Ensure row exists
+        row = await conn.fetchrow("SELECT id FROM dw_game_state ORDER BY id LIMIT 1")
+        if not row:
+             await conn.execute("INSERT INTO dw_game_state (map_image) VALUES ($1)", state.map_image)
+        else:
+             await conn.execute("UPDATE dw_game_state SET map_image = $1 WHERE id = $2", state.map_image, row['id'])
+        
+        res = {"map_image": state.map_image}
+        await broadcast_dw_tabletop(app, {"type": "gamestate_update", "payload": res})
+        return res
+
+@app.get("/api/dw/clocks", response_model=List[Clock])
+async def list_dw_clocks():
+    pool = app.state.pool
+    rows = await pool.fetch("SELECT * FROM dw_countdown_clocks ORDER BY id")
+    return [dict(r) for r in rows]
+
+@app.post("/api/dw/clocks", response_model=Clock)
+async def create_dw_clock(clock: ClockCreate):
+    pool = app.state.pool
+    row = await pool.fetchrow(
+        "INSERT INTO dw_countdown_clocks (name, filled, x, y) VALUES ($1, $2, $3, $4) RETURNING *",
+        clock.name, clock.filled, clock.x, clock.y
+    )
+    res = dict(row)
+    await broadcast_dw_tabletop(app, {"type": "clock_update", "payload": res})
+    return res
+
+@app.put("/api/dw/clocks/{clock_id}", response_model=Clock)
+async def update_dw_clock(clock_id: int, clock: ClockUpdate):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        update_data = clock.model_dump(exclude_unset=True)
+        if not update_data:
+             row = await conn.fetchrow("SELECT * FROM dw_countdown_clocks WHERE id = $1", clock_id)
+        else:
+             set_clauses = []
+             values = []
+             for i, (key, value) in enumerate(update_data.items(), start=1):
+                 set_clauses.append(f"{key} = ${i}")
+                 values.append(value)
+             values.append(clock_id)
+             query = f"UPDATE dw_countdown_clocks SET {', '.join(set_clauses)} WHERE id = ${len(values)} RETURNING *"
+             row = await conn.fetchrow(query, *values)
+        
+        if not row:
+            raise HTTPException(status_code=404, detail="Clock not found")
+        res = dict(row)
+        await broadcast_dw_tabletop(app, {"type": "clock_update", "payload": res})
+        return res
+
+@app.delete("/api/dw/clocks/{clock_id}", status_code=204)
+async def delete_dw_clock(clock_id: int):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        result = await conn.execute("DELETE FROM dw_countdown_clocks WHERE id = $1", clock_id)
+        if result == "DELETE 0":
+            raise HTTPException(status_code=404, detail="Clock not found")
+    await broadcast_dw_tabletop(app, {"type": "clock_delete", "payload": {"id": clock_id}})
+    return None
 
 @app.post("/api/transcribe")
 async def transcribe_audio(audio: UploadFile = File(...)):

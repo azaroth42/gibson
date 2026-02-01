@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>DW Tabletop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        body {
+            background-color: white;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Cinzel', serif;
+            /* DW Theme Font */
+            user-select: none;
+            touch-action: none;
+        }
+
+        #table-surface {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .token {
+            position: absolute;
+            width: 120px;
+            height: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .token:active {
+            cursor: grabbing;
+        }
+
+        .hp-wheel {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #eee;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        /* Inner white circle to make it a ring */
+        .hp-wheel::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .hp-text {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            line-height: 1;
+            color: #333;
+        }
+
+        .char-name {
+            margin-top: 10px;
+            font-weight: bold;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 0.9em;
+            color: #000;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        #map-container {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            z-index: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            /* border: 1px solid #ccc; */
+        }
+
+        /* Adjust map margins/padding if needed, but full screen is improved */
+        #map-container.boxed {
+            top: 140px;
+            bottom: 140px;
+            left: 140px;
+            right: 140px;
+            right: 140px;
+            border: 1px solid #ccc;
+        }
+
+        .clock-token {
+            position: absolute;
+            width: 140px;
+            height: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div id="table-surface">
+        <div id="map-container" class="boxed"></div>
+    </div>
+
+    <script>
+        const surface = document.getElementById('table-surface');
+        const mapContainer = document.getElementById('map-container');
+        let characters = [];
+        let clocks = [];
+        let gamestate = { map_image: null };
+
+        async function init() {
+            console.log("Initializing DW Tabletop...");
+
+            // Initial fetch
+            try {
+                // Characters
+                try {
+                    const resChars = await fetch('/dw/characters', { cache: 'no-store' });
+                    if (resChars.ok) {
+                        const newChars = await resChars.json();
+                        console.log("Fetched Chars:", newChars.length);
+                        updateTokens(newChars);
+                    } else {
+                        console.error("Failed to fetch characters");
+                    }
+                } catch (e) { console.error("Error updating chars:", e); }
+
+                // Clocks
+                try {
+                    const resClocks = await fetch('/api/dw/clocks', { cache: 'no-store' });
+                    if (resClocks.ok) {
+                        const newClocks = await resClocks.json();
+                        console.log("Fetched Clocks:", newClocks.length);
+                        clocks = newClocks;
+                        renderClocks();
+                    } else {
+                        console.error("Failed to fetch clocks");
+                    }
+                } catch (e) { console.error("Error updating clocks:", e); }
+
+                // Map
+                try {
+                    const resState = await fetch('/api/dw/gamestate', { cache: 'no-store' });
+                    if (resState.ok) {
+                        gamestate = await resState.json();
+                        console.log("Fetched Gamestate:", gamestate);
+                        renderMap();
+                    } else {
+                        console.error("Failed to fetch gamestate");
+                    }
+                } catch (e) { console.error("Error updating map:", e); }
+
+            } catch (e) { console.error("General Init Error:", e); }
+
+            // Connect WebSocket after rendering
+            try {
+                connectWS();
+            } catch (e) { console.error("Failed to connect WS:", e); }
+        }
+
+        window.addEventListener('resize', () => {
+            document.querySelectorAll('.token, .clock-token').forEach(updateRotation);
+        });
+
+        function connectWS() {
+            const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const ws = new WebSocket(`${proto}//${window.location.host}/ws/dw/tabletop`);
+
+            ws.onopen = () => {
+                console.log("Connected to DW Tabletop WS");
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    handleUpdate(data);
+                } catch (e) {
+                    console.error("WS Parse Error", e);
+                }
+            };
+
+            ws.onclose = () => {
+                console.log("WS Closed, retrying in 5s...");
+                setTimeout(connectWS, 5000);
+            };
+        }
+
+        function handleUpdate(data) {
+            console.log("Update received:", data);
+
+            if (data.type === 'gamestate_update') {
+                gamestate.map_image = data.payload.map_image;
+                renderMap();
+            } else if (data.type === 'character_update') {
+                // Single char update
+                const char = data.payload;
+                // Update local array
+                const idx = characters.findIndex(c => c.id === char.id);
+                if (idx >= 0) {
+                    characters[idx] = char;
+                } else {
+                    characters.push(char);
+                }
+                updateTokens(characters);
+            } else if (data.type === 'character_delete') {
+                const id = data.payload.id;
+                characters = characters.filter(c => c.id !== id);
+                const token = document.getElementById(`token-char-${id}`);
+                if (token) token.remove();
+            } else if (data.type === 'clock_update') {
+                const clock = data.payload;
+                const idx = clocks.findIndex(c => c.id === clock.id);
+                if (idx >= 0) {
+                    clocks[idx] = clock;
+                } else {
+                    clocks.push(clock);
+                }
+                renderClocks();
+            } else if (data.type === 'clock_delete') {
+                const id = data.payload.id;
+                clocks = clocks.filter(c => c.id !== id);
+                const token = document.getElementById(`token-clock-${id}`);
+                if (token) token.remove();
+            }
+        }
+
+        function ensureInBounds(x, y, w, h) {
+            const maxX = window.innerWidth - w;
+            const maxY = window.innerHeight - h;
+            return {
+                x: Math.max(0, Math.min(x, maxX)),
+                y: Math.max(0, Math.min(y, maxY))
+            };
+        }
+
+        function updateTokens(newChars) {
+            newChars.forEach((char, index) => {
+                let token = document.getElementById(`token-char-${char.id}`);
+
+                if (!token) {
+                    // Create new
+                    token = document.createElement('div');
+                    token.id = `token-char-${char.id}`;
+                    token.className = 'token';
+                    surface.appendChild(token);
+                    makeDraggable(token);
+                }
+
+                // Position
+                let x, y;
+                // Note: current DB schema for DW characters might not have x/y columns yet!
+                // Wait, schema.sql:
+                // CREATE TABLE IF NOT EXISTS dw_characters ...
+                // It does NOT have x/y columns in the provided schema.sql content!
+                // I need to add them or accept that position won't persist yet.
+                // Ah, line 14/15 in `characters` table has x/y. `dw_characters` (lines 82-106) does NOT.
+                // I should add x, y to dw_characters in schema.
+
+                // Fallback for now: local storage? Or just fail gracefully.
+                // I will add the columns to schema in the next step if I missed it.
+                // Let's assume char object might have them if I add them.
+
+                if (char.x !== undefined && char.y !== undefined && char.x !== null) {
+                    x = char.x;
+                    y = char.y;
+                } else if (!token.style.left) {
+                    // Initial Layout default
+                    x = 50 + (index % 8) * 130;
+                    y = window.innerHeight - 150 - (Math.floor(index / 8) * 150);
+                } else {
+                    x = parseInt(token.style.left);
+                    y = parseInt(token.style.top);
+                }
+
+                const bounds = ensureInBounds(x, y, 120, 140);
+                token.style.left = bounds.x + 'px';
+                token.style.top = bounds.y + 'px';
+
+                const current = char.current_hp;
+                const max = char.max_hp || 20;
+                const percent = max > 0 ? (current / max) * 100 : 0;
+                const color = current < (max * 0.3) ? '#ff4444' : '#4caf50';
+
+                token.innerHTML = `
+                    <div class="hp-wheel" style="background: conic-gradient(${color} ${percent}%, #ddd 0);">
+                        <div class="hp-text">${current}<br><span style="font-size:0.6em; color:#666;">/${max}</span></div>
+                    </div>
+                    <div class="char-name">${char.name}</div>
+                `;
+
+                updateRotation(token);
+            });
+
+            // Cleanup
+            const newIds = new Set(newChars.map(c => c.id));
+            const existingTokens = document.querySelectorAll('.token[id^="token-char-"]');
+            existingTokens.forEach(el => {
+                const id = parseInt(el.id.replace('token-char-', ''));
+                if (!newIds.has(id)) {
+                    el.remove();
+                }
+            });
+
+            characters = newChars;
+        }
+
+        function renderClocks() {
+            clocks.forEach((clock, index) => {
+                let token = document.getElementById(`token-clock-${clock.id}`);
+                if (!token) {
+                    token = document.createElement('div');
+                    token.id = `token-clock-${clock.id}`;
+                    token.className = 'clock-token';
+                    surface.appendChild(token);
+                    makeDraggable(token);
+                }
+
+                // Position
+                let x, y;
+                if (clock.x !== null && clock.y !== null && clock.x !== undefined) {
+                    x = clock.x;
+                    y = clock.y;
+                } else if (!token.style.left) {
+                    x = window.innerWidth - 200;
+                    y = 50 + (index * 180);
+                } else {
+                    x = parseInt(token.style.left);
+                    y = parseInt(token.style.top);
+                }
+
+                const bounds = ensureInBounds(x, y, 140, 160);
+                token.style.left = bounds.x + 'px';
+                token.style.top = bounds.y + 'px';
+
+                // Re-create content
+                token.innerHTML = '';
+                const svg = createPieSVG(clock.filled, clock.name);
+                const name = document.createElement('div');
+                name.className = 'char-name';
+                name.textContent = clock.name;
+
+                token.appendChild(svg);
+                token.appendChild(name);
+
+                updateRotation(token);
+            });
+            // remove deleted
+            const newIds = new Set(clocks.map(c => c.id));
+            const existingTokens = document.querySelectorAll('.clock-token');
+            existingTokens.forEach(el => {
+                const id = parseInt(el.id.replace('token-clock-', ''));
+                if (!newIds.has(id)) {
+                    el.remove();
+                }
+            });
+        }
+
+        function createPieSVG(filled, nameString) {
+            let total = 6;
+            if (nameString) {
+                const match = nameString.match(/\[(\d+)\]/);
+                if (match) {
+                    total = parseInt(match[1], 10);
+                }
+            }
+            if (total < 1) total = 6;
+            const safeFilled = Math.min(filled, total);
+
+            const size = 100; // viewBox unit
+            const center = size / 2;
+            const radius = 45;
+
+            const ns = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(ns, "svg");
+            svg.setAttribute("viewBox", `0 0 ${size} ${size}`);
+            svg.style.width = "100px";
+            svg.style.height = "100px";
+
+            for (let i = 0; i < total; i++) {
+                const startAngle = (i * 360) / total;
+                const endAngle = ((i + 1) * 360) / total;
+                const a1 = (startAngle - 90) * (Math.PI / 180);
+                const a2 = (endAngle - 90) * (Math.PI / 180);
+
+                const x1 = center + radius * Math.cos(a1);
+                const y1 = center + radius * Math.sin(a1);
+                const x2 = center + radius * Math.cos(a2);
+                const y2 = center + radius * Math.sin(a2);
+
+                const largeArc = (endAngle - startAngle) > 180 ? 1 : 0;
+
+                const path = document.createElementNS(ns, "path");
+                path.setAttribute("d", `M ${center} ${center} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`);
+
+                const isFilled = i < safeFilled;
+                path.setAttribute("fill", isFilled ? "#ff0055" : "rgba(0,0,0,0.2)");
+                path.setAttribute("stroke", "#333");
+                path.setAttribute("stroke-width", "1");
+
+                svg.appendChild(path);
+            }
+
+            return svg;
+        }
+
+        function renderMap() {
+            if (gamestate.map_image) {
+                mapContainer.style.backgroundImage = `url('${gamestate.map_image}')`;
+            } else {
+                mapContainer.style.backgroundImage = '';
+            }
+        }
+
+        function makeDraggable(el) {
+            let isDragging = false;
+            let offset = { x: 0, y: 0 };
+            let startX, startY;
+
+            function onStart(x, y) {
+                isDragging = true;
+                startX = x;
+                startY = y;
+                offset.x = x - el.offsetLeft;
+                offset.y = y - el.offsetTop;
+                el.style.zIndex = 1000;
+                el.style.transition = 'none';
+            }
+
+            function onMove(x, y) {
+                if (!isDragging) return;
+                let newX = x - offset.x;
+                let newY = y - offset.y;
+                newX = Math.max(0, Math.min(window.innerWidth - el.offsetWidth, newX));
+                newY = Math.max(0, Math.min(window.innerHeight - el.offsetHeight, newY));
+                el.style.left = newX + 'px';
+                el.style.top = newY + 'px';
+                updateRotation(el);
+            }
+
+            function onEnd() {
+                if (isDragging) {
+                    isDragging = false;
+                    el.style.zIndex = '';
+                    el.style.transition = 'transform 0.3s ease';
+                    // Save Position
+                    savePosition(el);
+                }
+            }
+
+            el.addEventListener('mousedown', e => { onStart(e.clientX, e.clientY); });
+            window.addEventListener('mousemove', e => { onMove(e.clientX, e.clientY); });
+            window.addEventListener('mouseup', onEnd);
+            el.addEventListener('touchstart', e => {
+                const t = e.touches[0];
+                onStart(t.clientX, t.clientY);
+                e.preventDefault();
+            }, { passive: false });
+            window.addEventListener('touchmove', e => {
+                const t = e.touches[0];
+                onMove(t.clientX, t.clientY);
+                e.preventDefault();
+            }, { passive: false });
+            window.addEventListener('touchend', onEnd);
+        }
+
+        async function savePosition(el) {
+            const x = parseInt(el.style.left || 0);
+            const y = parseInt(el.style.top || 0);
+
+            if (el.id.startsWith('token-char-')) {
+                const id = el.id.replace('token-char-', '');
+                await fetch(`/dw/characters/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ x: x, y: y })
+                });
+            } else if (el.id.startsWith('token-clock-')) {
+                const id = el.id.replace('token-clock-', '');
+                await fetch(`/api/dw/clocks/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ x: x, y: y })
+                });
+            }
+        }
+
+        function updateRotation(el) {
+            const rect = el.getBoundingClientRect();
+            // We use the center of the element to determine zone
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            const distTop = centerY;
+            const distBottom = window.innerHeight - centerY;
+            const distLeft = centerX;
+            const distRight = window.innerWidth - centerX;
+
+            const minDist = Math.min(distTop, distBottom, distLeft, distRight);
+
+            let angle = 0;
+            if (minDist === distTop) angle = 180;
+            else if (minDist === distLeft) angle = 90;
+            else if (minDist === distRight) angle = -90;
+            else angle = 0;
+
+            el.style.transform = `rotate(${angle}deg)`;
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
