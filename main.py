@@ -261,16 +261,50 @@ async def create_dw_character(char: DWCharacterCreate):
             
         return await get_dw_character_internal(conn, char_id)
 
-@app.delete("/dw/characters/{char_id}", status_code=204)
+@app.delete("/dw/characters/{char_id}")
 async def delete_dw_character(char_id: int):
     pool = app.state.pool
     async with pool.acquire() as conn:
-        result = await conn.execute("DELETE FROM dw_characters WHERE id = $1", char_id)
-        if result == "DELETE 0":
-            raise HTTPException(status_code=404, detail="Character not found")
+        await conn.execute("DELETE FROM dw_characters WHERE id = $1", char_id)
+    return {"status": "success"}
+
+@app.put("/dw/characters/{char_id}", response_model=DWCharacter)
+async def update_dw_character(char_id: int, char: DWCharacterUpdate):
+    pool = app.state.pool
     
-    await broadcast_dw_tabletop(app, {"type": "character_delete", "payload": {"id": char_id}})
-    return None
+    # Build update query dynamically
+    fields = []
+    values = []
+    idx = 1
+    
+    update_data = char.model_dump(exclude_unset=True)
+    if not update_data:
+        # No updates
+         async with pool.acquire() as conn:
+            row = await conn.fetchrow("SELECT * FROM dw_characters WHERE id = $1", char_id)
+            if not row: raise HTTPException(status_code=404, detail="Character not found")
+            return DWCharacter(**dict(row))
+
+    for key, value in update_data.items():
+        if key == 'strength': db_key = 'str'
+        elif key == 'int_stat': db_key = 'int'
+        else: db_key = key
+            
+        # Quote "int" column
+        col = f'"{db_key}"' if db_key == 'int' else db_key
+        fields.append(f"{col} = ${idx}")
+        values.append(value)
+        idx += 1
+        
+    values.append(char_id)
+    
+    query = f"UPDATE dw_characters SET {', '.join(fields)} WHERE id = ${idx} RETURNING *"
+    
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(query, *values)
+        if not row:
+            raise HTTPException(status_code=404, detail="Character not found")
+        return DWCharacter(**dict(row))
 
 @app.get("/dw/characters", response_model=List[DWCharacter])
 async def list_dw_characters():
@@ -762,7 +796,7 @@ async def view_advances(request: Request, char_id: int):
     row = await pool.fetchrow("SELECT id FROM characters WHERE id = $1", char_id)
     if not row:
         raise HTTPException(status_code=404, detail="Character not found")
-    return templates.TemplateResponse("advances.html", {"request": request, "char_id": char_id})
+    return templates.TemplateResponse("sprawl/advances.html", {"request": request, "char_id": char_id})
 
 @app.get("/api/tree")
 async def get_tree_api():

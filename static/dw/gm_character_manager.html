@@ -2,40 +2,44 @@
 <html>
 
 <head>
-    <title>Gibson - GM Character Manager</title>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/sprawl/sheet.css">
+    <title>DW - GM Character Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Merriweather&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/dw_sheet.css">
     <style>
         body {
             text-align: center;
-            background-color: #050505;
-            color: #eee;
-            font-family: 'Share Tech Mono', monospace;
+            background-image: url('/static/dw_bg.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-color: #2b2b2b;
+            margin: 0;
             padding: 10px;
         }
 
         /* Top Header Bar */
         .controls-area {
-            background: rgba(10, 10, 10, 0.95);
+            background: rgba(255, 255, 255, 0.95);
             max-width: 1200px;
             margin: 0 auto 20px auto;
             padding: 10px 20px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+            border: 2px solid #855;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             display: flex;
             gap: 15px;
             align-items: center;
             justify-content: flex-start;
+            border-radius: 4px;
         }
 
         h1 {
-            color: var(--main-color);
+            color: #855;
+            font-family: 'Cinzel', serif;
             font-size: 1.5em;
             margin: 0;
             padding-right: 20px;
-            border-right: 1px solid #333;
+            border-right: 1px solid #aaa;
             text-transform: uppercase;
-            text-shadow: 0 0 5px var(--main-color);
         }
 
         /* Custom Dropdown Styling */
@@ -45,9 +49,8 @@
         }
 
         .dropdown-btn {
-            background: #111;
-            border: 1px solid #444;
-            color: #fff;
+            background: #fff;
+            border: 1px solid #888;
             padding: 8px 12px;
             cursor: pointer;
             min-width: 200px;
@@ -61,20 +64,20 @@
         .dropdown-btn:after {
             content: '▼';
             font-size: 0.8em;
-            color: var(--main-color);
+            color: #666;
             margin-left: 10px;
         }
 
         .dropdown-content {
             display: none;
             position: absolute;
-            background-color: #000;
+            background-color: #fff;
             min-width: 250px;
             max-height: 400px;
             overflow-y: auto;
-            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
             z-index: 100;
-            border: 1px solid var(--border-color);
+            border: 1px solid #888;
             text-align: left;
             top: 100%;
             left: 0;
@@ -87,14 +90,13 @@
         .dropdown-item {
             padding: 8px 12px;
             cursor: pointer;
-            border-bottom: 1px solid #222;
-            color: #fff;
+            border-bottom: 1px solid #eee;
+            color: #000;
             display: block;
         }
 
         .dropdown-item:hover {
-            background-color: #1a1a1a;
-            color: var(--main-color);
+            background-color: #f1f1f1;
         }
 
         .dropdown-item label {
@@ -103,44 +105,38 @@
             align-items: center;
             width: 100%;
             margin: 0;
+            /* Override global */
             font-weight: normal;
         }
 
         .dropdown-item input {
             margin-right: 10px;
             width: auto;
-            accent-color: var(--main-color);
+            /* Override global */
         }
 
         .btn {
-            background: var(--main-color);
-            color: #000;
+            background: #855;
+            color: #fff;
             border: none;
             padding: 8px 16px;
             font-size: 0.9em;
             font-weight: bold;
             cursor: pointer;
-            font-family: inherit;
+            font-family: 'Cinzel', serif;
             text-transform: uppercase;
             transition: all 0.2s;
             height: fit-content;
         }
 
         .btn:hover {
-            box-shadow: 0 0 10px var(--main-color);
-            background: #fff;
+            box-shadow: 0 0 5px #f4e4bc;
+            background: #a66;
         }
 
         .btn-secondary {
-            background: #333;
-            color: #ccc;
+            background: #555;
             font-size: 0.8em;
-        }
-
-        .btn-secondary:hover {
-            background: #444;
-            color: #fff;
-            box-shadow: none;
         }
 
         /* Grid Layout */
@@ -166,9 +162,9 @@
 
         /* Card Styling */
         .char-card {
-            background: rgba(25, 4, 100, 0.95);
-            border: 1px solid #333;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            background: rgba(245, 245, 245, 0.95);
+            border: 1px solid #444;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
             padding: 15px;
             text-align: left;
             display: flex;
@@ -177,41 +173,39 @@
         }
 
         .char-header {
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 2px solid #855;
             padding-bottom: 10px;
             margin-bottom: 15px;
             text-align: center;
         }
 
         .char-name {
-            font-family: inherit;
+            font-family: 'Cinzel', serif;
             font-size: 1.4em;
-            color: var(--main-color);
+            color: #855;
             margin: 0;
-            text-transform: uppercase;
-            text-shadow: 0 0 5px rgba(0, 242, 255, 0.933);
         }
 
         .char-class {
             font-style: italic;
-            color: #9a9494;
+            color: #555;
             font-size: 0.9em;
         }
 
         .form-section {
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(230, 230, 230, 0.5);
             padding: 10px;
             margin-bottom: 10px;
-            border: 1px solid #222;
+            border: 1px solid #ccc;
         }
 
         .section-title {
             margin: 0 0 10px 0;
-            color: #a5a4a4;
+            color: #333;
             font-weight: bold;
-            font-size: 1em;
+            font-size: 0.9em;
             text-transform: uppercase;
-            border-bottom: 1px solid #a5a4a4;
+            border-bottom: 1px solid #aaa;
             padding-bottom: 2px;
         }
 
@@ -227,25 +221,21 @@
 
         label {
             display: block;
-            color: #c0baba;
+            color: #444;
             margin-bottom: 2px;
             font-size: 0.8em;
+            font-weight: bold;
         }
 
         input[type="number"] {
-            background: #111;
-            border: 1px solid #444;
-            color: #fff;
+            background: #fff;
+            border: 1px solid #999;
+            color: #000;
             padding: 5px;
             width: 100%;
             font-family: inherit;
             font-size: 1em;
             box-sizing: border-box;
-        }
-
-        input[type="number"]:focus {
-            outline: none;
-            border-color: var(--main-color);
         }
 
         .status-msg {
@@ -259,17 +249,12 @@
         .back-link {
             display: inline-block;
             margin-top: 40px;
-            background: #111;
+            background: rgba(0, 0, 0, 0.8);
             padding: 10px 20px;
-            color: #a8a3a3;
+            color: #eee;
             text-decoration: none;
-            border: 1px solid #333;
-            transition: all 0.2s;
-        }
-
-        .back-link:hover {
-            color: var(--main-color);
-            border-color: var(--main-color);
+            font-weight: bold;
+            border: 1px solid #555;
         }
     </style>
 </head>
@@ -277,10 +262,10 @@
 <body>
 
     <div class="controls-area">
-        <h1>Sprawl Manager</h1>
+        <h1>DW Manager</h1>
 
         <div class="custom-select-container">
-            <div class="dropdown-btn" onclick="toggleDropdown()">Select Operatives</div>
+            <div class="dropdown-btn" onclick="toggleDropdown()">Select Characters</div>
             <div id="dropdown-list" class="dropdown-content">
                 <!-- Checkboxes populated here -->
             </div>
@@ -298,19 +283,21 @@
         <!-- Cards injected here -->
     </div>
 
-    <a href="/static/sprawl/gm.html" class="back-link">&lt; Back to GM Panel</a>
+    <a href="/static/dw/gm_panel.html" class="back-link">&lt; Back to GM Panel</a>
 
     <script>
         let loadedCharacters = [];
 
         async function init() {
             try {
-                const res = await fetch('/characters');
+                const res = await fetch('/dw/characters');
                 const chars = await res.json();
-                loadedCharacters = chars;
+                loadedCharacters = chars; // Cache list
 
                 const list = document.getElementById('dropdown-list');
                 list.innerHTML = '';
+
+                // Add "Select All" option? Maybe later.
 
                 chars.forEach(c => {
                     const div = document.createElement('div');
@@ -318,7 +305,7 @@
                     div.innerHTML = `
                         <label>
                             <input type="checkbox" value="${c.id}" class="char-checkbox">
-                            ${c.name} <span style="font-size:0.8em; color:#666; margin-left:5px;">(${c.playbook})</span>
+                            ${c.name} <span style="font-size:0.8em; color:#666; margin-left:5px;">(${c.hero_class})</span>
                         </label>
                     `;
                     list.appendChild(div);
@@ -332,6 +319,7 @@
             document.getElementById("dropdown-list").classList.toggle("show");
         }
 
+        // Close dropdown if clicked outside
         window.onclick = function (event) {
             if (!event.target.matches('.dropdown-btn') && !event.target.closest('.dropdown-content')) {
                 var dropdowns = document.getElementsByClassName("dropdown-content");
@@ -351,30 +339,41 @@
             container.innerHTML = '';
 
             if (selectedIds.length === 0) {
-                container.innerHTML = '<div style="grid-column:1/-1; color:#888; font-size:1.2em;">No operatives selected.</div>';
+                container.innerHTML = '<div style="grid-column:1/-1; color:#fff; font-size:1.2em;">No characters selected.</div>';
                 return;
             }
 
-            // Re-fetch to ensure fresh data
+            // Reuse cached list if we have full data, but simple list might lack details?
+            // The /dw/characters endpoint returns full objects according to schema (response_model=List[DWCharacter]).
+            // So we can just use loadedCharacters.
+
+            const selectedChars = loadedCharacters.filter(c => selectedIds.includes(String(c.id)));
+
+            // Re-fetch to be safe about latest state? User might have edited elsewhere.
+            // Let's re-fetch all for simplicity since N is small.
             try {
-                const res = await fetch('/characters');
+                const res = await fetch('/dw/characters');
                 const allChars = await res.json();
-                loadedCharacters = allChars;
+                loadedCharacters = allChars; // Update cache
 
-                const selectedChars = allChars.filter(c => selectedIds.includes(String(c.id)));
+                const FRESHselectedChars = allChars.filter(c => selectedIds.includes(String(c.id)));
 
-                selectedChars.forEach(char => {
+                FRESHselectedChars.forEach(char => {
                     renderCard(char, container);
                 });
             } catch (e) {
                 console.error(e);
-                container.innerHTML = '<div style="color:red">Connection Error</div>';
             }
 
+            // Hide dropdown
             document.getElementById("dropdown-list").classList.remove("show");
         }
 
         function renderCard(char, container) {
+            // Handle STR/INT aliases from API vs JSON
+            const strVal = char.str !== undefined ? char.str : char.strength;
+            const intVal = char.int !== undefined ? char.int : char.int_stat;
+
             const card = document.createElement('div');
             card.className = 'char-card';
             card.id = `card-${char.id}`;
@@ -382,25 +381,32 @@
             card.innerHTML = `
                 <div class="char-header">
                     <h2 class="char-name">${char.name}</h2>
-                    <span class="char-class">${char.playbook}</span>
+                    <span class="char-class">${char.hero_class} | Lvl ${char.level}</span>
                 </div>
 
                 <div class="form-section">
                     <div class="section-title">Vitals</div>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Health</label>
-                            <input type="number" class="inp-health" value="${char.health}">
+                            <label>HP Current</label>
+                            <input type="number" class="inp-hp" value="${char.current_hp}">
                         </div>
                         <div class="form-group">
-                            <label>Max Health</label>
-                            <input type="number" class="inp-max-health" value="${char.max_health || 15}">
+                            <label>HP Max</label>
+                            <input type="number" class="inp-max-hp" value="${char.max_hp}">
                         </div>
                         <div class="form-group">
                             <label>XP</label>
-                            <input type="number" class="inp-xp" value="${char.experience || 0}">
+                            <input type="number" class="inp-xp" value="${char.xp}">
                         </div>
-                         <!-- Could add points used if relevant -->
+                        <div class="form-group">
+                            <label>Level</label>
+                            <input type="number" class="inp-level" value="${char.level}">
+                        </div>
+                        <div class="form-group">
+                            <label>Coin</label>
+                            <input type="number" class="inp-coin" value="${char.coin || 0}">
+                        </div>
                     </div>
                 </div>
 
@@ -408,24 +414,28 @@
                     <div class="section-title">Stats</div>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Tough</label>
-                            <input type="number" class="inp-tough" value="${char.tough || 0}" min="-3" max="3">
+                            <label>STR</label>
+                            <input type="number" class="inp-str" value="${strVal}" min="3" max="18">
                         </div>
                         <div class="form-group">
-                            <label>Cool</label>
-                            <input type="number" class="inp-cool" value="${char.cool || 0}" min="-3" max="3">
+                            <label>DEX</label>
+                            <input type="number" class="inp-dex" value="${char.dex}" min="3" max="18">
                         </div>
                         <div class="form-group">
-                            <label>Sharp</label>
-                            <input type="number" class="inp-sharp" value="${char.sharp || 0}" min="-3" max="3">
+                            <label>CON</label>
+                            <input type="number" class="inp-con" value="${char.con}" min="3" max="18">
                         </div>
                         <div class="form-group">
-                            <label>Style</label>
-                            <input type="number" class="inp-style" value="${char.style || 0}" min="-3" max="3">
+                            <label>INT</label>
+                            <input type="number" class="inp-int" value="${intVal}" min="3" max="18">
                         </div>
                         <div class="form-group">
-                            <label>Chrome</label>
-                            <input type="number" class="inp-chrome" value="${char.chrome || 0}" min="-3" max="3">
+                            <label>WIS</label>
+                            <input type="number" class="inp-wis" value="${char.wis}" min="3" max="18">
+                        </div>
+                        <div class="form-group">
+                            <label>CHA</label>
+                            <input type="number" class="inp-cha" value="${char.cha}" min="3" max="18">
                         </div>
                     </div>
                 </div>
@@ -440,39 +450,42 @@
             const card = document.getElementById(`card-${id}`);
             const status = document.getElementById(`status-${id}`);
 
-            // Gather data for Sprawl Update
+            // Gather data
             const updates = {
-                health: parseInt(card.querySelector('.inp-health').value),
-                max_health: parseInt(card.querySelector('.inp-max-health').value),
-                experience: parseInt(card.querySelector('.inp-xp').value),
-                tough: parseInt(card.querySelector('.inp-tough').value),
-                cool: parseInt(card.querySelector('.inp-cool').value),
-                sharp: parseInt(card.querySelector('.inp-sharp').value),
-                style: parseInt(card.querySelector('.inp-style').value),
-                chrome: parseInt(card.querySelector('.inp-chrome').value)
+                current_hp: parseInt(card.querySelector('.inp-hp').value),
+                max_hp: parseInt(card.querySelector('.inp-max-hp').value),
+                xp: parseInt(card.querySelector('.inp-xp').value),
+                level: parseInt(card.querySelector('.inp-level').value),
+                coin: parseInt(card.querySelector('.inp-coin').value),
+                str: parseInt(card.querySelector('.inp-str').value),
+                dex: parseInt(card.querySelector('.inp-dex').value),
+                con: parseInt(card.querySelector('.inp-con').value),
+                int: parseInt(card.querySelector('.inp-int').value),
+                wis: parseInt(card.querySelector('.inp-wis').value),
+                cha: parseInt(card.querySelector('.inp-cha').value),
             };
 
             status.textContent = "Saving...";
-            status.style.color = "#888";
+            status.style.color = "#555";
 
             try {
-                const res = await fetch(`/characters/${id}`, {
+                const res = await fetch(`/dw/characters/${id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(updates)
                 });
 
                 if (res.ok) {
-                    status.textContent = "UPDATED";
-                    status.style.color = "var(--main-color)";
+                    status.textContent = "Saved!";
+                    status.style.color = "green";
                     setTimeout(() => status.textContent = "", 2000);
                 } else {
-                    status.textContent = "ERROR SAVING";
+                    status.textContent = "Error saving";
                     status.style.color = "red";
                 }
             } catch (e) {
                 console.error(e);
-                status.textContent = "CONNECTION ERROR";
+                status.textContent = "Network Error";
                 status.style.color = "red";
             }
         }

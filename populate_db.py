@@ -19,6 +19,77 @@ async def populate_db(conn, table_nodes="ability_nodes", table_advances="charact
     Assumes tables exist.
     """
     print(f"Populating {table_nodes} and {table_items}...")
+
+    # --- Pre-parse Move Details ---
+    move_details = {}
+    if os.path.exists(ADVANCES_FILE_PATH):
+        with open(ADVANCES_FILE_PATH, 'r') as f:
+            lines = f.readlines()
+        
+        in_details = False
+        current_move = None
+        buffer = []
+
+        def commit_move_detail():
+            nonlocal current_move, buffer
+            if current_move and buffer:
+                text = "\n".join(buffer).strip()
+                for name in current_move:
+                    move_details[name] = text
+                    # Handle "Op" suffix vs "Operation"
+                    if name.endswith(" Op"):
+                        move_details[name + "eration"] = text
+            buffer = []
+
+        for line in lines:
+            line_s = line.strip()
+            if "### Move Details" in line:
+                in_details = True
+                commit_move_detail()
+                current_move = None
+                continue
+            
+            if line.startswith("#") and "Details" not in line:
+                in_details = False
+                commit_move_detail()
+                current_move = None
+                continue
+            
+            if in_details:
+                # Check for **Name:** or **Name**
+                # Capture text inside **, ignore optional trailing colon outside or inside
+                m = re.match(r'\*\*(.*?)(?::)?\*\*(?::)?', line_s)
+                if m:
+                    commit_move_detail()
+                    raw_names = m.group(1).strip().rstrip(':')
+                    
+                    # specific manual overrides if needed, or normalization
+                    # Handle "Backstab/Sniper" -> ["Backstab", "Sniper"]
+                    names = [n.strip() for n in raw_names.split('/')]
+                    names = [n for n in names if n] # Filter empty
+
+                    current_move = names 
+                    
+                    rest = line_s[len(m.group(0)):]
+                    if rest.strip():
+                        buffer.append(rest.strip())
+                    
+                    # Use the first one as the "primary" for the buffer, 
+                    # but we map all of them to the same text eventually.
+                    # Actually, we can just set current_move to loop over.
+                    # But we need to buffer first.
+                    current_move = names 
+                    
+                    rest = line_s[len(m.group(0)):]
+                    if rest.strip():
+                        buffer.append(rest.strip())
+                elif current_move is not None:
+                    if line_s:
+                        buffer.append(line_s)
+        
+        commit_move_detail()
+    
+    print(f"Parsed {len(move_details)} move details.")
     
     # --- Part 1: Ability Tree (from rebuild_tree.py) ---
     print(f"Clearing {table_nodes}...")
@@ -79,6 +150,7 @@ async def populate_db(conn, table_nodes="ability_nodes", table_advances="charact
 
         for line in lines:
             line_s = line.strip()
+            line_indented = line.rstrip()
             
             # Section Headers
             if line_s == "# Basic Moves":
@@ -139,6 +211,13 @@ async def populate_db(conn, table_nodes="ability_nodes", table_advances="charact
                 active_node_id = None
                 continue
 
+            # Move Details Header: ### Move Details
+            if "### Move Details" in line:
+                await update_desc(active_node_id, desc_buffer)
+                desc_buffer = []
+                active_node_id = None
+                continue
+
             # List Item: * [Cost] Key/Name: Desc
             if line.lstrip().startswith("* ["):
                 await update_desc(active_node_id, desc_buffer)
@@ -176,17 +255,29 @@ async def populate_db(conn, table_nodes="ability_nodes", table_advances="charact
                 # Generate key
                 parent_key_slug = node_keys.get(parent_id, "unknown")
                 curr_slug = f"{parent_key_slug}_{name}"
+
+                # Check for "Gain the move:" pattern
+                gain_move_match = re.search(r'Gain the move[:]?\s+(.*)', desc_text, re.IGNORECASE)
+                if gain_move_match:
+                    target_move = gain_move_match.group(1).strip().rstrip('.')
+                    if target_move in move_details:
+                        desc_text = move_details[target_move]
                 
-                new_id = await insert_node(curr_slug, name, desc_text, cost, parent_id)
+                # Pass empty string for description here, populate via desc_buffer/update_desc
+                new_id = await insert_node(curr_slug, name, "", cost, parent_id)
                 node_keys[new_id] = to_slug(curr_slug)
                 active_node_id = new_id
+                
+                desc_buffer = [desc_text] if desc_text else []
+                
                 current_parent_stack.append((indent, new_id))
                 continue
 
             # Description Accumulator
             if active_node_id:
-                if line_s and not line_s.startswith("#"):
-                    desc_buffer.append(line_s)
+                if not line_s.startswith("#"):
+                    # Use line_indented to keep format
+                    desc_buffer.append(line_indented)
 
         await update_desc(active_node_id, desc_buffer)
         print("Ability Tree populated.")
@@ -216,12 +307,15 @@ async def populate_db(conn, table_nodes="ability_nodes", table_advances="charact
                 current_item = None
 
         for line in lines:
-            line = line.strip()
-            if not line: continue
+            line_s = line.strip()
+            line_indented = line.rstrip()
+            
+            if not line_s and current_item is None:
+                 continue
             
             # Headers
-            if line.startswith('## '):
-                header = line[3:].strip().lower()
+            if line_s.startswith('## '):
+                header = line_s[3:].strip().lower()
                 if 'cyberware' in header:
                     current_type = 'cyberware'
                 elif 'gear' in header:
@@ -229,9 +323,9 @@ async def populate_db(conn, table_nodes="ability_nodes", table_advances="charact
                     commit_item()
                 continue
                 
-            if line.startswith('### '):
+            if line_s.startswith('### '):
                 commit_item()
-                header = line[4:].strip().lower()
+                header = line_s[4:].strip().lower()
                 if 'stress-causing' in header:
                     current_stress = True
                     current_type = 'cyberware'
@@ -244,9 +338,9 @@ async def populate_db(conn, table_nodes="ability_nodes", table_advances="charact
                 continue
                 
             if current_type == 'cyberware':
-                if line.startswith('#### '):
+                if line_s.startswith('#### '):
                     commit_item()
-                    name = line[5:].strip()
+                    name = line_s[5:].strip()
                     current_item = {
                         'name': name,
                         'description': '',
@@ -255,20 +349,20 @@ async def populate_db(conn, table_nodes="ability_nodes", table_advances="charact
                         'stress': current_stress
                     }
                 elif current_item:
-                    if line.startswith('* +'):
-                        tag = line[3:].strip()
+                    if line_s.startswith('* +'):
+                        tag = line_s[3:].strip()
                         current_item['tags'].append(tag)
-                    elif line.startswith('*'):
+                    elif line_s.startswith('*'):
                        # If it's a list item not starting with +, treat as part of desc? 
                        # Or if it's purely a list item, maybe append to decription
-                       current_item['description'] += line + "\n"
+                       current_item['description'] += line_indented + "\n"
                     else:
-                       current_item['description'] += line + "\n"
+                       current_item['description'] += line_indented + "\n"
             
             elif current_type == 'gear':
-                if line.startswith('* '):
+                if line_s.startswith('* '):
                     commit_item()
-                    content = line[2:].strip()
+                    content = line_s[2:].strip()
                     if content.startswith('+'): continue # subtag
                     
                     if ':' in content:
@@ -287,6 +381,8 @@ async def populate_db(conn, table_nodes="ability_nodes", table_advances="charact
                         'stress': False
                     }
                     commit_item() 
+                elif current_item:
+                    current_item['description'] += "\n" + line_indented 
 
         commit_item() # Flush last
         
