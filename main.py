@@ -70,7 +70,6 @@ from models import *
 @app.post("/characters", response_model=Character)
 async def create_character(char: CharacterCreate):
     pool = app.state.pool
-    import random
     # Start all stats at -1 per user request
     tough = cool = sharp = style = chrome = -1
     
@@ -89,17 +88,15 @@ async def create_character(char: CharacterCreate):
         target_ids = []
         
         if basic_moves_root:
-             # Get all children of "Basic Moves" node.
-             bm_rows = await conn.fetch("SELECT id, key FROM ability_nodes WHERE parent_id = $1", basic_moves_root['id'])
-             
-             allowed_science = ['Netrunner', 'Driver', 'Tech', 'Juicer', 'Face']
-             
-             for r in bm_rows:
-                 if 'science' in r['key'].lower():
-                     if char.playbook in allowed_science:
-                         target_ids.append(r['id'])
-                 else:
-                     target_ids.append(r['id'])
+            # Get all children of "Basic Moves" node.
+            bm_rows = await conn.fetch("SELECT id, key FROM ability_nodes WHERE parent_id = $1", basic_moves_root['id'])
+            allowed_science = ['Netrunner', 'Driver', 'Tech', 'Juicer', 'Face']
+            for r in bm_rows:
+                if 'science' in r['key'].lower():
+                    if char.playbook in allowed_science:
+                        target_ids.append(r['id'])
+                else:
+                    target_ids.append(r['id'])
 
         # Playbook Intrinsic Moves (Cost 0)
         # Find Playbook node by key (slugified name)
@@ -224,8 +221,6 @@ async def delete_reference_move(move_id: int):
             raise HTTPException(status_code=404, detail="Move not found")
     return None
 
-
-
 @app.post("/dw/characters", response_model=DWCharacter)
 async def create_dw_character(char: DWCharacterCreate):
     pool = app.state.pool
@@ -268,43 +263,6 @@ async def delete_dw_character(char_id: int):
         await conn.execute("DELETE FROM dw_characters WHERE id = $1", char_id)
     return {"status": "success"}
 
-@app.put("/dw/characters/{char_id}", response_model=DWCharacter)
-async def update_dw_character(char_id: int, char: DWCharacterUpdate):
-    pool = app.state.pool
-    
-    # Build update query dynamically
-    fields = []
-    values = []
-    idx = 1
-    
-    update_data = char.model_dump(exclude_unset=True)
-    if not update_data:
-        # No updates
-         async with pool.acquire() as conn:
-            row = await conn.fetchrow("SELECT * FROM dw_characters WHERE id = $1", char_id)
-            if not row: raise HTTPException(status_code=404, detail="Character not found")
-            return DWCharacter(**dict(row))
-
-    for key, value in update_data.items():
-        if key == 'strength': db_key = 'str'
-        elif key == 'int_stat': db_key = 'int'
-        else: db_key = key
-            
-        # Quote "int" column
-        col = f'"{db_key}"' if db_key == 'int' else db_key
-        fields.append(f"{col} = ${idx}")
-        values.append(value)
-        idx += 1
-        
-    values.append(char_id)
-    
-    query = f"UPDATE dw_characters SET {', '.join(fields)} WHERE id = ${idx} RETURNING *"
-    
-    async with pool.acquire() as conn:
-        row = await conn.fetchrow(query, *values)
-        if not row:
-            raise HTTPException(status_code=404, detail="Character not found")
-        return DWCharacter(**dict(row))
 
 @app.get("/dw/characters", response_model=List[DWCharacter])
 async def list_dw_characters():
@@ -521,22 +479,7 @@ async def websocket_dw_tabletop(websocket: WebSocket):
         print(f"DW Tabletop WS Error: {e}")
         if websocket in app.state.dw_tabletop_connections:
             app.state.dw_tabletop_connections.remove(websocket)
-
             app.state.tabletop_connections.remove(websocket)
-
-@app.websocket("/ws/dw/tabletop")
-async def websocket_dw_tabletop(websocket: WebSocket):
-    await websocket.accept()
-    app.state.dw_tabletop_connections.append(websocket)
-    try:
-        while True:
-            await websocket.receive_text()
-    except WebSocketDisconnect:
-        app.state.dw_tabletop_connections.remove(websocket)
-    except Exception as e:
-        print(f"DW Tabletop WS Error: {e}")
-        if websocket in app.state.dw_tabletop_connections:
-            app.state.dw_tabletop_connections.remove(websocket)
 
 @app.websocket("/ws/audio/{char_id}")
 async def websocket_audio_stream(websocket: WebSocket, char_id: int):
