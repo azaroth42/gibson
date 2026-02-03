@@ -559,6 +559,32 @@ async def delete_dw_item(char_id: int, item_id: int):
         await broadcast_dw_tabletop(app, {"type": "character_update", "payload": updated_char.model_dump()})
         return updated_char
 
+@app.put("/dw/characters/{char_id}/items/{item_id}")
+async def update_dw_item(char_id: int, item_id: int, item: DWItemUpdate):
+    pool = app.state.pool
+    update_data = item.model_dump(exclude_unset=True)
+    
+    if not update_data:
+         return await get_dw_character_internal(pool, char_id) # Should theoretically be conn but helper takes conn.
+         # Actually we need a connection here.
+         
+    set_clauses = []
+    values = []
+    for i, (key, value) in enumerate(update_data.items(), start=1):
+        set_clauses.append(f"{key} = ${i}")
+        values.append(value)
+    
+    values.append(item_id)
+    values.append(char_id)
+    
+    query = f"UPDATE dw_items SET {', '.join(set_clauses)} WHERE id = ${len(values)-1} AND character_id = ${len(values)}"
+    
+    async with pool.acquire() as conn:
+        await conn.execute(query, *values)
+        updated_char = await get_dw_character_internal(conn, char_id)
+        await broadcast_dw_tabletop(app, {"type": "character_update", "payload": updated_char.model_dump()})
+        return updated_char
+
 @app.post("/dw/characters/{char_id}/items")
 async def add_dw_item(char_id: int, item: DWItemAdd):
     pool = app.state.pool

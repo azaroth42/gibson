@@ -130,15 +130,6 @@ CREATE TABLE IF NOT EXISTS dw_items (
     qty INTEGER DEFAULT 1
 );
 
-CREATE TABLE IF NOT EXISTS dw_reference_items (
-    id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    tags TEXT[],
-    weight INTEGER DEFAULT 0,
-    class TEXT, -- Nullable if global
-    description TEXT
-);
-
 CREATE TABLE IF NOT EXISTS dw_character_moves (
     id SERIAL PRIMARY KEY,
     character_id INTEGER REFERENCES dw_characters(id) ON DELETE CASCADE,

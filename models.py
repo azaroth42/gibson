@@ -154,6 +154,13 @@ class DWItemAdd(BaseModel):
     weight: int = 0
     qty: int = 1
 
+class DWItemUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    tags: Optional[List[str]] = None
+    weight: Optional[int] = None
+    qty: Optional[int] = None
+
 class DWMoveAdd(BaseModel):
     name: str
     description: Optional[str] = None

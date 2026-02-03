@@ -209,7 +209,11 @@
                 <!-- Moves -->
             </div>
 
-            <h2>Gear <span style="font-size:0.6em; float:right;">Load: <span id="load">0</span>/10</span></h2>
+            <h2>
+                Gear
+                <button class="btn" style="font-size:0.6em; margin-left:10px;" onclick="openItemModal()">+ Add</button>
+                <span style="font-size:0.6em; float:right;">Load: <span id="load">0</span>/10</span>
+            </h2>
             <div id="gear-container">
                 <!-- Items -->
             </div>
@@ -225,6 +229,34 @@
             </div>
             <div id="available-moves-list" class="scrollalbe-list">
                 <!-- Moves will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Item Modal -->
+    <div id="item-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="item-modal-title">Add Equipment</h2>
+                <button class="close-btn" onclick="closeItemModal()">&times;</button>
+            </div>
+            <div class="modal-body" style="display:flex; flex-direction:column; gap:10px;">
+                <input type="hidden" id="item-id">
+                <div>
+                    <label style="display:block; font-family:'Cinzel',serif; color:#522;">Name</label>
+                    <input type="text" id="item-name" class="option-select">
+                </div>
+                <div>
+                    <label style="display:block; font-family:'Cinzel',serif; color:#522;">Tags (comma separated)</label>
+                    <input type="text" id="item-tags" class="option-select">
+                </div>
+                <div>
+                    <label style="display:block; font-family:'Cinzel',serif; color:#522;">Description</label>
+                    <textarea id="item-desc" class="look-box" style="height:100px;"></textarea>
+                </div>
+                <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+                    <button class="btn" onclick="saveItem()">Save</button>
+                </div>
             </div>
         </div>
     </div>
@@ -489,10 +521,145 @@
                 totalLoad += (i.weight * i.qty);
                 const row = document.createElement('div');
                 row.className = 'item-row';
-                row.innerHTML = `<span>${i.name} (x${i.qty})</span><span style="color:#777;">${i.weight} wt</span>`;
+                row.style.cursor = 'pointer';
+
+                // Content
+                const contentSpan = document.createElement('span');
+                contentSpan.innerHTML = `<strong>${i.name}</strong> <span style="font-size:0.9em; color:#666;">(${i.tags ? i.tags.join(', ') : ''})</span>`;
+                contentSpan.onclick = () => openItemModal(i);
+
+                // Delete Button
+                const delBtn = document.createElement('span');
+                delBtn.textContent = '[x]';
+                delBtn.style.color = '#a00';
+                delBtn.style.marginLeft = '10px';
+                delBtn.style.cursor = 'pointer';
+                delBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteItem(i.id);
+                };
+
+                row.appendChild(contentSpan);
+                row.appendChild(delBtn);
+
+                // Description (if any)
+                if (i.description) {
+                    const descDiv = document.createElement('div');
+                    descDiv.style.fontSize = '0.85em';
+                    descDiv.style.fontStyle = 'italic';
+                    descDiv.style.color = '#555';
+                    descDiv.style.marginLeft = '10px';
+                    descDiv.textContent = i.description;
+                    // row is flex? No, strictly block by default style. 
+                    // Let's modify structure slightly
+                    const wrapper = document.createElement('div');
+                    wrapper.appendChild(contentSpan);
+                    wrapper.appendChild(delBtn);
+                    row.innerHTML = ''; // reset
+                    row.appendChild(wrapper);
+                    row.appendChild(descDiv);
+                }
+
                 gearDiv.appendChild(row);
             });
             document.getElementById('load').textContent = totalLoad;
+        }
+
+        // Item Management Logic
+        function openItemModal(item = null) {
+            const modal = document.getElementById('item-modal');
+            const title = document.getElementById('item-modal-title');
+            const idInput = document.getElementById('item-id');
+            const nameInput = document.getElementById('item-name');
+            const tagsInput = document.getElementById('item-tags');
+            const descInput = document.getElementById('item-desc');
+
+            modal.style.display = 'flex';
+
+            if (item) {
+                title.textContent = 'Edit Equipment';
+                idInput.value = item.id;
+                nameInput.value = item.name;
+                tagsInput.value = item.tags ? item.tags.join(', ') : '';
+                descInput.value = item.description || '';
+            } else {
+                title.textContent = 'Add Equipment';
+                idInput.value = '';
+                nameInput.value = '';
+                tagsInput.value = '';
+                descInput.value = '';
+            }
+        }
+
+        function closeItemModal() {
+            document.getElementById('item-modal').style.display = 'none';
+        }
+
+        async function saveItem() {
+            const id = document.getElementById('item-id').value;
+            const name = document.getElementById('item-name').value;
+            const tagsStr = document.getElementById('item-tags').value;
+            const desc = document.getElementById('item-desc').value;
+
+            if (!name) {
+                alert("Name is required");
+                return;
+            }
+
+            const tags = tagsStr.split(',').map(t => t.trim()).filter(t => t);
+
+            const payload = {
+                name: name,
+                description: desc,
+                tags: tags,
+                qty: 1, // Default
+                weight: 0 // Default, user said don't worry about it
+            };
+
+            try {
+                let url = `/dw/characters/${charId}/items`;
+                let method = 'POST';
+
+                if (id) {
+                    url += `/${id}`;
+                    method = 'PUT';
+                }
+
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    closeItemModal();
+                    charData = await res.json();
+                    render();
+                } else {
+                    alert("Error saving item");
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Error saving item");
+            }
+        }
+
+        async function deleteItem(itemId) {
+            if (!confirm("Delete this item?")) return;
+            try {
+                const res = await fetch(`/dw/characters/${charId}/items/${itemId}`, {
+                    method: 'DELETE'
+                });
+
+                if (res.ok) {
+                    charData = await res.json();
+                    render();
+                } else {
+                    alert("Error deleting item");
+                }
+            } catch (e) {
+                alert("Error deleting item");
+            }
         }
 
         async function updateOption(key, value) {
