@@ -172,9 +172,13 @@ class DWReferenceMoveCreate(BaseModel):
     type: str = 'basic'
     class_name: Optional[str] = Field(None, alias="class")
 
+
 class DWReferenceMoveUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     type: Optional[str] = None
     class_name: Optional[str] = Field(None, alias="class")
+
+class DWMoveLink(BaseModel):
+    move_id: int
 

@@ -571,6 +571,84 @@ async def add_dw_item(char_id: int, item: DWItemAdd):
         await broadcast_dw_tabletop(app, {"type": "character_update", "payload": updated_char.model_dump()})
         return updated_char
 
+@app.get("/dw/characters/{char_id}/available-moves", response_model=List[DWReferenceMove])
+async def list_available_moves(char_id: int):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        # Get character class
+        char_row = await conn.fetchrow("SELECT hero_class FROM dw_characters WHERE id = $1", char_id)
+        if not char_row:
+             raise HTTPException(status_code=404, detail="Character not found")
+        
+        hero_class = char_row['hero_class']
+
+        # Get existing move IDs
+        existing_moves = await conn.fetch("SELECT move_id FROM dw_character_moves WHERE character_id = $1", char_id)
+        existing_ids = [r['move_id'] for r in existing_moves]
+        
+        # Build query
+        query = "SELECT * FROM dw_reference_moves WHERE lower(class) = lower($1) AND type = 'advanced'"
+        args = [hero_class]
+        
+        if existing_ids:
+            query += f" AND id != ALL(${len(args) + 1}::int[])"
+            args.append(existing_ids)
+            
+        query += " ORDER BY name"
+        
+        rows = await conn.fetch(query, *args)
+        return [DWReferenceMove(**dict(r)) for r in rows]
+
+@app.post("/dw/characters/{char_id}/moves")
+async def add_dw_character_move(char_id: int, move_link: DWMoveLink):
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        # 1. Check Character & Limits
+        char = await conn.fetchrow("SELECT level, hero_class FROM dw_characters WHERE id = $1", char_id)
+        if not char:
+             raise HTTPException(status_code=404, detail="Character not found")
+             
+        level = char['level']
+        allowed_advances = max(0, level - 1)
+        
+        # Count existing advanced moves
+        current_advances = await conn.fetchval("""
+            SELECT count(*) 
+            FROM dw_character_moves cm
+            JOIN dw_reference_moves rm ON cm.move_id = rm.id
+            WHERE cm.character_id = $1 AND rm.type = 'advanced'
+        """, char_id)
+        
+        if current_advances >= allowed_advances:
+             raise HTTPException(status_code=400, detail="No advanced move slots available for this level.")
+             
+        # 2. Check Move Validity
+        move = await conn.fetchrow("SELECT * FROM dw_reference_moves WHERE id = $1", move_link.move_id)
+        if not move:
+             raise HTTPException(status_code=404, detail="Move not found")
+             
+        if move['type'] != 'advanced':
+             raise HTTPException(status_code=400, detail="Only advanced moves can be added via this endpoint.")
+             
+        if move['class'] and move['class'].lower() != char['hero_class'].lower():
+             # Basic moves (class=NULL) are not advanced moves usually, but check anyway
+             pass # Strict class check? The moves list endpoint filters by class.
+             # If someone tries to add another class move, maybe allow it for multiclass?
+             # But prompt says "moves for the class of the character".
+             if move['class'].lower() != char['hero_class'].lower():
+                  raise HTTPException(status_code=400, detail="Move does not belong to character class.")
+
+        # 3. Add Move
+        try:
+            await conn.execute("INSERT INTO dw_character_moves (character_id, move_id) VALUES ($1, $2)", char_id, move_link.move_id)
+        except asyncpg.UniqueViolationError:
+            pass # Already exists, ignore
+            
+        updated_char = await get_dw_character_internal(conn, char_id)
+        # Broadcast? The existing code for items/updates does broadcast.
+        await broadcast_dw_tabletop(app, {"type": "character_update", "payload": updated_char.model_dump()})
+        return updated_char
+
 async def get_dw_character_internal(conn, char_id: int) -> DWCharacter:
     row = await conn.fetchrow("""
         SELECT *, "int" as int_stat FROM dw_characters WHERE id = $1

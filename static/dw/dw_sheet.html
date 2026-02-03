@@ -57,6 +57,61 @@
             margin-top: 5px;
             font-style: italic;
         }
+
+        /* Modal CSS */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #e8dcc5;
+            padding: 20px;
+            border-radius: 5px;
+            border: 2px solid #522;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #522;
+            padding-bottom: 10px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-family: 'Cinzel', serif;
+            color: #522;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #522;
+        }
+
+        .scrollalbe-list {
+            overflow-y: auto;
+            flex-grow: 1;
+        }
     </style>
 </head>
 
@@ -157,6 +212,19 @@
             <h2>Gear <span style="font-size:0.6em; float:right;">Load: <span id="load">0</span>/10</span></h2>
             <div id="gear-container">
                 <!-- Items -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Move Modal -->
+    <div id="add-move-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Advanced Move</h2>
+                <button class="close-btn" onclick="closeAddMoveModal()">&times;</button>
+            </div>
+            <div id="available-moves-list" class="scrollalbe-list">
+                <!-- Moves will be loaded here -->
             </div>
         </div>
     </div>
@@ -338,9 +406,36 @@
             const basicMoves = charData.moves.filter(m => m.type === 'basic');
             const specialMoves = charData.moves.filter(m => m.type === 'special');
 
+            // Sort: Starting < Advanced, then Alphabetical
+            classMoves.sort((a, b) => {
+                const typeOrder = { 'starting': 0, 'advanced': 1 };
+                const scoreA = typeOrder[a.type] !== undefined ? typeOrder[a.type] : 2;
+                const scoreB = typeOrder[b.type] !== undefined ? typeOrder[b.type] : 2;
+
+                if (scoreA !== scoreB) return scoreA - scoreB;
+                return a.name.localeCompare(b.name);
+            });
+
             if (classMoves.length > 0) {
-                const header = document.createElement('h3');
-                header.textContent = 'Class Moves';
+                const header = document.createElement('div');
+                header.style.display = 'flex';
+                header.style.justifyContent = 'space-between';
+                header.style.alignItems = 'center';
+                header.innerHTML = '<h3>Class Moves</h3>';
+
+                // Add Move Button Logic
+                const advancedMovesCount = charData.moves.filter(m => m.type === 'advanced').length;
+                const allowedMoves = Math.max(0, charData.level - 1);
+
+                if (advancedMovesCount < allowedMoves) {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn';
+                    btn.textContent = 'Add Move';
+                    btn.style.fontSize = '0.8em';
+                    btn.onclick = openAddMoveModal;
+                    header.appendChild(btn);
+                }
+
                 movesDiv.appendChild(header);
                 classMoves.forEach(m => movesDiv.appendChild(createMoveCard(m, true)));
             }
@@ -440,6 +535,68 @@
                 render();
             } else {
                 alert("Error updating character");
+            }
+        }
+
+        // Add Move Modal Logic
+        async function openAddMoveModal() {
+            const modal = document.getElementById('add-move-modal');
+            const list = document.getElementById('available-moves-list');
+            list.innerHTML = 'Loading...';
+            modal.style.display = 'flex';
+
+            try {
+                const res = await fetch(`/dw/characters/${charId}/available-moves`);
+                const moves = await res.json();
+                list.innerHTML = '';
+
+                if (moves.length === 0) {
+                    list.innerHTML = '<div style="padding:10px; text-align:center;">No available moves found.</div>';
+                    return;
+                }
+
+                moves.forEach(m => {
+                    const item = document.createElement('div');
+                    item.className = 'move-card';
+                    item.style.cursor = 'default';
+                    item.innerHTML = `
+                        <div class="move-header" style="justify-content:space-between; cursor:default;">
+                            <strong>${m.name}</strong>
+                            <button class="btn" style="font-size:0.8em;" onclick="addMove(${m.id})">Add</button>
+                        </div>
+                        <div class="move-desc" style="display:block; font-size:0.9em; padding-top:5px;">
+                            ${marked.parse(m.description || "")}
+                        </div>
+                    `;
+                    list.appendChild(item);
+                });
+            } catch (e) {
+                list.innerHTML = '<div style="color:red; paading:10px;">Error loading moves</div>';
+            }
+        }
+
+        function closeAddMoveModal() {
+            document.getElementById('add-move-modal').style.display = 'none';
+        }
+
+        async function addMove(moveId) {
+            try {
+                const res = await fetch(`/dw/characters/${charId}/moves`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ move_id: moveId })
+                });
+
+                if (res.ok) {
+                    closeAddMoveModal();
+                    charData = await res.json();
+                    render();
+                } else {
+                    const err = await res.json();
+                    alert("Error: " + err.detail);
+                }
+            } catch (e) {
+                alert("Error adding move");
             }
         }
 
