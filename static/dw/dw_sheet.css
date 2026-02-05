@@ -28,11 +28,18 @@ h4 {
     /* max-width: 900px; */
     margin: 0;
     display: grid;
-    grid-template-columns: 350px 1fr;
+    grid-template-columns: 350px 1fr 350px;
     /* Wider sidebar */
     gap: 30px;
     padding-right: 20px;
 
+    border-radius: 5px;
+}
+
+.gear-sidebar {
+    background: rgba(255, 255, 255, 0.5);
+    padding: 20px;
+    border: 3px double #855;
     border-radius: 5px;
 }
 

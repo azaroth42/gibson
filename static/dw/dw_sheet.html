@@ -208,7 +208,9 @@
             <div id="moves-container">
                 <!-- Moves -->
             </div>
+        </div>
 
+        <div class="gear-sidebar">
             <h2>
                 Gear
                 <button class="btn" style="font-size:0.6em; margin-left:10px;" onclick="openItemModal()">+ Add</button>
@@ -469,7 +471,7 @@
                 }
 
                 movesDiv.appendChild(header);
-                classMoves.forEach(m => movesDiv.appendChild(createMoveCard(m, true)));
+                classMoves.forEach(m => movesDiv.appendChild(createMoveCard(m, false)));
             }
 
             renderMoveSection(movesDiv, 'Basic Moves', basicMoves, false);

@@ -1,0 +1,61 @@
+330,The BARD,alignment,Good,Perform your art to aid someone else.
+331,The BARD,alignment,Neutral,Avoid a conflict or defuse a tense situation.
+332,The BARD,alignment,Chaotic,Spur others to significant and unplanned decisive action.
+333,The BARD,race,Elf,When you enter an important location (your call) you can ask the GM for one fact from the history of that location.
+334,The BARD,race,Human,When you first enter a civilized settlement someone who respects the custom of hospitality to minstrels will take you in as their guest.
+335,The BARD,damage_die,Damage,d6
+336,The BARD,max_hp,Max HP,6 + Constitution
+337,The CLERIC,alignment,Good,Endanger yourself to heal another.
+338,The CLERIC,alignment,Lawful,Endanger yourself following the precepts of your church or god.
+339,The CLERIC,alignment,Evil,Harm another to prove the superiority of your church or god.
+340,The CLERIC,race,Dwarf,You are one with stone. When you commune you are also granted a special version of Words of the Unspeaking as a rote which only works on stone.
+341,The CLERIC,race,Human,Your faith is diverse. Choose one wizard spell. You can cast and be granted that spell as if it was a cleric spell.
+342,The CLERIC,damage_die,Damage,d6
+343,The CLERIC,max_hp,Max HP,6 + Constitution
+344,The DRUID,alignment,Chaotic,Destroy a symbol of civilization.
+345,The DRUID,alignment,Good,Help something or someone grow.
+346,The DRUID,alignment,Neutral,Eliminate an unnatural menace.
+347,The DRUID,race,Elf,"The sap of the elder trees flows within you. In addition to any other attunements, the Great Forest is always considered your land."
+348,The DRUID,race,Human,"As your people learned to bind animals to field and farm, so too are you bound to them. You may always take the shape of any domesticated animal, in addition to your normal options."
+349,The DRUID,race,Halfling,"You sing the healing songs of spring and brook. When you make camp, you and your allies heal +1d6."
+350,The DRUID,damage_die,Damage,d6
+351,The DRUID,max_hp,Max HP,6 + Constitution
+352,The FIGHTER,alignment,Good,Defend those weaker than you.
+353,The FIGHTER,alignment,Neutral,Defeat a worthy opponent.
+354,The FIGHTER,alignment,Evil,Kill a defenseless or surrendered enemy.
+355,The FIGHTER,race,Dwarf,"When you share a drink with someone, you may parley with them using CON instead of CHA."
+356,The FIGHTER,race,Elf,Choose one weapon—you can always treat weapons of that type as if they had the precise tag.
+357,The FIGHTER,race,Halfling,"When you defy danger and use your small size to your advantage, take +1."
+358,The FIGHTER,race,Human,Once per battle you may reroll a single damage roll (yours or someone else’s).
+359,The FIGHTER,damage_die,Damage,d10
+360,The FIGHTER,max_hp,Max HP,10 + Constitution
+361,The PALADIN,alignment,Lawful,Deny mercy to a criminal or unbeliever.
+362,The PALADIN,alignment,Good,Endanger yourself to protect someone weaker than you.
+363,The PALADIN,race,Human,"You are human, so you get this move. When you pray for guidance, even for a moment, and ask, “What here is evil?” the GM will tell you, honestly."
+364,The PALADIN,damage_die,Damage,d10
+365,The PALADIN,max_hp,Max HP,10 + Constitution
+366,The RANGER,alignment,Chaotic,Free someone from literal or figurative bonds.
+367,The RANGER,alignment,Good,Endanger yourself to combat an unnatural threat.
+368,The RANGER,alignment,Neutral,Help an animal or spirit of the wild.
+369,The RANGER,race,Elf,When you undertake a perilous journey through wilderness whatever job you take you succeed as if you rolled a 10+.
+370,The RANGER,race,Human,"When you make camp in a dungeon or city, you don’t need to consume a ration."
+371,The RANGER,damage_die,Damage,d8
+372,The RANGER,max_hp,Max HP,8 + Constitution
+373,The THIEF,alignment,Chaotic,Leap into danger without a plan.
+374,The THIEF,alignment,Neutral,Avoid detection or infiltrate a location.
+375,The THIEF,alignment,Evil,Shift danger or blame from yourself to someone else.
+376,The THIEF,race,Halfling,"When you attack with a ranged weapon, deal +2 damage."
+377,The THIEF,race,Human,"You are a professional. When you spout lore or discern realities about criminal activities, take +1."
+378,The THIEF,damage_die,Damage,d8
+379,The THIEF,max_hp,Max HP,6 + Constitution
+380,The WIZARD,alignment,Good,Use magic to directly aid another.
+381,The WIZARD,alignment,Neutral,Discover something about a magical mystery.
+382,The WIZARD,alignment,Evil,Use magic to cause terror and fear.
+383,The WIZARD,race,Elf,Magic is as natural as breath to you. Detect Magic is a cantrip for you.
+384,The WIZARD,race,Human,Choose one cleric spell. You can cast it as if it was a wizard spell.
+385,The WIZARD,damage_die,Damage,d4
+386,The WIZARD,max_hp,Max HP,4 + Constitution
+387,The BARBARIAN,alignment,Chaotic,Eschew a convention of the civilized world.
+388,The BARBARIAN,alignment,Neutral,Teach someone the ways of your people.
+389,The BARBARIAN,race,Outsider,"You may be elf, dwarf, halfling, or human, but you and your people are not from around here. At the beginning of each session, the GM will ask you something about your homeland, why you left, or what you left behind. If you answer them, mark XP."
+395,The BARBARIAN,damage_die,Damage,d10

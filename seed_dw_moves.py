@@ -4,6 +4,7 @@ from db import init_db, get_db_pool
 
 RULES_FILE = 'rules/DungeonWorld_Rules.md'
 
+
 async def seed_moves():
     print("Initializing database...")
     await init_db()

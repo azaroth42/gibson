@@ -67,7 +67,6 @@ async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-
 ### Websocket endpoints
 
 # IMPORTANT: Define specific routes before generic ones
@@ -597,6 +596,13 @@ async def add_dw_item(char_id: int, item: DWItemAdd):
         await broadcast_dw_tabletop(app, {"type": "character_update", "payload": updated_char.model_dump()})
         return updated_char
 
+@app.get("/dw/moves", response_model=List[DWReferenceMove])
+async def list_all_moves():
+    pool = app.state.pool
+    async with pool.acquire() as conn:
+        rows = await conn.fetch("SELECT * FROM dw_reference_moves ORDER BY class, type DESC, name")
+        return [DWReferenceMove(**dict(r)) for r in rows]
+
 @app.get("/dw/characters/{char_id}/available-moves", response_model=List[DWReferenceMove])
 async def list_available_moves(char_id: int):
     pool = app.state.pool
@@ -626,7 +632,7 @@ async def list_available_moves(char_id: int):
         return [DWReferenceMove(**dict(r)) for r in rows]
 
 @app.post("/dw/characters/{char_id}/moves")
-async def add_dw_character_move(char_id: int, move_link: DWMoveLink):
+async def add_dw_character_move(char_id: int, move_link: DWMoveLink, ignore_requirements: bool = False):
     pool = app.state.pool
     async with pool.acquire() as conn:
         # 1. Check Character & Limits
@@ -645,24 +651,26 @@ async def add_dw_character_move(char_id: int, move_link: DWMoveLink):
             WHERE cm.character_id = $1 AND rm.type = 'advanced'
         """, char_id)
         
-        if current_advances >= allowed_advances:
-             raise HTTPException(status_code=400, detail="No advanced move slots available for this level.")
-             
-        # 2. Check Move Validity
-        move = await conn.fetchrow("SELECT * FROM dw_reference_moves WHERE id = $1", move_link.move_id)
-        if not move:
-             raise HTTPException(status_code=404, detail="Move not found")
-             
-        if move['type'] != 'advanced':
-             raise HTTPException(status_code=400, detail="Only advanced moves can be added via this endpoint.")
-             
-        if move['class'] and move['class'].lower() != char['hero_class'].lower():
-             # Basic moves (class=NULL) are not advanced moves usually, but check anyway
-             pass # Strict class check? The moves list endpoint filters by class.
-             # If someone tries to add another class move, maybe allow it for multiclass?
-             # But prompt says "moves for the class of the character".
-             if move['class'].lower() != char['hero_class'].lower():
-                  raise HTTPException(status_code=400, detail="Move does not belong to character class.")
+        # Validate Requirements (unless ignored)
+        if not ignore_requirements:
+            if current_advances >= allowed_advances:
+                raise HTTPException(status_code=400, detail="No advanced move slots available for this level.")
+
+            # 2. Validate Move
+            move = await conn.fetchrow("SELECT * FROM dw_reference_moves WHERE id = $1", move_link.move_id)
+            if not move:
+                 raise HTTPException(status_code=404, detail="Move not found")
+                 
+            if move['type'] != 'advanced':
+                 raise HTTPException(status_code=400, detail="Only advanced moves can be added via this endpoint.")
+                 
+            if move['class'] and move['class'].lower() != char['hero_class'].lower():
+                 raise HTTPException(status_code=400, detail="Move is not for this class")
+        else:
+            # Still need to verify move exists for integrity
+             move = await conn.fetchrow("SELECT * FROM dw_reference_moves WHERE id = $1", move_link.move_id)
+             if not move:
+                 raise HTTPException(status_code=404, detail="Move not found")
 
         # 3. Add Move
         try:

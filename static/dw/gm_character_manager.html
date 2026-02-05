@@ -256,6 +256,143 @@
             font-weight: bold;
             border: 1px solid #555;
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #e8dcc5;
+            padding: 0;
+            border-radius: 5px;
+            border: 2px solid #522;
+            width: 80%;
+            max-width: 1000px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #522;
+            color: #fff;
+            border-bottom: 2px solid #300;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-family: 'Cinzel', serif;
+            color: #fff;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #fff;
+        }
+
+        .browse-container {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .class-list {
+            width: 250px;
+            background: rgba(0, 0, 0, 0.1);
+            border-right: 1px solid #855;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .class-item {
+            padding: 15px;
+            border-bottom: 1px solid #ccc;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            color: #333;
+            transition: background 0.2s;
+        }
+
+        .class-item:hover {
+            background: rgba(136, 85, 85, 0.1);
+        }
+
+        .class-item.active {
+            background: #855;
+            color: #fff;
+        }
+
+        .moves-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .move-category {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2em;
+            color: #855;
+            border-bottom: 2px solid #855;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+        }
+
+        .move-category:first-child {
+            margin-top: 0;
+        }
+
+        .move-card {
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .move-card:hover {
+            border-color: #855;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transform: translateX(5px);
+        }
+
+        .move-card h4 {
+            margin: 0 0 5px 0;
+            color: #333;
+            font-family: 'Cinzel', serif;
+        }
+
+        .move-card .desc {
+            font-size: 0.9em;
+            color: #555;
+            max-height: 3.6em;
+            /* roughly 3 lines */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     </style>
 </head>
 
@@ -285,8 +422,30 @@
 
     <a href="/static/dw/gm_panel.html" class="back-link">&lt; Back to GM Panel</a>
 
+    <!-- Add Move Modal -->
+    <div id="move-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="move-modal-title">Add Move</h2>
+                <button class="close-btn" onclick="closeMoveModal()">&times;</button>
+            </div>
+            <div class="browse-container">
+                <div id="class-list" class="class-list">
+                    <!-- Class items injected here -->
+                </div>
+                <div id="moves-area" class="moves-list">
+                    <div style="padding:40px; text-align:center; color:#666; font-style:italic;">
+                        Select a Class to view moves...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         let loadedCharacters = [];
+        let allMoves = [];
+        let activeCharId = null;
 
         async function init() {
             try {
@@ -310,8 +469,20 @@
                     `;
                     list.appendChild(div);
                 });
+
+                // Pre-fetch moves
+                loadAllMoves();
             } catch (e) {
                 console.error("Failed to load characters list", e);
+            }
+        }
+
+        async function loadAllMoves() {
+            try {
+                const res = await fetch('/dw/moves');
+                allMoves = await res.json();
+            } catch (e) {
+                console.error("Failed to load moves", e);
             }
         }
 
@@ -440,7 +611,10 @@
                     </div>
                 </div>
 
-                <button class="btn" style="width:100%; margin-top:auto;" onclick="saveCard(${char.id})">Save Changes</button>
+                <div style="margin-top:auto; display:flex; flex-direction:column; gap:10px;">
+                    <button class="btn" style="width:100%;" onclick="openMoveModal('${char.id}', '${char.name}')">Add Move</button>
+                    <button class="btn" style="width:100%;" onclick="saveCard(${char.id})">Save Changes</button>
+                </div>
                 <div class="status-msg" id="status-${char.id}"></div>
             `;
             container.appendChild(card);
@@ -495,6 +669,128 @@
         }
         function gridTemplate4() {
             document.getElementById('cards-container').style.gridTemplateColumns = 'repeat(4, 1fr)';
+        }
+
+        /* Modal Logic */
+        function openMoveModal(charId, charName) {
+            activeCharId = charId;
+            document.getElementById('move-modal-title').textContent = `Add Move to ${charName}`;
+            document.getElementById('move-modal').style.display = 'flex';
+            renderClassList();
+        }
+
+        function closeMoveModal() {
+            document.getElementById('move-modal').style.display = 'none';
+            activeCharId = null;
+            document.getElementById('moves-area').innerHTML = '<div style="padding:40px; text-align:center; color:#666; font-style:italic;">Select a Class to view moves...</div>';
+            // Clear active class selection
+            document.querySelectorAll('.class-item').forEach(el => el.classList.remove('active'));
+        }
+
+        function renderClassList() {
+            const container = document.getElementById('class-list');
+            container.innerHTML = '';
+
+            // Extract unique classes
+            const classes = new Set();
+            classes.add("Special / Basic"); // For null class moves
+
+            allMoves.forEach(m => {
+                if (m.class) classes.add(m.class);
+            });
+
+            const sortedClasses = Array.from(classes).sort();
+
+            sortedClasses.forEach(cls => {
+                const div = document.createElement('div');
+                div.className = 'class-item';
+                div.textContent = cls;
+                div.onclick = () => selectClass(cls, div);
+                container.appendChild(div);
+            });
+        }
+
+        function selectClass(className, element) {
+            // Highlight
+            document.querySelectorAll('.class-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            const container = document.getElementById('moves-area');
+            container.innerHTML = '';
+
+            // Filter moves
+            const moves = allMoves.filter(m => {
+                if (className === "Special / Basic") return !m.class;
+                return m.class === className;
+            });
+
+            // Group by Type
+            const starting = moves.filter(m => m.type === 'starting').sort((a, b) => a.name.localeCompare(b.name));
+            const advanced = moves.filter(m => m.type === 'advanced').sort((a, b) => a.name.localeCompare(b.name));
+            const special = moves.filter(m => m.type !== 'starting' && m.type !== 'advanced').sort((a, b) => a.name.localeCompare(b.name));
+
+            if (starting.length > 0) {
+                renderMoveGroup('Starting Moves', starting, container);
+            }
+            if (advanced.length > 0) {
+                renderMoveGroup('Advanced Moves', advanced, container);
+            }
+            if (special.length > 0) {
+                renderMoveGroup('Special Moves', special, container);
+            }
+
+            if (moves.length === 0) {
+                container.innerHTML = '<div style="padding:20px;">No moves found for this category.</div>';
+            }
+        }
+
+        function renderMoveGroup(title, moves, container) {
+            const h3 = document.createElement('div');
+            h3.className = 'move-category';
+            h3.textContent = title;
+            container.appendChild(h3);
+
+            moves.forEach(m => {
+                const div = document.createElement('div');
+                div.className = 'move-card';
+                // Strip markdown for preview? Or just show raw? 
+                // Let's strip simple markdown for the preview part
+                const cleanDesc = m.description.replace(/(\*|_|#|\[|\])/g, '');
+
+                div.innerHTML = `
+                    <h4>${m.name}</h4>
+                    <div class="desc">${cleanDesc}</div>
+                `;
+                div.onclick = () => addMoveToChar(m.id, m.name);
+                container.appendChild(div);
+            });
+        }
+
+        async function addMoveToChar(moveId, moveName) {
+            if (!activeCharId) return;
+
+            if (!confirm(`Add "${moveName}" to selected character?`)) return;
+
+            try {
+                const res = await fetch(`/dw/characters/${activeCharId}/moves?ignore_requirements=true`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ move_id: moveId })
+                });
+
+                if (res.ok) {
+                    alert(`"${moveName}" added successfully!`);
+                    // We don't necessarily close the modal, maybe they want to add more?
+                    // But usually one at a time. Let's close it for cleanliness.
+                    closeMoveModal();
+                } else {
+                    const err = await res.json();
+                    alert('Error adding move: ' + err.detail);
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Network error');
+            }
         }
 
         init();
