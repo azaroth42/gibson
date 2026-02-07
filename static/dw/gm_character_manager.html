@@ -410,9 +410,15 @@
 
         <button class="btn" onclick="loadSelected()">Load Selected</button>
 
-        <div style="margin-left:auto; display:flex; gap:10px;">
-            <button class="btn btn-secondary" onclick="gridTemplate3()">3 Col</button>
-            <button class="btn btn-secondary" onclick="gridTemplate4()">4 Col</button>
+        <div style="margin-left:auto; display:flex; align-items:center; gap:5px;">
+            <label style="color:#000; font-weight:bold; margin:0; margin-right:5px;">Cols:</label>
+            <select id="column-select" onchange="updateGridColumns()"
+                style="padding:5px; border:1px solid #888; border-radius:4px;">
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+            </select>
         </div>
     </div>
 
@@ -463,12 +469,15 @@
                     div.className = 'dropdown-item';
                     div.innerHTML = `
                         <label>
-                            <input type="checkbox" value="${c.id}" class="char-checkbox">
+                            <input type="checkbox" value="${c.id}" class="char-checkbox" checked>
                             ${c.name} <span style="font-size:0.8em; color:#666; margin-left:5px;">(${c.hero_class})</span>
                         </label>
                     `;
                     list.appendChild(div);
                 });
+
+                // Load initial view
+                loadSelected();
 
                 // Pre-fetch moves
                 loadAllMoves();
@@ -549,9 +558,11 @@
             card.className = 'char-card';
             card.id = `card-${char.id}`;
 
+            var charname = char.name.replace("'", "-");
+
             card.innerHTML = `
                 <div class="char-header">
-                    <h2 class="char-name"><a href="/static/dw/dw_sheet.html?id=${char.id}">${char.name}</a></h2>
+                    <h2 class="char-name"><a href="/static/dw/dw_sheet.html?id=${char.id}">${charname}</a></h2>
                     <span class="char-class">${char.hero_class} | Lvl ${char.level}</span>
                 </div>
 
@@ -612,7 +623,7 @@
                 </div>
 
                 <div style="margin-top:auto; display:flex; flex-direction:column; gap:10px;">
-                    <button class="btn" style="width:100%;" onclick="openMoveModal('${char.id}', '${char.name}')">Add Move</button>
+                    <button class="btn" style="width:100%;" onclick="openMoveModal('${char.id}', '${charname}')">Add Move</button>
                     <button class="btn" style="width:100%;" onclick="saveCard(${char.id})">Save Changes</button>
                 </div>
                 <div class="status-msg" id="status-${char.id}"></div>
@@ -664,11 +675,9 @@
             }
         }
 
-        function gridTemplate3() {
-            document.getElementById('cards-container').style.gridTemplateColumns = 'repeat(3, 1fr)';
-        }
-        function gridTemplate4() {
-            document.getElementById('cards-container').style.gridTemplateColumns = 'repeat(4, 1fr)';
+        function updateGridColumns() {
+            const cols = document.getElementById('column-select').value;
+            document.getElementById('cards-container').style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
         }
 
         /* Modal Logic */

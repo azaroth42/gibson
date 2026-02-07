@@ -1,0 +1,19 @@
+19,17,Khopesh of Madness,"On a 10+ for Hack and Slash, cause Madness in the target","{'"+3 damage'"}",0,1
+20,17,Longbow,"",{},0,1
+21,19,Hawke's Sword,Ancient,"{'"+2 damage'",reach,messy,forceful}",0,1
+22,19,Green Ring,From Snakefolk ghost. Reroll Defy Danger to resist poison,{},0,1
+23,18,The Blood Dagger,"Turns water into blood. Take 1/2 damage from undead. If used to kill a living creature, gain 10 HP","{'"+d4 damage'",life-stealing}",0,1
+24,18,Blindness Poison,"",{},0,1
+25,18,Sand Scorpion Venom,Causes paralysis,{},0,1
+26,18,Wyvern Venom,Reduces Strength,{},0,1
+27,18,Serpent's Tears,Roll damage twice against target and take the best,{},0,1
+28,18,Rapier,"","{'"Roll +DEX'"}",0,1
+29,18,Throwing Daggers,"",{},0,1
+30,18,Ancient Venom,"Magical poison, causes death (slowly), with magical black fog",{},0,1
+32,20,Shield,"","{'"+1 armor'"}",0,1
+33,20,Platemail,"","{'"2 armor'"}",0,1
+31,20,Longsword,"","{'"+1 damage'",'"1 piercing'"}",0,1
+34,21,Armor,"","{'"1 armor'"}",0,1
+35,21,Staff,"",{},0,1
+36,21,Crocodile Talisman,"When you cast a spell, you deal +1 damage and give +1 healing
+When you Defy Danger to resist magic, you get +1 to the roll ",{},0,1

@@ -75,9 +75,5 @@ The application will be available at `http://localhost:8000`.
 
 DW Notes:
 
-- Spell levels don't take up an advanced move slot
-- Cleric needs a way to get a Wizard spell list.
-- Multiclass moves
-
 - Thaddeus needs to spend +3 Stat points
 - Bodhi needs to spend 1 stat point, and level up
